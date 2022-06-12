@@ -150,9 +150,10 @@ lvim.plugins = {
     "jbyuki/one-small-step-for-vimkind",
     requires = { { "mfussenegger/nvim-dap" } },
   },
-  { "chaoren/vim-wordmotion" },
+  -- { "chaoren/vim-wordmotion" },
   { "folke/tokyonight.nvim" },
   { "svermeulen/vimpeccable" },
+  { "skywind3000/asyncrun.vim" },
   -- {
   --   "folke/trouble.nvim",
   --   cmd = "TroubleToggle",
@@ -208,11 +209,13 @@ dap.configurations.cs = dap.configurations.c_sharp
 
 -- DAP widgets (gui)
 local widgets = require('dap.ui.widgets')
-my_dap_sidebar = widgets.sidebar(widgets.scopes)
+local my_dap_sidebar = widgets.sidebar(widgets.scopes)
 -- end
 
 -- Neat bindings
 local vimp = require('vimp')
+-- unmap vimp bindings so the config can be reloaded
+vimp.unmap_all()
 
 local opts = { noremap = true, silent = true }
 local map = vim.api.nvim_set_keymap
@@ -223,7 +226,7 @@ map("n", "[<space>", "moO<esc>`o", opts)
 map("n", "]<space>", "moo<esc>`o", opts)
 
 -- Debugger mappings
--- map("n", ",h", ":DapStepOut<cr>", opts)
+-- map("n", ",h", ":DapStepOut<cr>", opts);
 -- map("n", ",l", ":DapStepInto<cr>", opts)
 -- map("n", ",j", ":DapStepOver<cr>", opts)
 -- map("n", ",c", ":DapContinue<cr>", opts)
@@ -233,7 +236,7 @@ lvim.builtin.which_key.mappings["dk"] = { "<cmd>lua require('dap.ui.widgets').ho
 vimp.nnoremap(",o", my_dap_sidebar.toggle)
 
 
-
 -- Colorscheme
 vim.g.tokyonight_style = 'storm'
 lvim.colorscheme = "tokyonight"
+
