@@ -55,13 +55,16 @@ lvim.builtin.telescope.defaults.mappings = {
 
 -- TODO: User Config for predefined plugins
 -- After changing plugin config exit and reopen LunarVim, Run :PackerInstall :PackerCompile
+lvim.builtin.dap.active = true
 lvim.builtin.alpha.active = true
 lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
-lvim.builtin.nvimtree.show_icons.git = 0
-lvim.builtin.dap.active = true
+
+if (lvim.builtin.nvimtree.show_icons) then
+  lvim.builtin.nvimtree.show_icons.git = 0
+end
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -146,6 +149,7 @@ lvim.builtin.treesitter.highlight.enabled = true
 
 -- Additional Plugins
 lvim.plugins = {
+  { "mfussenegger/nvim-dap" },
   {
     "jbyuki/one-small-step-for-vimkind",
     requires = { { "mfussenegger/nvim-dap" } },
@@ -154,11 +158,18 @@ lvim.plugins = {
   { "folke/tokyonight.nvim" },
   { "svermeulen/vimpeccable" },
   { "skywind3000/asyncrun.vim" },
+  {
+    "phaazon/hop.nvim",
+    as = "hop",
+    config = function() require 'hop'.setup() end,
+  },
+
   -- {
   --   "folke/trouble.nvim",
   --   cmd = "TroubleToggle",
   -- },
 }
+
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {
@@ -224,6 +235,16 @@ local map = vim.api.nvim_set_keymap
 map("n", "[<space>", "moO<esc>`o", opts)
 -- Add line below
 map("n", "]<space>", "moo<esc>`o", opts)
+
+
+-- configure hop
+require 'hop'.setup()
+
+map("n", "gw", "<cmd>HopWord<cr>", opts)
+map("n", "gL", "<cmd>HopLine<cr>", opts)
+map("n", "gF", "<cmd>HopChar1<cr>", opts)
+map("n", "g/", "<cmd>HopPattern<cr>", opts)
+
 
 -- Debugger mappings
 -- map("n", ",h", ":DapStepOut<cr>", opts);
