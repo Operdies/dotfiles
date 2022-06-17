@@ -1,0 +1,2 @@
+#!/bin/bash
+pgrep -x firewall-applet || /usr/bin/firewall-applet

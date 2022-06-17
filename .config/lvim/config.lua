@@ -204,8 +204,8 @@ dap.configurations.c_sharp = {
     program = "${workspaceFolder}/bin/Debug/tap.dll",
     cwd = "${workspaceFolder}/bin/Debug",
     stopOnEntry = false,
-    args = { 'package', 'install', 'TUI', '-v', '--version', 'any', '-t', '/usr/share/OpenTAP' },
-    -- args = {'package', 'list'},
+    -- args = { 'package', 'install', 'TUI', '-v', '--version', 'any', '-t', '/usr/share/OpenTAP' },
+    args = { 'completion', 'regenerate' },
     runInTerminal = false,
   },
   {
@@ -217,8 +217,6 @@ dap.configurations.c_sharp = {
 
 }
 dap.configurations.cs = dap.configurations.c_sharp
-
--- DAP widgets (gui)
 local widgets = require('dap.ui.widgets')
 local my_dap_sidebar = widgets.sidebar(widgets.scopes)
 -- end
@@ -235,6 +233,10 @@ local map = vim.api.nvim_set_keymap
 map("n", "[<space>", "moO<esc>`o", opts)
 -- Add line below
 map("n", "]<space>", "moo<esc>`o", opts)
+map("n", "<Down>", ":DapStepOver<cr>", { noremap = false, silent = true })
+map("n", "<Left>", ":DapStepOut<cr>", { noremap = false, silent = true })
+map("n", "<Right>", ":DapStepInto<cr>", { noremap = false, silent = true })
+map("n", "<Up>", ":DapContinue<cr>", { noremap = false, silent = true })
 
 
 -- configure hop
@@ -260,4 +262,3 @@ vimp.nnoremap(",o", my_dap_sidebar.toggle)
 -- Colorscheme
 vim.g.tokyonight_style = 'storm'
 lvim.colorscheme = "tokyonight"
-
