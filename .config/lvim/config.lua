@@ -149,6 +149,7 @@ lvim.builtin.treesitter.highlight.enabled = true
 
 -- Additional Plugins
 lvim.plugins = {
+  { "metakirby5/codi.vim" },
   { "mfussenegger/nvim-dap" },
   {
     "jbyuki/one-small-step-for-vimkind",
@@ -262,3 +263,35 @@ vimp.nnoremap(",o", my_dap_sidebar.toggle)
 -- Colorscheme
 vim.g.tokyonight_style = 'storm'
 lvim.colorscheme = "tokyonight"
+
+
+-- codi
+vim.g["codi#interpreters"] = {
+  csharp = {
+    bin = { "dotnet-script" },
+    prompt = "[>*] ",
+    quitcmd = "#exit"
+  },
+  bash = {
+    bin = { "bash" },
+    prompt = "[>$] ",
+    quitcmd = "exit"
+  },
+  zsh = {
+    bin = { "zsh" },
+    -- prompt not working, fix
+    prompt = "[➜] ",
+    quitcmd = "exit"
+  }
+}
+vim.g["codi#aliases"] = {
+  ["csx"] = "csharp",
+  ["cs"] = "csharp",
+  ["bash"] = "bash",
+  ["sh"] = "bash",
+  ["zsh"] = "zsh"
+}
+-- vim.g["codi#autocmd"] = "InsertLeave"
+vim.g["codi#autocmd"] = "None"
+map("n", "<C-c><C-c>", "<cmd>CodiUpdate<cr>", opts)
+map("n", "<C-c><C-e>", "<cmd>CodiExpand<cr>", opts)
