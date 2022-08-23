@@ -4,10 +4,10 @@
 
 # terminal emulator
 super + Return
-	xfce4-terminal
+	alacritty
 
 # program launcher
-super + d
+super + {d,space}
 	rofi -modi drun -show drun -line-padding 4 \
                 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
                 -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
@@ -137,6 +137,10 @@ super + alt + shift + {h,j,k,l}
 # move a floating window
 super + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
+
+# rotate window selection 
+super + {r, shift + r}
+  bspc node @parent --rotate {90, -90}
 #
 # Special hotkeys
 #
@@ -173,10 +177,14 @@ super + Print
 
 # Shortcuts
 super + w 
-  firefox
+  rofi -show calc \
+  -modi calc \
+  -config "~/.config/rofi/powermenu.rasi" \
+  -calc-command "echo -n '\{result\}' | xclip -selection clipboard"
 
 super + n 
   thunar  
 
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh
+
