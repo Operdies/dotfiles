@@ -1,0 +1,10 @@
+#!/bin/bash 
+
+while read -ra e; do 
+  name="$(bspc query -D -d "${e[2]}" --names)"
+  if [ $name = I ]; then
+    polybar-msg cmd hide
+  else
+    polybar-msg cmd show
+  fi
+done < <(bspc subscribe desktop_focus)

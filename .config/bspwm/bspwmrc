@@ -2,16 +2,7 @@
 
 pgrep -x sxhkd > /dev/null || sxhkd &
 
-
-if [[ $HOSTNAME == alex-endeavour ]]; then 
-  bspc monitor DP-4 -d D1 D2
-  bspc monitor HDMI-0 -d H1 H2
-else 
-  bspc monitor -d I II III IV V VI VII VIII IX X
-fi
-
-
-bspc config border_width         2
+bspc config border_width         1
 bspc config window_gap          12
 
 bspc config split_ratio          0.52
@@ -37,6 +28,16 @@ bspc config active_border_color         "#073642"
 #
 # Set display from arandr saved script
 sh ~/.screenlayout/monitor.sh &
+
+# configure monitors
+if [[ $HOSTNAME == alex-endeavour ]]; then 
+  bspc wm --reorder-monitors DP-4 HDMI-0
+  bspc monitor DP-4 -d D1 D2 D3 D4 D5
+  bspc monitor HDMI-0 -d H1 H2 H3
+else 
+  bspc monitor -d I II III IV V VI VII VIII IX X
+fi
+
 # Bar
 ~/.config/polybar/launch.sh &
 # Notifications
