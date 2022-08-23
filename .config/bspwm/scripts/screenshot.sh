@@ -8,6 +8,10 @@ option2="window"
 # options to be displyed
 options="$option0\n$option1\n$option2"
 
+scrot () {
+  command scrot $@ '/tmp/%F_%T_$wx$h.png' -e 'xclip -selection clipboard -target image/png -i $f'
+}
+
 selected="$(echo -e "$options" | rofi -lines 3 -dmenu -p "scrot")"
 case $selected in
     $option0)
