@@ -93,4 +93,16 @@ function Iconography {
   done
 }
 
-Iconography
+# Always run the script once. Otherwise it won't show output
+# before the first bspc event fires
+echo $(Iconography)
+
+echo "yes" >> ~/startcount
+
+while read -ra e; do 
+  # echo here to send a newline. Otherwise polybar won't update.
+  echo $(Iconography)
+done < <(stdbuf -i0 -o0 -e0 bspc subscribe node_add node_remove desktop_focus)
+# It seems polybar messes with the output buffering of 'bspc subscribe'
+# Here we use 'stdbuf' to disable buffering and minimize latency
+

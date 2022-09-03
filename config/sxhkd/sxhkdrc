@@ -183,7 +183,7 @@ super + w
   -calc-command "echo -n '\{result\}' | xclip -selection clipboard"
 
 super + m
-  echo 'tiled\nmonocle\nrtall' | rofi -dmenu | xargs bsp-layout set
+  echo 'rtall\nrwide\ntiled\nmonocle' | rofi -dmenu | xargs bsp-layout set
 
 super + F2
   polybar-msg cmd toggle
