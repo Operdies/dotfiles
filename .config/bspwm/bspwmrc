@@ -69,8 +69,6 @@ dex -a -s /etc/xdg/autostart/:~/.config/autostart/
 # This hack just kills them all and starts a new one
 pkill firewall-applet 
 firewall-applet &
-# Picom
-# picom -CGb &
 # Network Applet
 nm-applet --indicator &
 
@@ -83,17 +81,6 @@ xsetroot -cursor_name left_ptr &
 # Set caps = escape
 setxkbmap -option caps:escape
 # pgrep -x xautolock > /dev/null || xautolock -time 30 -locker "systemctl suspend" -detectsleep &
-
-# enable window transparency
-pgrep compton || compton &
-
-
-# Force full composition
-# prevents screen tearing
-# Also causes lag in looking-glass
-# Investigate this further perhaps?
-# Is a regular (non-full) composition pipeline fine?
-# nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
 
 # disable screen sleeping on inactivity
 xset -dpms &

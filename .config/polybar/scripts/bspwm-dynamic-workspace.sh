@@ -8,6 +8,7 @@ function GetWindows {
     [ (parent | parent | parent | .name) + "
 " + .className ][]'
   # Here we traverse the parent stack to get back to the name of the workspace
+  # the resulting data structure is an associative array of workspace name followed by window class name
 }
 
 function GetIcon {
@@ -28,7 +29,7 @@ function GetIcon {
     [Dd]iscord)
       echo -ne ""
       ;;
-    [Ss]potify)
+    [Ss]potify|"")
       echo -ne ""
       ;;
     [Tt]hunar)
@@ -44,35 +45,52 @@ function FocusedWorkspace {
   bspc query -D  --names -d .focused
 }
 
+function WriteWindows {
+  local windows=($@)
+  for win in ${windows[@]}; do
+    echo -ne $(GetIcon $win)
+  done;
+}
+
 function Iconography {
   local focused="$(FocusedWorkspace)"
   local windows=($(GetWindows))
-  local current=""
+  declare -A groups
+  # Associative arrays are not ordered 
+  # Store the keys in an ordered array for future lookups
+  declare -a groupOrder
 
-  for ((i=0; i < ${#windows[@]}; i+=2)); do
+  for ((i=0; i < ${#windows[@]}; i+=2)); do 
     local workspace=${windows[i]}
     local class=${windows[i+1]}
-
-    if [ ! "$current" = "$workspace" ]; then
-      if [ ! -z "$current" ]; then 
-        echo -ne "]%{A} "
-      fi
-
-      echo -ne "%{A1:bspc desktop -f $workspace:}"
-
-      if [ "$workspace" = "$focused" ]; then
-        echo -ne "%{F#aaf}"
-      else
-        if [ "$current" = "$focused" ]; then 
-          echo -ne "%{F-}"
-        fi
-      fi
-      echo -ne "$workspace ["
+    if [ "${groups[$workspace]}" = "" ]; then
+      groupOrder[${#groupOrder[@]}]=$workspace
     fi
-    current="$workspace"
-    echo -ne " $(GetIcon $class) "
+    groups[$workspace]+=" $class "
   done
-  echo "]"
+
+  for workspace in ${groupOrder[@]}; do
+    local windows=(${groups[$workspace]})
+
+    # Register a click command to select this workspace
+    echo -ne "%{A1:bspc desktop -f $workspace:}"
+
+    local fgStart=""
+    local fgEnd=""
+    local bgStart=""
+    local bgEnd=""
+
+    if [ "$workspace" = "$focused" ]; then
+      fgEnd="%{F-}"
+      bgEnd="%{B-}"
+      bgStart="%{B#73d0ff}"
+      fgStart="%{F#000}"
+    fi
+
+    echo -ne " $fgStart$bgStart$workspace [ $(WriteWindows ${windows[@]}) ]$bgEnd$fgEnd "
+    # End the click command
+    echo -ne "%{A}"
+  done
 }
 
 Iconography
