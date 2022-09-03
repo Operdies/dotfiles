@@ -21,7 +21,7 @@ function GetIcon {
       echo -ne ""
       ;;
     [Aa]lacritty)
-      echo -ne ""
+      echo -ne ""
       ;;
     [Cc]hrome|[Cc]hromium)
       echo -ne ""
@@ -31,6 +31,9 @@ function GetIcon {
       ;;
     [Tt]hunar)
       echo -ne ""
+      ;;
+    [Pp]avucontrol)
+      echo -ne ""
       ;;
     *)
       echo -ne $class
@@ -62,6 +65,7 @@ function WriteWindows {
     fi
   done;
 
+  declare -a WinIcons
   for win in ${!Assoc[@]}; do 
     local cnt=${Assoc[$win]}
     local superscript=""
@@ -71,8 +75,9 @@ function WriteWindows {
       fi
       superscript=${superscripts[$cnt]}
     fi
-    echo -ne " $(GetIcon $win)$superscript "
+    WinIcons[${#WinIcons[@]}]="$(GetIcon $win)$superscript"
   done
+  echo -ne ${WinIcons[@]}
 }
 
 function Iconography {
