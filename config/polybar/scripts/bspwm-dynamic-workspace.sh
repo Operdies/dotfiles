@@ -48,7 +48,7 @@ function FocusedWorkspace {
 function WriteWindows {
   local windows=($@)
   for win in ${windows[@]}; do
-    echo -ne $(GetIcon $win)
+    echo -ne " $(GetIcon $win) "
   done;
 }
 

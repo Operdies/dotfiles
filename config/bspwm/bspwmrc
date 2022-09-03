@@ -22,11 +22,11 @@ bspc config ignore_ewmh_focus true
 
 bspc config top_padding 30
 # Hide polybar on desktop 1
-# bspc config -d I top_padding -30
+bspc config -d I top_padding -30
 # Always put looking-glass-client on I
 bspc rule -a looking-glass-client desktop=I
 # Set polybar state to hidden on desktop I 
-# pgrep no-bar-on-ws1 || ~/.config/bspwm/scripts/window-management/no-bar-on-ws1 &
+pgrep no-bar-on-ws1 || ~/.config/bspwm/scripts/window-management/no-bar-on-ws1 &
 
 bspc rule -a "" desktop=III
 bspc rule -a discord desktop=III
@@ -85,3 +85,9 @@ setxkbmap -option caps:escape
 # disable screen sleeping on inactivity
 xset -dpms &
 xset s off &
+
+# picom
+# -C: Avoid drawing shadows on dock/panel windows.
+# -G: Don't draw shadows on DND windows
+# -b: daemon mode
+# picom -CGb --config-path /dev/null
