@@ -44,10 +44,6 @@ super + alt + {q,r}
 super + {_,shift + }q
 	bspc node -{c,k}
 
-# alternate between the tiled and monocle layout
-super + m
-	bspc desktop -l next
-
 # send the newest marked node to the newest preselected node
 super + y
 	bspc node newest.marked.local -n newest.!automatic.local
@@ -101,6 +97,10 @@ super + {o,i}
 # focus or send to the given desktop
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
+
+# bubble desktop
+super + {Left, Right}
+  bspc desktop focused -b {prev, next}
 
 #
 # preselect
@@ -182,8 +182,11 @@ super + w
   -config "~/.config/rofi/powermenu.rasi" \
   -calc-command "echo -n '\{result\}' | xclip -selection clipboard"
 
-super + n 
-  thunar  
+super + m
+  echo 'tiled\nmonocle\nrtall' | rofi -dmenu | xargs bsp-layout set
+
+super + F2
+  polybar-msg cmd toggle
 
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh

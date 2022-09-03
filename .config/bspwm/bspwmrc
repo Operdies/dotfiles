@@ -17,13 +17,18 @@ bspc config single_monocle true
 bspc config pointer_follows_focus false
 bspc config focus_follows_pointer false
 
+# prevent windows from stealing focus
+bspc config ignore_ewmh_focus true
+
+bspc config top_padding 30
 # Hide polybar on desktop 1
-bspc config -d I top_padding -30
+# bspc config -d I top_padding -30
 # Always put looking-glass-client on I
 bspc rule -a looking-glass-client desktop=I
 # Set polybar state to hidden on desktop I 
 # pgrep no-bar-on-ws1 || ~/.config/bspwm/scripts/window-management/no-bar-on-ws1 &
 
+bspc rule -a "" desktop=III
 bspc rule -a discord desktop=III
 
 # bspc rule -a Gimp desktop='^8' state=floating follow=on
@@ -89,3 +94,7 @@ pgrep compton || compton &
 # Investigate this further perhaps?
 # Is a regular (non-full) composition pipeline fine?
 # nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
+
+# disable screen sleeping on inactivity
+xset -dpms &
+xset s off &
