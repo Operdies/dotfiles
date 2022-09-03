@@ -97,8 +97,6 @@ function Iconography {
 # before the first bspc event fires
 echo $(Iconography)
 
-echo "yes" >> ~/startcount
-
 while read -ra e; do 
   # echo here to send a newline. Otherwise polybar won't update.
   echo $(Iconography)
