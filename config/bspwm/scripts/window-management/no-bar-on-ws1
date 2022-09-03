@@ -2,7 +2,7 @@
 
 while read -ra e; do 
   name="$(bspc query -D -d "${e[2]}" --names)"
-  if [ $name = I ]; then
+  if [ $name = 1 ]; then
     polybar-msg cmd hide
   else
     polybar-msg cmd show

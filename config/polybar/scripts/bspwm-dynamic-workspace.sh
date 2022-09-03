@@ -30,7 +30,7 @@ function GetIcon {
       echo -ne "ﭮ"
       ;;
     [Ss]potify|"")
-      echo -ne ""
+      echo -ne ""
       ;;
     [Tt]hunar)
       echo -ne ""
@@ -87,7 +87,7 @@ function Iconography {
       fgStart="%{F#000}"
     fi
 
-    echo -ne " $fgStart$bgStart$workspace [ $(WriteWindows ${windows[@]}) ]$bgEnd$fgEnd "
+    echo -ne "$fgStart$bgStart $workspace [ $(WriteWindows ${windows[@]}) ] $bgEnd$fgEnd"
     # End the click command
     echo -ne "%{A}"
   done
