@@ -102,7 +102,13 @@ echo "yes" >> ~/startcount
 while read -ra e; do 
   # echo here to send a newline. Otherwise polybar won't update.
   echo $(Iconography)
-done < <(stdbuf -i0 -o0 -e0 bspc subscribe node_add node_remove desktop_focus node_swap node_transfer)
+done < <(stdbuf -i0 -o0 -e0 \
+  bspc subscribe \
+  node_add \
+  node_remove \
+  desktop_focus \
+  node_swap \
+  node_transfer)
 # It seems polybar messes with the output buffering of 'bspc subscribe'
 # Here we use 'stdbuf' to disable buffering and minimize latency
 
