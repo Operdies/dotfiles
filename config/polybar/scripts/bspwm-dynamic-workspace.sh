@@ -68,16 +68,37 @@ function WriteWindows {
   declare -a WinIcons
   for win in ${!Assoc[@]}; do 
     local cnt=${Assoc[$win]}
-    local superscript=""
+    # If there is more than one window of the same class,
+    # we want to add a superscript denoting the number of windows.
+    # If there is only one window, we want to add a space 
+    # before the next icon.
+    local superscript=" "
     if (( cnt > 1 )); then
       if (( cnt >= ${#superscripts[@]} )); then
         cnt=$((${#superscripts[@]}-1))
       fi
       superscript=${superscripts[$cnt]}
     fi
-    WinIcons[${#WinIcons[@]}]="$(GetIcon $win)$superscript"
+    local w="$(GetIcon $win)$superscript"
+    WinIcons[${#WinIcons[@]}]="$w"
   done
-  echo -ne ${WinIcons[@]}
+
+  # Printing the icons is a bit convoluted here because
+  # we want some special behavior. We want to have a space
+  # between icons only if there is no supercript, but we 
+  # want to omit the space for the last element.
+  local numIcons=${#WinIcons[@]}
+  local i=0
+  for icon in "${WinIcons[@]}"; do 
+    i=$((i+1))
+    if ((numIcons <= i)); then
+      # omit trailing spaces
+      echo -ne $icon
+    else
+      echo -ne "$icon"
+    fi
+  done
+
 }
 
 function Iconography {
