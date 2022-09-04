@@ -111,12 +111,18 @@ function Iconography {
     local underlineEnd=""
 
     if [ "$workspace" = "$focused" ]; then
-      fgEnd="%{F-}"
-      # bgEnd="%{B-}"
-      # bgStart="%{B#73d0ff}"
-      fgStart="%{F#fff}"
-      underlineStart="%{u#fff}%{+u}"
-      underlineEnd="%{-u}"
+      if [ ! -z $FOREGROUND_COLOR ]; then
+        fgStart="%{F$FOREGROUND_COLOR}"
+        fgEnd="%{F-}"
+      fi
+      if [ ! -z $BACKGROUND_COLOR ]; then
+        bgStart="%{B$BACKGROUND_COLOR}"
+        bgEnd="%{B-}"
+      fi
+      if [ ! -z $ACCENT_COLOR ]; then 
+        underlineStart="%{u$ACCENT_COLOR}%{+u}"
+        underlineEnd="%{-u}"
+      fi
     fi
 
     local subscript=${_SUBSCRIPT_MAPPING[$workspace]}
