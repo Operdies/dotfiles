@@ -70,7 +70,7 @@ function WriteWindows {
     local cnt=${Assoc[$win]}
     local superscript=""
     if (( cnt > 1 )); then
-      if (( cnt > ${#superscripts[@]} )); then
+      if (( cnt >= ${#superscripts[@]} )); then
         cnt=$((${#superscripts[@]}-1))
       fi
       superscript=${superscripts[$cnt]}
