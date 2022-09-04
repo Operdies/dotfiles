@@ -36,7 +36,7 @@ function GetIcon {
       echo -ne ""
       ;;
     *)
-      echo -ne $class
+      echo -ne ""
       ;;
   esac
 }
@@ -107,16 +107,20 @@ function Iconography {
     local fgEnd=""
     local bgStart=""
     local bgEnd=""
+    local underlineStart=""
+    local underlineEnd=""
 
     if [ "$workspace" = "$focused" ]; then
       fgEnd="%{F-}"
-      bgEnd="%{B-}"
-      bgStart="%{B#73d0ff}"
-      fgStart="%{F#000}"
+      # bgEnd="%{B-}"
+      # bgStart="%{B#73d0ff}"
+      fgStart="%{F#fff}"
+      underlineStart="%{u#fff}%{+u}"
+      underlineEnd="%{-u}"
     fi
 
     local subscript=${_SUBSCRIPT_MAPPING[$workspace]}
-    echo -ne "$fgStart$bgStart$subscript[$(WriteWindows ${windows[@]})]$bgEnd$fgEnd"
+    echo -ne "$fgStart$bgStart$underlineStart$subscript[$(WriteWindows ${windows[@]})]$underlineEnd$bgEnd$fgEnd"
     # End the click command
     echo -ne "%{A}"
   done
