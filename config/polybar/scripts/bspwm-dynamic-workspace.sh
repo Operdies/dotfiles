@@ -1,14 +1,14 @@
 #!/bin/bash
+
 function GetWindows {
-  bspc wm -d | yq '.monitors[] | 
-    .desktops[] | 
-    .root | 
-    [.. | select(has("client"))][] | 
-    .client | select(has("className")) | 
-    [ (parent | parent | parent | .name) + "
-" + .className ][]'
-  # Here we traverse the parent stack to get back to the name of the workspace
-  # the resulting data structure is an associative array of workspace name followed by window class name
+  bspc wm -d | yq '.monitors | 
+    map_values(. as $m | .desktops | 
+      map_values(. as $d | 
+      $d.root | .. | select(has("firstChild")) | .client | select(.className != null) | .className | [ . ] | . as $windowNames | select(length > 0) |
+            [ "__DESKTOP__", $d.name, $windowNames ]
+      )
+    ) | flatten | .[]'
+# select(has("firstChild")) | .client | select(.className != null) | .className
 }
 
 function GetIcon {
@@ -108,14 +108,20 @@ function Iconography {
   # Associative arrays are not ordered 
   # Store the keys in an ordered array for future lookups
   declare -a groupOrder
+  local currentDesktop=""
 
-  for ((i=0; i < ${#windows[@]}; i+=2)); do 
-    local workspace=${windows[i]}
-    local class=${windows[i+1]}
-    if [ "${groups[$workspace]}" = "" ]; then
-      groupOrder[${#groupOrder[@]}]=$workspace
-    fi
-    groups[$workspace]+=" $class "
+  for ((i = 0; i < ${#windows[@]}; i++)); do 
+    local item="${windows[$i]}"
+    case $item in 
+      __DESKTOP__)
+        i=$((i+1))
+        currentDesktop="${windows[$i]}"
+        groupOrder[${#groupOrder[@]}]="$currentDesktop"
+        ;;
+      *)
+        groups[$currentDesktop]+=" $item "
+        ;;
+    esac
   done
 
   for workspace in ${groupOrder[@]}; do
@@ -152,6 +158,8 @@ function Iconography {
     echo -ne "%{A}"
   done
 }
+
+
 
 # Always run the script once. Otherwise it won't show output
 # before the first bspc event fires
