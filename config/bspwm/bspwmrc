@@ -22,7 +22,7 @@ bspc config ignore_ewmh_focus true
 
 bspc config top_padding 30
 # Hide polybar on desktop 1
-bspc config -d I top_padding -30
+bspc config -d 1 top_padding -30
 # Always put looking-glass-client on I
 bspc rule -a looking-glass-client desktop=^1
 # Set polybar state to hidden on desktop I 
