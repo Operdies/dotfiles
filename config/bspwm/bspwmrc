@@ -24,8 +24,8 @@ bspc rule -a Gimp desktop='^8' state=floating follow=on
  
 # This is my work machine-id
 if [[ $(cat /etc/machine-id) == "a5451bc2a11f49538e0d74f70c3216b2" ]]; then
+  pgrep border_only_active_window || ~/.config/bspwm/scripts/window-management/border_only_active_window 4 &
   bspc config top_padding 40
-  bspc config border_width 4
   bspc config window_gap 16
 else 
   bspc config top_padding 30
@@ -35,9 +35,9 @@ else
   bspc rule -a looking-glass-client desktop=^1
   # Set polybar state to hidden on desktop I
   pgrep no-bar-on-ws1 || ~/.config/bspwm/scripts/window-management/no-bar-on-ws1 &
+  pgrep border_only_active_window || ~/.config/bspwm/scripts/window-management/border_only_active_window 2 &
 
   bspc config single_monocle true
-  bspc config border_width 2
   bspc config window_gap 8
   bspc rule -a discord desktop=^3
 fi

@@ -1,0 +1,14 @@
+#!/bin/bash
+# Only show a border around the currently active window
+
+for pid in $(pidof -x border_only_active_window); do 
+  if [ $pid != $$ ]; then 
+    kill $pid
+    echo "Killing sibling"
+  fi
+done
+WIDTH=$1
+while read -ra e; do 
+  bspc config -d focused border_width 1
+  bspc config -n focused border_width $WIDTH
+done < <(bspc subscribe node_focus)
