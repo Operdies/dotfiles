@@ -94,8 +94,6 @@ xset -dpms &
 xset s off &
 
 # picom
-# -C: Avoid drawing shadows on dock/panel windows.
-# -G: Don't draw shadows on DND windows
 # -b: daemon mode
-# picom -CGb --config /dev/null
+picom -b --config ~/.config/picom.conf
 
