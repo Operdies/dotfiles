@@ -29,7 +29,7 @@ else
   # Hide polybar on desktop 1
   # bspc config -d 1 top_padding -30
   # Always put looking-glass-client on I
-  bspc rule -a looking-glass-client desktop=^1 state=pseudo_tiled rectangle=1920x1080+0+0 center=true private=on
+  bspc rule -a looking-glass-client desktop=^1 state=pseudo_tiled center=true private=on
   # Set polybar state to hidden on desktop I
   # pgrep no-bar-on-ws1 || ~/.config/bspwm/scripts/window-management/no-bar-on-ws1 &
   # pgrep border_only_active_window || ~/.config/bspwm/scripts/window-management/border_only_active_window 2 &
