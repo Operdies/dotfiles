@@ -19,10 +19,17 @@ super + ctrl + d
                 -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
 
 # show ssh sesssions
-super + shift + d
-	rofi -modi drun -show ssh -line-padding 4 \
-                -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
-                -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
+# super + shift + d
+# 	rofi -modi drun -show ssh -line-padding 4 \
+#                 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
+#                 -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
+
+# show VM launcher 
+super + shift + d 
+  ~/repos/polybar-nats-iconography/query | \
+  rofi -dmenu -i -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal | \
+  xargs ~/repos/polybar-nats-iconography/launch
+  
 
 # power-menu 
 super + shift + e
@@ -141,6 +148,10 @@ super + {Left,Down,Up,Right}
 # rotate window selection 
 super + {r, shift + r}
   bspc node @parent --rotate {90, -90}
+
+# Balance the size of all windows 
+super + shift + b 
+  bspc node @/ -B
 #
 # Special hotkeys
 #
