@@ -158,11 +158,11 @@ super + shift + b
 
 # Multimedia keys
 XF86AudioRaiseVolume
-  amixer -q set Master 5%+ unmute
+  ~/.config/sxhkd/scripts/volume.sh inc 0.05
 
 # Still multimedia
 XF86AudioLowerVolume
-  amixer -q set Master 5%- unmute
+  ~/.config/sxhkd/scripts/volume.sh dec 0.05
 
 # still
 XF86AudioMute
