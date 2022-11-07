@@ -158,11 +158,11 @@ super + shift + b
 
 # Multimedia keys
 XF86AudioRaiseVolume
-  ~/.config/sxhkd/scripts/volume.sh inc 0.05
+  pactl set-sink-volume 0 +5% && pactl set-sink-mute 0 0
 
 # Still multimedia
 XF86AudioLowerVolume
-  ~/.config/sxhkd/scripts/volume.sh dec 0.05
+  pactl set-sink-volume 0 -5% && pactl set-sink-mute 0 0
 
 # still
 XF86AudioMute
