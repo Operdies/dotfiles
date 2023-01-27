@@ -4,7 +4,7 @@
 
 # terminal emulator
 super + Return
-	alacritty
+	wezterm start
 
 # program launcher
 super + {d,space}
@@ -182,6 +182,9 @@ XF86MonBrightnessDown
 # Screenshot
 Print
   scrot ~/Pictures/Screenshot-$(date +%F_%T).png
+
+super + shift + s
+  ~/.config/bspwm/scripts/screenshot.sh
 
 super + Print
   ~/.config/bspwm/scripts/screenshot.sh
