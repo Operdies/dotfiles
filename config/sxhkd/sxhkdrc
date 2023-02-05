@@ -4,7 +4,7 @@
 
 # terminal emulator
 super + Return
-	alacritty
+	wezterm start
 
 # program launcher
 super + {d,space}
@@ -28,7 +28,13 @@ super + ctrl + d
 super + shift + d 
   ~/repos/polybar-nats-iconography/query | \
   rofi -dmenu -i -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal | \
-  xargs ~/repos/polybar-nats-iconography/launch
+  xargs ~/repos/polybar-nats-iconography/launch 
+  
+# show VM admin launcher 
+super + ctrl + shift + d 
+  ~/repos/polybar-nats-iconography/query | \
+  rofi -dmenu -i -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal | \
+  xargs ~/repos/polybar-nats-iconography/launch adm
   
 
 # power-menu 
@@ -89,7 +95,7 @@ super + bracket{left,right}
 
 # focus the last node/desktop
 super + {grave,Tab}
-	bspc {node,desktop} -f last
+	bspc {node,desktop} -f last.local
 
 # focus the older or newer node in the focus history
 super + {o,i}
@@ -108,10 +114,6 @@ super + {_,shift + }{1-9,0}
 # bubble desktop
 # super + {Left, Right}
 #   bspc desktop focused -b {prev, next}
-
-#
-# preselect
-#
 
 # preselect the direction
 super + ctrl + {h,j,k,l}
@@ -187,17 +189,20 @@ super + Print
   ~/.config/bspwm/scripts/screenshot.sh
 
 # Shortcuts
-super + w 
-  rofi -show calc \
-  -modi calc \
-  -config "~/.config/rofi/powermenu.rasi" \
-  -calc-command "echo -n '\{result\}' | xclip -selection clipboard"
+# super + w 
+#   rofi -show calc \
+#   -modi calc \
+#   -config "~/.config/rofi/powermenu.rasi" \
+#   -calc-command "echo -n '\{result\}' | xclip -selection clipboard"
 
 super + m
   bsp-layout layouts | rofi -dmenu | xargs bsp-layout set
 
 super + F2
   polybar-msg cmd toggle
+
+super + w
+  echo cgo | nats request Shell.StartService cgo
 
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh
