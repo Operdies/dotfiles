@@ -111,9 +111,9 @@ super + g
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
 
-# bubble desktop
-# super + {Left, Right}
-#   bspc desktop focused -b {prev, next}
+bubble desktop
+super + {Left, Right}
+  bspc desktop focused -b {prev, next}
 
 # preselect the direction
 super + ctrl + {h,j,k,l}
