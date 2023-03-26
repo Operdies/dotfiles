@@ -32,4 +32,7 @@ return {
 			username = "alexw",
 		},
 	},
+	keys = {
+		{ key = "Enter", mods = "ALT", action = wezterm.action.DisableDefaultAssignment },
+	},
 }
