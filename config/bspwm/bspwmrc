@@ -79,12 +79,15 @@ virtual-triple-pip-mode() {
 	export RIGHT="vir2"
 	export MIDDLE="vir3"
 
+  # Save the current focus so we can restore it after setting up monitors
+	FOCUSED="$(bspc query -n focused -N)"
+
 	# Ensure the main monitor is focused
 	bspc monitor -f "$DISPLAY_NAME"
 	# Configure the virtual monitors in xrandr if they are not already
 	if ! xrandr --listactivemonitors | grep -q "vir"; then
 		# Set the monitors with xrandr so other programs (polybar) know about the virtual displays as well
-		xrandr --setmonitor "$LEFT" 1280/297x1440/340+0+0 "$DISPLAY_NAME"
+		xrandr --setmonitor "$LEFT" 1280/297x1440/340+0+0 none #"$DISPLAY_NAME"
 		xrandr --setmonitor "$RIGHT" 1280/298x1440/340+3840+0 none
 		xrandr --setmonitor "$MIDDLE" 2560/595x1440/340+1280+0 none
 
@@ -99,16 +102,16 @@ virtual-triple-pip-mode() {
 		bspc wm -a "$MIDDLE" "2560x1440+1280+0"
 		bspc wm -a "$RIGHT" "1280x1440+3840+0"
 	fi
-	#
+
+	# Restore focus
+	bspc node -f "$FOCUSED"
+
 	# We don't want any top padding for the QHD monitor
 	bspc config -m "$MIDDLE" top_padding 0
 
 	bspc monitor $LEFT -d 1 2 3
 	bspc monitor $RIGHT -d 4 5 6
 	bspc monitor $MIDDLE -d 7 8 9 0
-
-	# Restore focus
-	bspc node -f "$FOCUSED"
 
 	# Explicitly reorder the monitors to ensure the workspace order is correct
 	bspc wm --reorder-monitors $LEFT $RIGHT $MIDDLE
@@ -147,7 +150,7 @@ bspc rule -a 'Virt-manager:*' state=floating
 bspc rule -a 'Arandr:*' state=floating
 bspc rule -a 'Blueman-manager:*' state=floating
 bspc rule -a "Thunar:*" state=floating
-bspc rule -a "Steam" desktop=^4
+bspc rule -a 'Steam:*' desktop=^4 state=floating
 
 bspc config top_padding 40
 bspc config window_gap 12
