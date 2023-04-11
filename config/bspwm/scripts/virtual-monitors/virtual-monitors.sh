@@ -25,7 +25,7 @@ virtual_split() {
 	local FOCUSED="$(bspc query -n focused -N)"
 	local DISPLAY_NAME="${1}"
 	local RATIO="${2}"
-  local dims=($(get_dimensions "$DISPLAY_NAME"))
+	local dims=($(get_dimensions "$DISPLAY_NAME"))
 	local WIDTH="${dims[0]}"
 	local HEIGHT="${dims[1]}"
 	local LEFT="${DISPLAY_NAME}-left"
@@ -40,9 +40,10 @@ virtual_split() {
 
 	bspc monitor "$LEFT" -d 1 2 3
 	bspc monitor "$RIGHT" -d 4 5 6
+	bspc monitor "$DISPLAY_NAME" -d 7
 
 	bspc wm --adopt-orphans
-	bspc wm --reorder-monitors "$LEFT" "$RIGHT"
+	bspc wm --reorder-monitors "$LEFT" "$RIGHT" "$DISPLAY_NAME"
 	bspc node -f "$FOCUSED"
 	bspc wm --record-history on
 }

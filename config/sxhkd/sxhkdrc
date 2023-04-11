@@ -57,7 +57,7 @@ super + y
 
 # swap the current node and the biggest window
 super + g
-	bspc node -s biggest.window.local
+  ~/.config/bspwm/scripts/window-management/swap-biggest-or-last.sh
 
 #
 # state/flags
