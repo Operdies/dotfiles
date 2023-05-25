@@ -45,9 +45,11 @@ super + shift + e
 super + Escape
 	pkill -USR1 -x sxhkd
 
-#
+# Insert; { Insert, Home, Prior, Delete, End, Next }
+#   bspc desktop -f { 1, 0, 4, 2, 9, 5 }
+
 # bspwm hotkeys
-#
+
 
 # quit/restart bspwm
 super + alt + {q,r}
@@ -104,12 +106,15 @@ super + {o,i}
 	bspc wm -h on
 
 # swap the current node and the biggest window, or the last selected node if the biggest window is selected
-super + g
-  ~/.config/bspwm/scripts/window-management/swap-biggest-or-last.sh
+super + {_, shift+}g
+  ~/.config/bspwm/scripts/window-management/swap-biggest-or-last.sh {local, global}
 
 # focus or send to the given desktop
-super + {_,shift + }{1-9,0}
-	bspc {desktop -f,node -d} '^{1-9,10}'
+super + shift + {1-9,0}
+	bspc node -d '^{1-9,10}'
+
+super + {1,2,3}
+  sh ~/.config/bspwm/scripts/window-management/tabber.sh {1,2,3}
 
 bubble desktop
 super + {Left, Right}
@@ -131,9 +136,6 @@ super + ctrl + space
 super + ctrl + shift + space
 	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
 
-#
-# move/resize
-#
 
 # expand a window by moving one of its side outward
 super + alt + {h,j,k,l}

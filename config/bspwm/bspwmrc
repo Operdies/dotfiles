@@ -1,19 +1,59 @@
 #!/bin/bash
 
 pgrep -x sxhkd >/dev/null || sxhkd &
+pgrep -x redshift >/dev/null || redshift &
+
+
+if xrandr --listactivemonitors | grep -q "DP-4"; then
+	export DISPLAY_NAME="DP-4"
+  export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
+else
+	export DISPLAY_NAME="DisplayPort-1"
+  export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
+fi
+
+# if xrandr --listactivemonitors | grep -q "DisplayPort-1"; then
+# 	export DISPLAY_NAME="DisplayPort-1"
+#   export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
+# else
+# 	export DISPLAY_NAME="DP-4"
+#   export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
+# fi
+
+default-config() {
+	bspc config split_ratio 0.50
+	bspc config borderless_monocle true
+	bspc config gapless_monocle false
+	bspc config pointer_follows_focus true
+	bspc config focus_follows_pointer true
+
+	# prevent windows from stealing focus
+	bspc config ignore_ewmh_focus true
+	bspc config top_padding 40
+	bspc config window_gap 12
+	# Border
+	bspc config border_width 2
+	bspc config focused_border_color "#ac21c4"
+	bspc config normal_border_color "#073642"
+	bspc config active_border_color "#073642"
+	bspc config single_monocle false
+
+	# Some wine applications behave weird with borders.
+	# Floating windows move diagonally off the screen unless tiled.
+	~/.config/bspwm/scripts/window-management/no_border_wine &
+}
 
 ultrawide() {
-	DISPLAY_NAME="DisplayPort-1"
-  export RIGHT="$DISPLAY_NAME"
-	~/.screenlayout/amd.sh
+	export RIGHT="$DISPLAY_NAME"
+  $MONITOR_SCRIPT
 	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
 	~/.config/polybar/launch.sh kill
 	~/.config/polybar/launch.sh right
-
 }
 
 pip-mode() {
-	export LEFT="HDMI-0"
+	export LEFT="$DISPLAY_NAME"
+	# export LEFT="HDMI-0"
 	export RIGHT="DP-4"
 
 	~/.screenlayout/pip.sh
@@ -22,64 +62,19 @@ pip-mode() {
 	bspc monitor $LEFT -d 7 8 9 0
 	# Explicitly set the monitor order to ensure DP-4 workspaces precede HDMI-0 workspaces
 	bspc wm --reorder-monitors $RIGHT $LEFT
+
+	default-config
 }
 
-virtual-pip-mode() {
-	# Store the focused node so we can restore it later
-	FOCUSED="$(bspc query -n focused -N)"
-	~/.screenlayout/amd.sh
-	DISPLAY_NAME="DisplayPort-1"
-	export LEFT="vir1"
-	export RIGHT="vir2"
-	export FHD="FHD"
-	export QHD="QHD"
-
-	# Ensure the main monitor is focused
-	bspc monitor -f "$DISPLAY_NAME"
-	# Configure the virtual monitors in xrandr if they are not already
-	if ! xrandr --listactivemonitors | grep -q "vir"; then
-		# Set the monitors with xrandr so other programs (polybar) know about the virtual displays as well
-		xrandr --setmonitor "$LEFT" 2560/595x1440/340+0+0 "$DISPLAY_NAME"
-		xrandr --setmonitor "$RIGHT" 2560/595x1440/340+2560+0 none
-
-		# Force a resolution change to ensure the changes are propagated (not sure if this is needed?)
-		xrandr --fb 5121x1440
-		xrandr --fb 5120x1440
-	fi
-
-	# If the virtual monitors are not already configured, create them
-	if ! bspc query -M --names | grep -q vir; then
-		bspc wm -a "$LEFT" "2560x1440+0+0"
-		bspc wm -a "$RIGHT" "2560x1440+2560+0"
-		bspc wm -a "$FHD" "1920x1080+1600+180"
-		bspc wm -a "$QHD" "2560x1440+1280+0"
-	fi
-	#
-	# We don't want any top padding for the QHD monitor
-	bspc config -m "$QHD" top_padding 0
-
-	bspc monitor $LEFT -d 1 2 3
-	bspc monitor $RIGHT -d 4 5 6 7
-	bspc monitor $FHD -d 8
-	bspc monitor $QHD -d 9
-	# Put a single desktop on the physical monitor to support fullscreen
-	bspc monitor $DISPLAY_NAME -d 0
-
-	# Restore focus
-	bspc node -f "$FOCUSED"
-
-	# Explicitly reorder the monitors to ensure the workspace order is correct
-	bspc wm --reorder-monitors $LEFT $RIGHT $FHD $QHD $DISPLAY_NAME
-}
 
 # Configure the screen so the is a single 2560x1440 monitor in the middle, and two 1280x1440 monitors surrounding it
 virtual-triple-pip-mode() {
-	DISPLAY_NAME="DisplayPort-1"
+  $MONITOR_SCRIPT
 	export LEFT="vir1"
 	export RIGHT="vir2"
 	export MIDDLE="vir3"
 
-  # Save the current focus so we can restore it after setting up monitors
+	# Save the current focus so we can restore it after setting up monitors
 	FOCUSED="$(bspc query -n focused -N)"
 
 	# Ensure the main monitor is focused
@@ -110,18 +105,20 @@ virtual-triple-pip-mode() {
 	bspc config -m "$MIDDLE" top_padding 0
 
 	bspc monitor $LEFT -d 1 2 3
-	bspc monitor $RIGHT -d 4 5 6
-	bspc monitor $MIDDLE -d 7 8 9 0
+	bspc monitor $MIDDLE -d 4 5 6
+	bspc monitor $RIGHT -d 7 8 9 0
 
 	# Explicitly reorder the monitors to ensure the workspace order is correct
-	bspc wm --reorder-monitors $LEFT $RIGHT $MIDDLE
+	bspc wm --reorder-monitors $LEFT $MIDDLE $RIGHT
 
-	# Open steam games on last workspace
+	# Open steam games workspace ^10
 	GAMES=$(fd -d 1 "appmanifest" ~/.steam/steam/steamapps -x echo '{/.}' | sed 's/[^0-9]//g')
 	for game in $GAMES; do
-		echo $game
-		bspc rule -a steam_app_"$game" desktop=^10 state=fullscreen
+		bspc rule -a steam_app_"$game" desktop=^6 state=fullscreen
 	done
+
+	# apply the default config
+	default-config
 
 	# Bar
 	~/.config/polybar/launch.sh kill
@@ -133,40 +130,24 @@ virtual-triple-pip-mode() {
 # ultrawide
 virtual-triple-pip-mode
 # virtual-pip-mode
-# pip
+# pip-mode
 
-bspc config split_ratio 0.65
-bspc config borderless_monocle true
-bspc config gapless_monocle false
-bspc config pointer_follows_focus true
-bspc config focus_follows_pointer true
-
-# prevent windows from stealing focus
-bspc config ignore_ewmh_focus true
-
-bspc rule -a looking-glass-client desktop=^10 state=fullscreen
+# rules
+bspc rule -a looking-glass-client desktop=^6 state=fullscreen
 bspc rule -a Pavucontrol:pavucontrol state=floating
 bspc rule -a 'Virt-manager:*' state=floating
 bspc rule -a 'Arandr:*' state=floating
 bspc rule -a 'Blueman-manager:*' state=floating
 bspc rule -a "Thunar:*" state=floating
-bspc rule -a 'Steam:*' desktop=^4 state=floating
+bspc rule -a 'Steam:*' desktop=^7
+bspc rule -a 'discord:*' desktop=^7
 
-bspc config top_padding 40
-bspc config window_gap 12
-# Border
-bspc config border_width 2
-bspc config focused_border_color "#ac21c4"
-bspc config normal_border_color "#073642"
-bspc config active_border_color "#073642"
-bspc config single_monocle false
+bspc rule -a 'my_glfw_sample' state=floating
 
 # Notifications
 /usr/bin/dunst &
 # Polkit
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-# Wallpaper
-nitrogen --restore &
 # Dex
 dex -a -s /etc/xdg/autostart/:~/.config/autostart/
 
@@ -198,3 +179,7 @@ picom -b --config ~/.config/picom.conf
 
 # set the usless key left of 'z' to backtick / tilde
 xmodmap -e 'keycode 94 = grave asciitilde'
+
+# Wallpaper
+nitrogen --restore &
+
