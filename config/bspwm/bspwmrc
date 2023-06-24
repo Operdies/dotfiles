@@ -8,7 +8,7 @@ if xrandr --listactivemonitors | grep -q "DP-4"; then
 	export DISPLAY_NAME="DP-4"
   export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
 else
-	export DISPLAY_NAME="DisplayPort-1"
+	export DISPLAY_NAME="DisplayPort-0"
   export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
 fi
 
@@ -140,6 +140,7 @@ bspc rule -a 'Arandr:*' state=floating
 bspc rule -a 'Blueman-manager:*' state=floating
 bspc rule -a "Thunar:*" state=floating
 bspc rule -a 'Steam:*' desktop=^7
+bspc rule -a 'steamwebhelper:*' desktop=^7
 bspc rule -a 'discord:*' desktop=^7
 
 bspc rule -a 'my_glfw_sample' state=floating
