@@ -1,19 +1,15 @@
 #!/bin/bash
 
 get_touchpad() {
-	xinput --list | grep Touchpad | grep -P --only-matching 'id=\d+' | cut -d= -f2
+	xinput --list | grep " Touchpad " | grep -P --only-matching 'id=\d+' | cut -d= -f2
 }
 
 get_props() {
-	xinput --list-props $(get_touchpad) | tr -d $'\t' | grep "^libinput" | cut -d' ' --complement -f1
+	xinput --list-props $(get_touchpad) | grep -v " Default" | tr -d $'\t' | grep "^libinput" | cut -d' ' --complement -f1
 }
 
 get_options() {
 	echo 0
-	echo 1
-}
-
-set_option() {
 	echo 1
 }
 
@@ -35,7 +31,26 @@ rofi() {
 	command rofi -dmenu -i -window-title "$1"
 }
 
+setProperty() {
+	propId="$1"
+	value="$2"
+	echo xinput --set-prop $(get_touchpad) $propId $value
+	xinput --set-prop $(get_touchpad) $propId $value
+}
+
 case $1 in
+set)
+	setting="$2"
+	value="$3"
+	guess="$(get_props | grep -i "$2" | head -n 1)"
+	if [ -n "$guess" ]; then
+		propId="$(echo $guess | grep -P --only-matching "\(\d+\)" | tr -d '()')"
+    echo "Guessed prop: '$guess' with id $propId. Setting value $value"
+		setProperty "$propId" "$value"
+	else
+		echo "Nothing similar to value in list of properties for device."
+	fi
+	;;
 wizard)
 	prop="$(get_props | rofi 'Select a property')"
 	if [ -n "$prop" ]; then
@@ -43,7 +58,7 @@ wizard)
 		if [ -n "$propId" ]; then
 			prettyName="$(echo $prop | sed 's/ (.*//g')"
 			value="$(get_options | rofi "Set '$prettyName' to what?")"
-			xinput --set-prop $(get_touchpad) $propId $value
+			setProperty "$propId" "$value"
 		fi
 	else
 		echo You chose nothing
