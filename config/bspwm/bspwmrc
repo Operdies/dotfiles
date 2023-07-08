@@ -3,13 +3,12 @@
 pgrep -x sxhkd >/dev/null || sxhkd &
 pgrep -x redshift >/dev/null || redshift &
 
-
 if xrandr --listactivemonitors | grep -q "DP-4"; then
 	export DISPLAY_NAME="DP-4"
-  export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
+	export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
 else
 	export DISPLAY_NAME="DisplayPort-0"
-  export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
+	export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
 fi
 
 # if xrandr --listactivemonitors | grep -q "DisplayPort-1"; then
@@ -21,7 +20,7 @@ fi
 # fi
 
 default-config() {
-	bspc config split_ratio 0.50
+	bspc config split_ratio 0.60
 	bspc config borderless_monocle true
 	bspc config gapless_monocle false
 	bspc config pointer_follows_focus true
@@ -29,23 +28,38 @@ default-config() {
 
 	# prevent windows from stealing focus
 	bspc config ignore_ewmh_focus true
-	bspc config top_padding 40
-	bspc config window_gap 12
+	bspc config top_padding 0
+	bspc config window_gap 8
 	# Border
-	bspc config border_width 2
+	bspc config border_width 1
 	bspc config focused_border_color "#ac21c4"
 	bspc config normal_border_color "#073642"
 	bspc config active_border_color "#073642"
-	bspc config single_monocle false
+
+	bspc config single_monocle true
+  bspc config gapless_monocle true
 
 	# Some wine applications behave weird with borders.
 	# Floating windows move diagonally off the screen unless tiled.
 	~/.config/bspwm/scripts/window-management/no_border_wine &
 }
 
+laptop() {
+	default-config
+	export MONITOR="eDP1"
+	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
+	~/.config/polybar/launch.sh kill
+	~/.config/polybar/launch.sh eDP1
+	~/.config/sxhkd/scripts/libinput.sh set 'natural scrolling' 1
+	~/.config/sxhkd/scripts/libinput.sh set 'disable while typign' 1
+
+  # Enable touchpad gestures 
+  libinput-gestures &
+}
+
 ultrawide() {
 	export RIGHT="$DISPLAY_NAME"
-  $MONITOR_SCRIPT
+	$MONITOR_SCRIPT
 	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
 	~/.config/polybar/launch.sh kill
 	~/.config/polybar/launch.sh right
@@ -66,10 +80,9 @@ pip-mode() {
 	default-config
 }
 
-
 # Configure the screen so the is a single 2560x1440 monitor in the middle, and two 1280x1440 monitors surrounding it
 virtual-triple-pip-mode() {
-  $MONITOR_SCRIPT
+	$MONITOR_SCRIPT
 	export LEFT="vir1"
 	export RIGHT="vir2"
 	export MIDDLE="vir3"
@@ -127,8 +140,9 @@ virtual-triple-pip-mode() {
 	~/.config/polybar/launch.sh vir3
 }
 
+laptop
 # ultrawide
-virtual-triple-pip-mode
+# virtual-triple-pip-mode
 # virtual-pip-mode
 # pip-mode
 
@@ -142,8 +156,6 @@ bspc rule -a "Thunar:*" state=floating
 bspc rule -a 'Steam:*' desktop=^7
 bspc rule -a 'steamwebhelper:*' desktop=^7
 bspc rule -a 'discord:*' desktop=^7
-
-bspc rule -a 'my_glfw_sample' state=floating
 
 # Notifications
 /usr/bin/dunst &
