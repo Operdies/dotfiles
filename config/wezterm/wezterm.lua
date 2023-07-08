@@ -35,4 +35,5 @@ return {
 	keys = {
 		{ key = "Enter", mods = "ALT", action = wezterm.action.DisableDefaultAssignment },
 	},
+  warn_about_missing_glyphs = false,
 }
