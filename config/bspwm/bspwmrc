@@ -20,7 +20,7 @@ fi
 # fi
 
 default-config() {
-	bspc config split_ratio 0.60
+	bspc config split_ratio 0.51
 	bspc config borderless_monocle true
 	bspc config gapless_monocle false
 	bspc config pointer_follows_focus true
@@ -51,7 +51,7 @@ laptop() {
 	~/.config/polybar/launch.sh kill
 	~/.config/polybar/launch.sh eDP1
 	~/.config/sxhkd/scripts/libinput.sh set 'natural scrolling' 1
-	~/.config/sxhkd/scripts/libinput.sh set 'disable while typign' 1
+	~/.config/sxhkd/scripts/libinput.sh set 'disable while typing' 1
 
   # Enable touchpad gestures 
   libinput-gestures &

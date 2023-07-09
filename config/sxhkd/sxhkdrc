@@ -176,11 +176,11 @@ XF86AudioMute
 
 # Brightness up
 XF86MonBrightnessUp
-  xbacklight -inc 20
+  xbacklight -inc 10
 
 # And brightness down
 XF86MonBrightnessDown
-  xbacklight -dec 20
+  xbacklight -dec 10
 
 XF86TouchpadToggle
   bash ~/.config/sxhkd/scripts/libinput.sh wizard
