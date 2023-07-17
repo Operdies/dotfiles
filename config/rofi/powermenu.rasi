@@ -6,10 +6,10 @@
 configuration {
     font:                           "Sourcecode Pro Regular 10";
     show-icons:                     false;
-    icon-theme: 		    "Arc-X-D";
+    icon-theme: 		            "Arc-X-D";
     scroll-method:                  0;
     disable-history:                false;
-    sidebar-mode: 		    false;
+    sidebar-mode: 		            false;
 }
 
 @import "~/.config/rofi/arc_dark_transparent_colors.rasi"
@@ -19,14 +19,13 @@ window {
     border:                         0;
     padding:                        10;
     transparency:                   "real";
-    width:                          180px;
+    width:                          140px;
     location:                       northwest;
-y-offset:                       30;
-/*x-offset:	                    850;*/
-    transparency:                   "real";
+    y-offset:                       40;
+    x-offset:                       5;
 }
 listview {
-    lines:                          6;
+    lines:                          5;
     columns:                        1;
     scrollbar:			false;
 }
@@ -111,7 +110,7 @@ prompt {
     text-color: @normal-foreground;
 }
 inputbar {
-    children:   [ prompt,textbox-prompt-colon,entry,case-indicator ];
+    children:   [ entry ];
 }
 textbox-prompt-colon {
     expand:     false;

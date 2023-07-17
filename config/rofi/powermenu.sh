@@ -1,11 +1,11 @@
 #!/bin/env bash
 
 # Options for powermenu
-lock="......Lock"
-logout=".....Logout"
-shutdown="....Shutdown"
-reboot="....Reboot"
-sleep="....Sleep"
+lock="   Lock"
+logout="󰗼   Logout"
+shutdown="   Shutdown"
+reboot="󰁯   Reboot"
+sleep="  Sleep"
 
 # Get answer from user via rofi
 selected_option=$(echo "$lock
@@ -14,7 +14,7 @@ $sleep
 $reboot
 $shutdown" | rofi -dmenu\
                   -i\
-                  -p "Power"\
+                  -p ""\
                   -config "~/.config/rofi/powermenu.rasi"\
                   -font "Symbols Nerd Font 12"\
                   -width "15"\
@@ -26,7 +26,8 @@ $shutdown" | rofi -dmenu\
 # Do something based on selected option
 if [ "$selected_option" == "$lock" ]
 then
-    /home/$USER/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh
+    # /home/$USER/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh
+    i3lock
 elif [ "$selected_option" == "$logout" ]
 then
     bspc quit
@@ -38,7 +39,8 @@ then
     systemctl reboot
 elif [ "$selected_option" == "$sleep" ]
 then
-    amixer set Master mute
+    # amixer set Master mute
+    i3lock
     systemctl suspend
 else
     echo "No match"

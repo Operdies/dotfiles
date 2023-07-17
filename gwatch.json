@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Operdies/gwatch.nvim/main/schema.json",
+  "window position": "bottom",
+  "profiles": {
+    "setup": {
+      "command": "bash ./setup.sh",
+      "trigger": "hotkey",
+      "mode": "kill"
+    },
+    "libinput-gestures": {
+      "command": "libinput-gestures",
+      "trigger": "hotkey",
+      "mode": "kill"
+    }
+  }
+}

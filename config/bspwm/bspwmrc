@@ -81,7 +81,7 @@ laptop() {
 	# Enable touchpad gestures
 	libinput-gestures &
 	# Set blank time to 60 seconds
-	set s 60 60
+	xset s 60 60 &
 	if has xautolock; then
 		# Lock screen and suspend after 2 minutes
 		pgrep xautolock || xautolock -detectsleep -time 2 -locker '~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh; sleep 5; systemctl suspend' &
@@ -158,14 +158,10 @@ virtual-triple-pip-mode() {
 	bspc wm --reorder-monitors $LEFT $MIDDLE $RIGHT
 
 	# Open steam games workspace ^10
-	if has fd; then
-		GAMES=$(fd -d 1 "appmanifest" ~/.steam/steam/steamapps -x echo '{/.}' | sed 's/[^0-9]//g')
-		for game in $GAMES; do
-			bspc rule -a steam_app_"$game" desktop=^6 state=fullscreen
-		done
-	else
-		error "fd is not installed"
-	fi
+	GAMES=$(fd -d 1 "appmanifest" ~/.steam/steam/steamapps -x echo '{/.}' | sed 's/[^0-9]//g')
+	for game in $GAMES; do
+		bspc rule -a steam_app_"$game" desktop=^6 state=fullscreen
+	done
 
 	# apply the default config
 	default-config
@@ -220,9 +216,11 @@ xsetroot -cursor_name left_ptr &
 # Set caps = escape
 setxkbmap -option caps:escape
 
-# disable screen sleeping on inactivity
-# xset -dpms &
-# xset s off &
+if ! is_laptop; then
+	# disable screen sleeping on inactivity
+	xset -dpms &
+	xset s off &
+fi
 
 # picom
 # -b: daemon mode

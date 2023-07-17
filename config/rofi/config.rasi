@@ -6,27 +6,24 @@
 configuration {
     font:				"Sourcecode Pro Regular 10";
     show-icons:				true;
-    case-sensitive: false;
     icon-theme:				"Arc-X-D";
     display-drun:			"Apps";
     drun-display-format:		"{name}";
     scroll-method:			0;
     disable-history:			false;
     sidebar-mode:			false;
-    kb-toggle-case-sensitivity: "Alt+s";
 }
 
 @import "~/.config/rofi/arc_dark_transparent_colors.rasi"
 
 window {
     background-color: @background;
-    border:           1;
-    padding:          10;
-    width:                          900 px;
+    border:           0;
+    padding:          30;
 }
 listview {
     lines:                          10;
-    columns:                        1;
+    columns:                        3;
 }
 mainbox {
     border:  0;
