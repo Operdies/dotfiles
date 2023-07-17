@@ -1,23 +1,48 @@
 #!/bin/bash
 
-pgrep -x sxhkd >/dev/null || sxhkd &
-pgrep -x redshift >/dev/null || redshift &
+start=$SECONDS
+# Notifications
+/usr/bin/dunst &
+dunstctl close-all
 
-if xrandr --listactivemonitors | grep -q "DP-4"; then
-	export DISPLAY_NAME="DP-4"
-	export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
-else
-	export DISPLAY_NAME="DisplayPort-0"
-	export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
+notify() {
+	msg="$@"
+	dunstify -u normal -t 2000 bspwmrc "$msg"
+}
+
+error() {
+	msg="$@"
+	dunstify -u critical bspwmrc "$msg"
+}
+
+has() {
+	which "$1" 2>/dev/null
+}
+
+SXHKD_FIFO=/tmp/sxhkd-fifo
+[ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
+pgrep -x sxhkd >/dev/null || sxhkd -s $SXHKD_FIFO &
+if has redshift; then
+	pgrep -x redshift >/dev/null || redshift &
 fi
 
-# if xrandr --listactivemonitors | grep -q "DisplayPort-1"; then
-# 	export DISPLAY_NAME="DisplayPort-1"
-#   export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
-# else
-# 	export DISPLAY_NAME="DP-4"
-#   export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
-# fi
+is_monitor() {
+	xrandr --listactivemonitors | grep -q "$1"
+}
+
+is_laptop() {
+	is_monitor "eDP1"
+}
+
+if is_monitor "DP-4"; then
+	export DISPLAY_NAME="DP-4"
+	export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
+elif is_monitor "DispalyPort-0"; then
+	export DISPLAY_NAME="DisplayPort-0"
+	export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
+elif ! is_monitor "eDP1"; then
+	error "Unrecognized monitor setup. Proceeding with laptop config."
+fi
 
 default-config() {
 	bspc config split_ratio 0.51
@@ -37,7 +62,7 @@ default-config() {
 	bspc config active_border_color "#073642"
 
 	bspc config single_monocle true
-  bspc config gapless_monocle true
+	bspc config gapless_monocle true
 
 	# Some wine applications behave weird with borders.
 	# Floating windows move diagonally off the screen unless tiled.
@@ -45,16 +70,24 @@ default-config() {
 }
 
 laptop() {
-	default-config
 	export MONITOR="eDP1"
+	default-config
 	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
 	~/.config/polybar/launch.sh kill
-	~/.config/polybar/launch.sh eDP1
+	~/.config/polybar/launch.sh eDP1 &
 	~/.config/sxhkd/scripts/libinput.sh set 'natural scrolling' 1
 	~/.config/sxhkd/scripts/libinput.sh set 'disable while typing' 1
 
-  # Enable touchpad gestures 
-  libinput-gestures &
+	# Enable touchpad gestures
+	libinput-gestures &
+	# Set blank time to 60 seconds
+	set s 60 60
+	if has xautolock; then
+		# Lock screen and suspend after 2 minutes
+		pgrep xautolock || xautolock -detectsleep -time 2 -locker '~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh; sleep 5; systemctl suspend' &
+	else
+		error "xautolock is not installed"
+	fi
 }
 
 ultrawide() {
@@ -125,10 +158,14 @@ virtual-triple-pip-mode() {
 	bspc wm --reorder-monitors $LEFT $MIDDLE $RIGHT
 
 	# Open steam games workspace ^10
-	GAMES=$(fd -d 1 "appmanifest" ~/.steam/steam/steamapps -x echo '{/.}' | sed 's/[^0-9]//g')
-	for game in $GAMES; do
-		bspc rule -a steam_app_"$game" desktop=^6 state=fullscreen
-	done
+	if has fd; then
+		GAMES=$(fd -d 1 "appmanifest" ~/.steam/steam/steamapps -x echo '{/.}' | sed 's/[^0-9]//g')
+		for game in $GAMES; do
+			bspc rule -a steam_app_"$game" desktop=^6 state=fullscreen
+		done
+	else
+		error "fd is not installed"
+	fi
 
 	# apply the default config
 	default-config
@@ -140,7 +177,11 @@ virtual-triple-pip-mode() {
 	~/.config/polybar/launch.sh vir3
 }
 
-laptop
+if is_laptop; then
+	laptop
+else
+	ultrawide
+fi
 # ultrawide
 # virtual-triple-pip-mode
 # virtual-pip-mode
@@ -157,8 +198,6 @@ bspc rule -a 'Steam:*' desktop=^7
 bspc rule -a 'steamwebhelper:*' desktop=^7
 bspc rule -a 'discord:*' desktop=^7
 
-# Notifications
-/usr/bin/dunst &
 # Polkit
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 # Dex
@@ -180,15 +219,14 @@ xsetroot -cursor_name left_ptr &
 
 # Set caps = escape
 setxkbmap -option caps:escape
-# pgrep -x xautolock > /dev/null || xautolock -time 30 -locker "systemctl suspend" -detectsleep &
 
 # disable screen sleeping on inactivity
-xset -dpms &
-xset s off &
+# xset -dpms &
+# xset s off &
 
 # picom
 # -b: daemon mode
-picom -b --config ~/.config/picom.conf
+picom -b --config ~/.config/picom.conf &
 
 # set the usless key left of 'z' to backtick / tilde
 xmodmap -e 'keycode 94 = grave asciitilde'
@@ -196,3 +234,5 @@ xmodmap -e 'keycode 94 = grave asciitilde'
 # Wallpaper
 nitrogen --restore &
 
+duration=$((SECONDS - start))
+notify "Reloaded config in $duration seconds"
