@@ -40,7 +40,7 @@ virtual_split() {
 
 	bspc monitor "$LEFT" -d 1 2 3
 	bspc monitor "$RIGHT" -d 4 5 6
-	bspc monitor "$DISPLAY_NAME" -d 7
+	# bspc monitor "$DISPLAY_NAME" -d 7
 
 	bspc wm --adopt-orphans
 	bspc wm --reorder-monitors "$LEFT" "$RIGHT" "$DISPLAY_NAME"
