@@ -6,6 +6,7 @@ has() {
 
 ensure_binaries() {
 	binaries=(
+    nvr neovim-remote
 		rg ripgrep
     xautolock xautolock
     htop htop

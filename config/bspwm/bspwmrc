@@ -19,6 +19,11 @@ has() {
 	which "$1" 2>/dev/null
 }
 
+# hello
+num_monitors() {
+	xrandr --listactivemonitors | head -n 1 | cut -d':' -f2 | xargs
+}
+
 SXHKD_FIFO=/tmp/sxhkd-fifo
 [ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
 pgrep -x sxhkd >/dev/null || sxhkd -s $SXHKD_FIFO &
@@ -81,10 +86,12 @@ laptop() {
 	# Enable touchpad gestures
 	libinput-gestures &
 	# Set blank time to 60 seconds
-	xset s 60 60 &
+	xset +dpms
+	xset s 120 120
 	if has xautolock; then
 		# Lock screen and suspend after 2 minutes
-		pgrep xautolock || xautolock -detectsleep -time 2 -locker '~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh; sleep 5; systemctl suspend' &
+		# pgrep xautolock || xautolock -detectsleep -time 2 -locker '~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh; sleep 5; systemctl suspend' &
+		xautolock -detectsleep -time 1 -locker '$HOME/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh' &
 	else
 		error "xautolock is not installed"
 	fi

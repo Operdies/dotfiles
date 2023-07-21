@@ -100,10 +100,6 @@ super + {grave,Tab}
 	bspc {node,desktop} -f last.local
 
 # focus the older or newer node in the focus history
-super + {o,i}
-	bspc wm -h off; \
-	bspc node {older,newer} -f; \
-	bspc wm -h on
 
 # swap the current node and the biggest window, or the last selected node if the biggest window is selected
 super + {_, shift+}g
@@ -115,9 +111,6 @@ super + {_, shift +} {1-9,0}
 # super + {1,2,3}
 #   sh ~/.config/bspwm/scripts/window-management/tabber.sh {1,2,3}
 
-bubble desktop
-super + {Left, Right}
-  bspc desktop focused -b {prev, next}
 
 # preselect the direction
 super + ctrl + {h,j,k,l}
@@ -175,12 +168,13 @@ XF86AudioMute
 # Simple amixer command seems to have problems unmuting device
 
 # Brightness up
-XF86MonBrightnessUp
-  xbacklight -inc 10
+{_, shift +} XF86MonBrightnessUp
+  ~/.config/sxhkd/scripts/backlight.sh { --inc 5, --set 100 }
 
 # And brightness down
-XF86MonBrightnessDown
-  xbacklight -dec 10
+# 
+{_, shift +} XF86MonBrightnessDown
+  ~/.config/sxhkd/scripts/backlight.sh { --dec 5, --set 35 }
 
 XF86TouchpadToggle
   bash ~/.config/sxhkd/scripts/libinput.sh wizard
@@ -197,7 +191,7 @@ super + Print
 # super + w 
 #   rofi -show calc \
 #   -modi calc \
-#   -config "~/.config/rofi/powermenu.rasi" \
+#   -config "~/.cosfig/rofi/powermenu.rasi" \
 #   -calc-command "echo -n '\{result\}' | xclip -selection clipboard"
 
 super + m
@@ -211,3 +205,4 @@ super + w
 
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh
+
