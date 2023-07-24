@@ -12,7 +12,10 @@ scrot () {
   command scrot $@ '/tmp/%F_%T_$wx$h.png' -e 'xclip -selection clipboard -target image/png -i $f; mv $f ~/Pictures/'
 }
 
-selected="$(echo -e "$options" | rofi -lines 3 -dmenu -p "scrot")"
+selected="$1"
+if [ -z "$selected" ]; then
+  selected="$(echo -e "$options" | rofi -lines 3 -dmenu -p "scrot")"
+fi
 case $selected in
     $option0)
         cd ~/Pictures/ && sleep 1 && scrot;;

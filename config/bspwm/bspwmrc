@@ -27,6 +27,7 @@ num_monitors() {
 SXHKD_FIFO=/tmp/sxhkd-fifo
 [ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
 pgrep -x sxhkd >/dev/null || sxhkd -s $SXHKD_FIFO &
+pgrep -x sxhkd-whichkey || ~/.cargo/bin/sxhkd-whichkey --status-fifo $SXHKD_FIFO &
 if has redshift; then
 	pgrep -x redshift >/dev/null || redshift &
 fi
@@ -87,11 +88,11 @@ laptop() {
 	libinput-gestures &
 	# Set blank time to 60 seconds
 	xset +dpms
-	xset s 120 120
+	xset s 60 60
 	if has xautolock; then
 		# Lock screen and suspend after 2 minutes
 		# pgrep xautolock || xautolock -detectsleep -time 2 -locker '~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh; sleep 5; systemctl suspend' &
-		xautolock -detectsleep -time 1 -locker '$HOME/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh' &
+		xautolock -detectsleep -time 2 -locker "$HOME/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh" &
 	else
 		error "xautolock is not installed"
 	fi

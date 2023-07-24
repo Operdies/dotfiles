@@ -6,25 +6,26 @@ has() {
 
 ensure_binaries() {
 	binaries=(
-    nvr neovim-remote
+		nvr neovim-remote
 		rg ripgrep
-    xautolock xautolock
-    htop htop
-    lazygit lazygit
-    tldr tldr
-    hush hush-bin
-    bsp-layout bsp-layout
+		xautolock xautolock
+		htop htop
+		lazygit lazygit
+		tldr tldr
+		hush hush-bin
+		bsp-layout bsp-layout
 		git git
 		curl curl
 		go go
-    yq go-yq
+		yq go-yq
 		nvim neovim
+		xwininfo xorg-xwininfo
 		cargo rustup
 		zsh zsh
-    qutebrowser "qutebrowser python-adblock"
-    gcc gcc
-    npm npm
-    wezterm wezterm
+		qutebrowser "qutebrowser python-adblock"
+		gcc gcc
+		npm npm
+		wezterm wezterm
 	)
 
 	missing=()
@@ -44,7 +45,7 @@ ensure_binaries() {
 		mpkg="${missing[@]}"
 		echo "Missing packages: $mpkg"
 
-    cmd="yay -Sy $mpkg --noconfirm"
+		cmd="yay -Sy $mpkg --noconfirm"
 		while true; do
 			read -p "Install missing packages? ($cmd) (yn) " yn
 			case $yn in
