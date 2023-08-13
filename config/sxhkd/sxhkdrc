@@ -14,16 +14,20 @@ super + ctrl + d
                 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
                 -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
 
+
+# Power Menu
+# { Lock,󰗼 Logout, Shutdown,󰁯 Reboot, Sleep}
 super + shift + e ; { 1, 2, 3, 4, 5}
-  { ~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh, \
-    bspc quit, \
-    ~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh; systemctl suspend, \
-    systemctl reboot, \
-    systemctl poweroff }
+  { ~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh \
+    , bspc quit \
+    , systemctl poweroff \
+    , systemctl reboot \
+    , ~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh; systemctl suspend \
+  }
   
 # make sxhkd reload its configuration files:
 super + Escape
-	pkill -USR1 -x sxhkd
+	pkill -USR1 -x rhkd ; pkill -USR1 -x sxhkd
 
 # quit/restart bspwm
 super + alt + r
@@ -33,39 +37,41 @@ super + alt + r
 super + {_,shift + }q
 	bspc node -{c,k}
 
-# send the newest marked node to the newest preselected node
-super + y
-	bspc node newest.marked.local -n newest.!automatic
+# Manage Windows 
+# {close,kill,next} window
+super + n : { c, k, f }
+  bspc node -{c,k,f next.local.!hidden.window } # -c:"close window" -k:kill\ window -f:'next' $(2)
 
-# set the window state
-super + {t,shift + t,s,f}
-	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
 
-# set the node flags
-super + ctrl + {m,x,y,z}
+# Manage Tiling Layout
+# Set layout to {tall,rtall,monocle,rwide}
+super + t : { l, h, m, w }
+  bsp-layout set {tall,rtall,monocle,rwide}
+
+# {tiled,floating,fullscreen}
+super + t : {t, s, f}
+	bspc node -t {tiled; bsp-layout set tiled,floating,fullscreen}
+
+# set node flags
+# {marked,locked,sticky,private}
+super + x : {m,x,y,z}
 	bspc node -g {marked,locked,sticky,private}
+# focus {next,previous}
+super + x : {_, shift+}c
+  bspc node -f {next,prev}.local.!hidden.window # 
 
 # focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
 
-# super + comma : { p , b ; b, comma, period }
-# 	bspc node -f @{parent,brother,first,second}
-
-# super + {p,b,comma,period}
-# 	bspc node -f @{parent,brother,first,second}
-
 # focus the next/previous window in the current desktop
 super + {_,shift + }c
 	bspc node -f {next,prev}.local.!hidden.window
 
-# focus the next/previous desktop in the current monitor
-super + bracket{left,right}
+# tab desktops
+# focus {next,previous} local desktop
+super + Tab : bracket{left,right}
 	bspc desktop -f {prev,next}.local
-
-# focus the last node/desktop
-super + {grave,Tab}
-	bspc {node,desktop} -f last.local
 
 # focus the older or newer node in the focus history
 # super + {o,i}
@@ -80,65 +86,95 @@ super + {_, shift+}g
 super + {_, shift +} {1-9,0}
   bspc {desktop -f, node -d} '^{1-9,10}'
 
-# super + {1,2,3}
-#   sh ~/.config/bspwm/scripts/window-management/tabber.sh {1,2,3}
+# Preselection
+# Preselect {left,down,up,right}
+super + p : {h,j,k,l}
+	bspc node -p {west,south,north,east} 
 
-
-super + { space, shift + space } : {1-9,0}
-  bspc {desktop -f, node -d} '^{1-9,10}'
-
-# preselect the direction
-super + ctrl + {h,j,k,l}
-	bspc node -p {west,south,north,east}
-
-# preselect the ratio
-super + ctrl + {1-9}
+# {1-9}0% Ratio
+super + p : {1-9}
 	bspc node -o 0.{1-9}
 
-# cancel the preselection for the focused node
-super + ctrl + space
+# Abort
+super + p ; space
 	bspc node -p cancel
+
+# Move focused node to selected area
+super + p : s
+  bspc node -g marked && bspc node newest.marked.local -n newest.!automatic # Insert current node in preselection area
+
+# Focus {previous,next} node
+super + p : { shift + c, c }
+  bspc node -f {prev,next}.local.!hidden.window 
 
 # cancel the preselection for the focused desktop
 super + ctrl + shift + space
 	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
 
-
-# expand a window by moving one of its side outward
-super + alt + {h,j,k,l}
-	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
-
-# contract a window by moving one of its side inward
-super + alt + shift + {h,j,k,l}
+# Window Sizing
+# {Right,Top,Bottom,Left} Inwards
+super + w : shift + {h,j,k,l}
 	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
 
-# move a floating window
-super + {Left,Down,Up,Right}
+# {Left,Bottom,Top,Right} Outwards
+super + w : {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# Focus {next,previous} Node
+super + w : {_,shift + }c
+	bspc node -f {next,prev}.local.!hidden.window
+
+# Move {Left,Down,Up,Right}
+super + w : alt + {h,j,k,l}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
-super + r ; { q, w, e, r }
-  { qutebrowser, wezterm, hakuneko-desktop, pavucontrol }
-
-# Balance the size of all windows 
-super + shift + b 
-  bspc node @/ -B
-
-super + v : { j, k, m }
-  {\
-    pactl set-sink-volume 0 -5% && pactl set-sink-mute 0 0,\
-    pactl set-sink-volume 0 +5% && pactl set-sink-mute 0 0,\
-    amixer -D pulse sset Master toggle-mute
+# Launch
+# {qutebrowser,wezterm,manga reader,pavucontrol,Discord,Steam}
+super + r ; { q, w, m, p, d, s }
+  { \
+    qutebrowser \
+  , wezterm start\
+  , hakuneko-desktop\
+  , pavucontrol \
+  , discord \
+  , steam \
   }
 
+# Balance the size of all windows 
+# super + shift + b 
+#   bspc node @/ -B
 
-super + b : { j, k }
-  { ~/.config/sxhkd/scripts/backlight.sh --dec 5, \
-    ~/.config/sxhkd/scripts/backlight.sh --inc 5 }
+super + v : { j, k, super + j, super + k }
+  pactl set-sink-volume 0 { -5%, +5%, -20%, +20% } && pactl set-sink-mute 0 0 # Volume $(3)
 
+super + v : m 
+  amixer -D pulse sset Master toggle-mute # Toggle Mute
+
+# Set brightness
+# {1-9,10}0% brightness
+super + b ; {1-9,0}
+  ~/.config/sxhkd/scripts/backlight.sh --set {1-9,10}0
+
+# Adjust brightness
+# {Increase,Decrease} brightness by 5%
+super + b : {l,h} 
+  ~/.config/sxhkd/scripts/backlight.sh {--inc 5,--dec 5}
+
+# {Double,Halve} brightness
+super + b : {j,k} 
+  ~/.config/sxhkd/scripts/backlight.sh {--halve,--double}
+
+# {32%,100%} brightness
+super + b : { shift + h, shift + l }
+  ~/.config/sxhkd/scripts/backlight.sh {--set 32,--set 100}
+
+# {Enable,Disable} screen sleep timer
+super + b : { c,z }
+  xset s {on,off}
+  
 XF86TouchpadToggle
   bash ~/.config/sxhkd/scripts/libinput.sh wizard
   
-
 # Screenshot
 Print
   scrot ~/Pictures/Screenshot-$(date +%F_%T).png
@@ -146,12 +182,14 @@ Print
 super + s ; { s, a, w }
   ~/.config/bspwm/scripts/screenshot.sh { screen, area, window }
 
-super + m ; { t ; t, r ; t, comma, m, w }
-  bsp-layout set{ tall, rtall, tiled, monocle, rwide }
-
 super + F2
   polybar-msg cmd toggle
 
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh
 
+super + F4
+  echo {1,2} {3,4}
+
+super + F5 ; super + c 
+  for ((i=0;i<10;i++)); do dunstify hello; sleep 1; done
