@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+notify() {
+	msg="$*"
+	dunstify -u normal -t 2000 bspwmrc "$msg"
+}
+
+rand() {
+	MIN="$1"
+	MAX="$2"
+	mod=$((MAX - MIN + 1))
+	roll=$((RANDOM % mod))
+	echo $((roll + MIN))
+}
+
 case $1 in
 left | right)
 	polybar "$1" -c ~/.config/polybar/config.ini &
@@ -11,7 +24,17 @@ kill)
 	while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
 	;;
 *)
-	MONITOR="$1" polybar generic -c ~/.config/polybar/config.ini &
+	if [ "$2" = "rand" ]; then
+		WIDTH=$(rand 48 50)
+		WIDTH=$((WIDTH * 2))
+		OFFSET_X=$((100 - WIDTH))
+		OFFSET_X=$((OFFSET_X / 2))
+	else
+		WIDTH=100
+		OFFSET_X=0
+	fi
+	MONITOR="$1"
+	MONITOR=$MONITOR WIDTH="$WIDTH%" OFFSET_X="$OFFSET_X%" polybar generic -c ~/.config/polybar/config.ini &
 	;;
 
 esac

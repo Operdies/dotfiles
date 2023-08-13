@@ -157,15 +157,14 @@ my_sites = [
     'https://gtk-rs.org/*',
     'https://onthegomap.com/*',
 ]
-
 # Only accept cookies and javascript from specific sites
-config.set('content.cookies.accept', 'never')
+config.set('content.cookies.accept', 'no-3rdparty')
 config.set('content.javascript.enabled', True)
 config.set('content.javascript.can_access_clipboard', False)
 
 for site in my_sites:
     config.set('content.javascript.enabled', True, site)
-    config.set('content.cookies.accept', 'no-3rdparty', site)
+    config.set('content.cookies.accept', 'no-unknown-3rdparty', site)
     config.set('content.javascript.can_access_clipboard', True, site)
     
 # As dark as possible please
@@ -174,3 +173,4 @@ config.set("colors.webpage.bg", "#000000")
 
 # config.source('qutebrowser-themes/themes/onedark.py')
 
+config.set('tabs.show', 'multiple')

@@ -25,7 +25,7 @@ write() {
 
 report() {
 	pct=$(get_pct)
-  write "$pct"
+	write "$pct"
 }
 
 get_pct() {
@@ -42,6 +42,11 @@ pct_to_nits() {
 
 set_pct() {
 	pct=$1
+	if ((pct < 1)); then
+		pct=1
+	elif ((pct > 100)); then
+		pct=100
+	fi
 	new_brightness=$((pct * pct_per_nits))
 	set_nits $new_brightness
 	fifo="$(get_fifo)"
@@ -73,7 +78,7 @@ poll() {
 
 tail_fifo() {
 	while read -r e; do
-    write "$e"
+		write "$e"
 	done < <(tail -f "$(get_fifo)")
 }
 
@@ -90,5 +95,7 @@ case "$arg" in
 --set) set_pct "$2" ;;
 --inc) inc "$2" ;;
 --dec) dec "$2" ;;
+--halve) set_pct $(($(get_pct) / 2)) ;;
+--double) set_pct $(($(get_pct) * 2)) ;;
 *) echo "Unrecognized option '$*'" ;;
 esac

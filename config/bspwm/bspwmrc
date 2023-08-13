@@ -5,13 +5,21 @@ start=$SECONDS
 /usr/bin/dunst &
 dunstctl close-all
 
+rand() {
+	MIN="$1"
+	MAX="$2"
+	mod=$((MAX - MIN + 1))
+	roll=$((RANDOM % mod))
+	echo $((roll + MIN))
+}
+
 notify() {
-	msg="$@"
+	msg="$*"
 	dunstify -u normal -t 2000 bspwmrc "$msg"
 }
 
 error() {
-	msg="$@"
+	msg="$*"
 	dunstify -u critical bspwmrc "$msg"
 }
 
@@ -24,10 +32,27 @@ num_monitors() {
 	xrandr --listactivemonitors | head -n 1 | cut -d':' -f2 | xargs
 }
 
-SXHKD_FIFO=/tmp/sxhkd-fifo
-[ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
-pgrep -x sxhkd >/dev/null || sxhkd -s $SXHKD_FIFO &
-pgrep -x sxhkd-whichkey || ~/.cargo/bin/sxhkd-whichkey --status-fifo $SXHKD_FIFO &
+start_sxhkd() {
+	# Set caps = escape
+	# This should run before sxhkd starts so caps can be mapped to ESCAPE_KEYSYM
+	setxkbmap -option caps:escape
+	# set the usless key left of 'z' to backtick / tilde
+	xmodmap -e 'keycode 94 = grave asciitilde'
+
+  SXHKD="rhkd"
+	SXHKD_FIFO=/tmp/sxhkd-fifo
+	[ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
+	if pgrep -x "$SXHKD" >/dev/null; then
+    # Reload config if sxhkd is already running
+		pkill -USR1 -x "$SXHKD"
+	else
+    ~/.cargo/bin/rhkd -s $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc > ~/startup_errors &
+	fi
+	pgrep -x rhkx-whichkey || ~/.cargo/bin/rhkd-whichkey --status-fifo $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc &
+}
+
+start_sxhkd
+
 if has redshift; then
 	pgrep -x redshift >/dev/null || redshift &
 fi
@@ -78,9 +103,13 @@ default-config() {
 laptop() {
 	export MONITOR="eDP1"
 	default-config
+	SPLIT_RATIO=0.5$(rand 1 5)
+	bspc config split_ratio "$SPLIT_RATIO"
+	bspc config border_width "$(rand 1 2)"
+	bspc config window_gap "$(rand 7 9)"
 	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
 	~/.config/polybar/launch.sh kill
-	~/.config/polybar/launch.sh eDP1 &
+	~/.config/polybar/launch.sh eDP1 rand &
 	~/.config/sxhkd/scripts/libinput.sh set 'natural scrolling' 1
 	~/.config/sxhkd/scripts/libinput.sh set 'disable while typing' 1
 
@@ -88,11 +117,13 @@ laptop() {
 	libinput-gestures &
 	# Set blank time to 60 seconds
 	xset +dpms
-	xset s 60 60
+	SLEEP_MINTUES=2
+	SLEEP_SECONDS=$((SLEEP_MINTUES * 60))
+	xset s $SLEEP_SECONDS $SLEEP_SECONDS
 	if has xautolock; then
 		# Lock screen and suspend after 2 minutes
 		# pgrep xautolock || xautolock -detectsleep -time 2 -locker '~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh; sleep 5; systemctl suspend' &
-		xautolock -detectsleep -time 2 -locker "$HOME/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh" &
+		xautolock -detectsleep -time $((SLEEP_MINTUES + 1)) -locker "$HOME/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh" &
 	else
 		error "xautolock is not installed"
 	fi
@@ -114,9 +145,9 @@ pip-mode() {
 	~/.screenlayout/pip.sh
 	# Set display from arandr saved script
 	bspc monitor $RIGHT -d 1 2 3 4 5 6
-	bspc monitor $LEFT -d 7 8 9 0
+	bspc monitor "$LEFT" -d 7 8 9 0
 	# Explicitly set the monitor order to ensure DP-4 workspaces precede HDMI-0 workspaces
-	bspc wm --reorder-monitors $RIGHT $LEFT
+	bspc wm --reorder-monitors $RIGHT "$LEFT"
 
 	default-config
 }
@@ -181,16 +212,6 @@ virtual-triple-pip-mode() {
 	~/.config/polybar/launch.sh vir3
 }
 
-if is_laptop; then
-	laptop
-else
-	ultrawide
-fi
-# ultrawide
-# virtual-triple-pip-mode
-# virtual-pip-mode
-# pip-mode
-
 # rules
 bspc rule -a looking-glass-client desktop=^6 state=fullscreen
 bspc rule -a Pavucontrol:pavucontrol state=floating
@@ -198,9 +219,22 @@ bspc rule -a 'Virt-manager:*' state=floating
 bspc rule -a 'Arandr:*' state=floating
 bspc rule -a 'Blueman-manager:*' state=floating
 bspc rule -a "Thunar:*" state=floating
-bspc rule -a 'Steam:*' desktop=^7
-bspc rule -a 'steamwebhelper:*' desktop=^7
-bspc rule -a 'discord:*' desktop=^7
+
+if is_laptop; then
+	laptop
+	bspc rule -a 'discord:*' desktop=^3
+	bspc rule -a 'Steam:*' desktop=^4
+	bspc rule -a 'steamwebhelper:*' desktop=^4
+else
+	ultrawide
+	bspc rule -a 'discord:*' desktop=^7
+	bspc rule -a 'Steam:*' desktop=^7
+	bspc rule -a 'steamwebhelper:*' desktop=^7
+fi
+# ultrawide
+# virtual-triple-pip-mode
+# virtual-pip-mode
+# pip-mode
 
 # Polkit
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
@@ -218,12 +252,6 @@ nm-applet --indicator &
 # Cursor
 xsetroot -cursor_name left_ptr &
 
-# Low battery notifier
-# ~/.config/bspwm/scripts/low_bat_notifier.sh
-
-# Set caps = escape
-setxkbmap -option caps:escape
-
 if ! is_laptop; then
 	# disable screen sleeping on inactivity
 	xset -dpms &
@@ -232,10 +260,9 @@ fi
 
 # picom
 # -b: daemon mode
-picom -b --config ~/.config/picom.conf &
-
-# set the usless key left of 'z' to backtick / tilde
-xmodmap -e 'keycode 94 = grave asciitilde'
+if has picom; then
+	picom -b --config ~/.config/picom.conf &
+fi
 
 # Wallpaper
 nitrogen --restore &
