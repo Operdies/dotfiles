@@ -179,6 +179,8 @@ XF86TouchpadToggle
 Print
   scrot ~/Pictures/Screenshot-$(date +%F_%T).png
 
+# Screenshot
+# Screenshot {screen,area,window}
 super + s ; { s, a, w }
   ~/.config/bspwm/scripts/screenshot.sh { screen, area, window }
 
