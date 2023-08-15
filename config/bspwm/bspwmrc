@@ -59,7 +59,7 @@ if has redshift; then
 fi
 
 is_monitor() {
-	xrandr --listactivemonitors | grep -q "$1"
+	xrandr | grep -q "$1 connected"
 }
 
 is_laptop() {
@@ -70,10 +70,7 @@ is_work_laptop() {
 	cat /sys/class/net/*/address | grep -q "c0:b8:83:38:0f:04"
 }
 
-if is_monitor "DP-4"; then
-	export DISPLAY_NAME="DP-4"
-	export MONITOR_SCRIPT="$HOME/.screenlayout/nvidia.sh"
-elif is_monitor "DispalyPort-0"; then
+if is_monitor "DisplayPort-0"; then
 	export DISPLAY_NAME="DisplayPort-0"
 	export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
 elif ! is_monitor "eDP1"; then
