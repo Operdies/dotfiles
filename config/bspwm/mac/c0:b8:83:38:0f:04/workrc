@@ -1,0 +1,11 @@
+#!/bin/env bash
+
+is_monitor() {
+	xrandr --listactivemonitors | grep -q "$1"
+}
+
+if is_monitor DP1 ; then 
+  ~/.config/bspwm/scripts/virtual-monitors/virtual-monitors.sh split "DP1" 0.4
+else 
+  bspc monitor -d 1 2 3 4 5 6 7 8 9 0
+fi

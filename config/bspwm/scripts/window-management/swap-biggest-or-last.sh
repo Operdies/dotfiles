@@ -23,3 +23,4 @@ else
   # Now refocus the current focused node
   bspc node -f $focused
 fi
+bspc node -f biggest.local
