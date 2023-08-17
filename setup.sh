@@ -8,6 +8,7 @@ ensure_binaries() {
 	binaries=(
 		nvr neovim-remote
 		discord "discord noto-fonts-emoji"
+		fd fd
 		rg ripgrep
 		xautolock xautolock
 		htop htop

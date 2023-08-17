@@ -14,7 +14,7 @@ rand() {
 }
 
 case $1 in
-left | right)
+left | middle | right)
 	polybar "$1" -c ~/.config/polybar/config.ini &
 	;;
 kill)

@@ -32,6 +32,13 @@ num_monitors() {
 	xrandr --listactivemonitors | head -n 1 | cut -d':' -f2 | xargs
 }
 
+rhkd() {
+	~/.cargo/bin/rhkd "$@"
+}
+rhkd-whichkey() {
+	~/.cargo/bin/rhkd-whichkey "$@"
+}
+
 start_sxhkd() {
 	# Set caps = escape
 	# This should run before sxhkd starts so caps can be mapped to ESCAPE_KEYSYM
@@ -40,16 +47,16 @@ start_sxhkd() {
 	# set the usless key left of 'z' to backtick / tilde
 	xmodmap -e 'keycode 94 = grave asciitilde'
 
-	SXHKD="rhkd"
+	SXHKD="shkd"
 	SXHKD_FIFO=/tmp/sxhkd-fifo
 	[ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
 	if pgrep -x "$SXHKD" >/dev/null; then
 		# Reload config if sxhkd is already running
 		pkill -USR1 -x "$SXHKD"
 	else
-		~/.cargo/bin/rhkd -s $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc >~/startup_errors &
+		"$SXHKD" -s $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc >~/rhkdlogs &
 	fi
-	pgrep -x rhkx-whichkey || ~/.cargo/bin/rhkd-whichkey --status-fifo $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc &
+	pgrep -x rhkd-whichkey || rhkd-whichkey --status-fifo $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc &
 }
 
 start_sxhkd
@@ -96,6 +103,10 @@ default-config() {
 
 	bspc config single_monocle fale
 	bspc config gapless_monocle false
+
+	# Some wine applications behave weird with borders.
+	# Floating windows move diagonally off the screen unless tiled.
+	~/.config/bspwm/scripts/window-management/no_border_wine &
 }
 
 laptop() {
@@ -103,6 +114,7 @@ laptop() {
 	default-config
 	bspc config single_monocle true
 	bspc config gapless_monocle true
+
 	SPLIT_RATIO=0.5$(rand 1 5)
 	bspc config split_ratio "$SPLIT_RATIO"
 	bspc config border_width "$(rand 1 2)"
@@ -194,6 +206,10 @@ pip-mode() {
 
 # Configure the screen so the is a single 2560x1440 monitor in the middle, and two 1280x1440 monitors surrounding it
 virtual-triple-pip-mode() {
+	default-config
+	bspc config single_monocle true
+	bspc config gapless_monocle true
+
 	$MONITOR_SCRIPT
 	export LEFT="vir1"
 	export RIGHT="vir2"
@@ -227,7 +243,7 @@ virtual-triple-pip-mode() {
 	bspc node -f "$FOCUSED"
 
 	# We don't want any top padding for the QHD monitor
-	bspc config -m "$MIDDLE" top_padding 0
+	# bspc config -m "$MIDDLE" top_padding 0
 
 	bspc monitor $LEFT -d 1 2 3
 	bspc monitor $MIDDLE -d 4 5 6
@@ -249,7 +265,7 @@ virtual-triple-pip-mode() {
 	~/.config/polybar/launch.sh kill
 	~/.config/polybar/launch.sh left
 	~/.config/polybar/launch.sh right
-	~/.config/polybar/launch.sh vir3
+	~/.config/polybar/launch.sh middle
 }
 
 # rules
@@ -269,7 +285,7 @@ elif is_laptop; then
 	bspc rule -a 'Steam:*' desktop=^4
 	bspc rule -a 'steamwebhelper:*' desktop=^4
 else
-	ultrawide
+	virtual-triple-pip-mode
 	bspc rule -a 'discord:*' desktop=^7
 	bspc rule -a 'Steam:*' desktop=^7
 	bspc rule -a 'steamwebhelper:*' desktop=^7
@@ -277,10 +293,6 @@ else
 	# Floating windows move diagonally off the screen unless tiled.
 	~/.config/bspwm/scripts/window-management/no_border_wine &
 fi
-# ultrawide
-# virtual-triple-pip-mode
-# virtual-pip-mode
-# pip-mode
 
 # Polkit
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
