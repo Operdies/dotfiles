@@ -160,12 +160,12 @@ my_sites = [
 # Only accept cookies and javascript from specific sites
 config.set('content.cookies.accept', 'no-3rdparty')
 config.set('content.javascript.enabled', True)
-config.set('content.javascript.can_access_clipboard', False)
+config.set('content.javascript.clipboard', 'none')
 
 for site in my_sites:
     config.set('content.javascript.enabled', True, site)
     config.set('content.cookies.accept', 'no-unknown-3rdparty', site)
-    config.set('content.javascript.can_access_clipboard', True, site)
+    # config.set('content.javascript.clipboard', 'access')
     
 # As dark as possible please
 config.set("colors.webpage.darkmode.enabled", True)
