@@ -5,14 +5,14 @@ super + Return
 # program launcher
 super + d
 	rofi -modi drun -show drun -line-padding 4 \
-                -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
-                -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
+    -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
+    -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
 
 # show open window
 super + ctrl + d
 	rofi -modi drun -show window -line-padding 4 \
-                -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
-                -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
+    -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
+    -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
 
 
 # Power Menu
@@ -184,14 +184,6 @@ Print
 super + s ; { s, a, w }
   ~/.config/bspwm/scripts/screenshot.sh { screen, area, window }
 
-super + F2
-  polybar-msg cmd toggle
-
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh
 
-super + F4
-  echo {1,2} {3,4}
-
-super + F5 ; super + c 
-  for ((i=0;i<10;i++)); do dunstify hello; sleep 1; done

@@ -47,16 +47,14 @@ start_sxhkd() {
 	# set the usless key left of 'z' to backtick / tilde
 	xmodmap -e 'keycode 94 = grave asciitilde'
 
-	SXHKD="shkd"
-	SXHKD_FIFO=/tmp/sxhkd-fifo
-	[ -p $SXHKD_FIFO ] || mkfifo $SXHKD_FIFO
-	if pgrep -x "$SXHKD" >/dev/null; then
+	HKD="rhkd"
+	if pgrep -x "$HKD" >/dev/null; then
 		# Reload config if sxhkd is already running
-		pkill -USR1 -x "$SXHKD"
+		pkill -USR1 -x "$HKD"
 	else
-		"$SXHKD" -s $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc >~/rhkdlogs &
+		"$HKD" -c ~/.config/sxhkd/sxhkdrc
 	fi
-	pgrep -x rhkd-whichkey || rhkd-whichkey --status-fifo $SXHKD_FIFO -c ~/.config/sxhkd/sxhkdrc &
+	pgrep -x rhkd-whichkey || rhkd-whichkey -c ~/.config/sxhkd/sxhkdrc &
 }
 
 start_sxhkd
