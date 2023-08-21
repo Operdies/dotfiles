@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This fixes an issue causing Jetbrains windows to be tiny
+export _JAVA_AWT_WM_NONREPARENTING=1
+
 start=$SECONDS
 
 # Notifications
@@ -58,7 +61,7 @@ if has redshift; then
 fi
 
 is_monitor() {
-	xrandr | grep -q "$1 connected"
+	xrandr | grep -q "^$1 connected"
 }
 
 is_laptop() {
