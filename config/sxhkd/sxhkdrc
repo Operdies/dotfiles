@@ -45,11 +45,11 @@ super + n : { c, k, f }
 
 # Manage Tiling Layout
 # Set layout to {tall,rtall,monocle,rwide}
-super + t : { l, h, m, w }
+super + t ; { l, h, m, w }
   bsp-layout set {tall,rtall,monocle,rwide}
 
 # {tiled,floating,fullscreen}
-super + t : {t, s, f}
+super + t ; {t, s, f}
 	bspc node -t {tiled; bsp-layout set tiled,floating,fullscreen}
 
 # set node flags
@@ -144,11 +144,18 @@ super + r ; { q, w, m, p, d, s }
 # super + shift + b 
 #   bspc node @/ -B
 
+# Volume Controls
+# Volume { -5%, +5%,-20%,+20%}
 super + v : { j, k, super + j, super + k }
-  pactl set-sink-volume 0 { -5%, +5%, -20%, +20% } && pactl set-sink-mute 0 0 # Volume $(3)
+  pactl set-sink-volume 0 { -5%, +5%, -20%, +20% } && pactl set-sink-mute 0 0
 
-super + v : m 
+# Mute
+super + v ; m 
   amixer -D pulse sset Master toggle-mute # Toggle Mute
+
+# Pavucontrol
+super + v ; p 
+  pavucontrol
 
 # Set brightness
 # {1-9,10}0% brightness
@@ -185,5 +192,5 @@ super + s ; { s, a, w }
   ~/.config/bspwm/scripts/screenshot.sh { screen, area, window }
 
 super + F1
-  ~/.config/bspwm/scripts/keybindings_rofi.sh
+  ~/.config/bspwm/scripts/keybindings_rofi.sh2
 
