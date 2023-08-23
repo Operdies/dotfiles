@@ -27,7 +27,7 @@ super + shift + e ; { 1, 2, 3, 4, 5}
   
 # make sxhkd reload its configuration files:
 super + Escape
-	pkill -USR1 -x rhkd ; pkill -USR1 -x sxhkd
+	~/.config/sxhkd/bash_config.bash
 
 # quit/restart bspwm
 super + alt + r
@@ -127,18 +127,6 @@ super + w : {_,shift + }c
 # Move {Left,Down,Up,Right}
 super + w : alt + {h,j,k,l}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
-
-# Launch
-# {qutebrowser,wezterm,manga reader,pavucontrol,Discord,Steam}
-super + r ; { q, w, m, p, d, s }
-  { \
-    qutebrowser \
-  , wezterm start\
-  , hakuneko-desktop\
-  , pavucontrol \
-  , discord \
-  , steam \
-  }
 
 # Balance the size of all windows 
 # super + shift + b 

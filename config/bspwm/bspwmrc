@@ -28,7 +28,7 @@ error() {
 }
 
 has() {
-	which "$1" 2>/dev/null
+	command -v "$1"
 }
 
 num_monitors() {
@@ -52,6 +52,8 @@ start_sxhkd() {
 
 	pgrep -x rhkd || rhkd -c ~/.config/sxhkd/sxhkdrc &
 	pgrep -x rhkd-whichkey || rhkd-whichkey -c ~/.config/sxhkd/sxhkdrc &
+
+	~/.config/sxhkd/bash_config.bash
 }
 
 start_sxhkd
