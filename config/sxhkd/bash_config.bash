@@ -7,9 +7,8 @@ rhkc() {
 }
 
 bind_unconditional() {
-	title=
-	if ! [ -z "$TITLE" ]; then
-		title="-t $TITLE"
+	if [ -z ${FLAGS+x} ] || [ -z "$FLAGS" ]; then
+		FLAGS=()
 	fi
 
 	for ((i = 0; i < ${#BINDINGS[@]}; i += 3)); do
@@ -17,14 +16,13 @@ bind_unconditional() {
 		hotkey="${BINDINGS[i + 1]}"
 		description="${BINDINGS[i + 2]}"
 		dunstify unconditional "c $bin h $hotkey d $description"
-		rhkc bind "$PREFIX$hotkey" -c "$bin" -d "$description"
+		rhkc bind "$PREFIX$hotkey" -c "$bin" -d "$description" "${FLAGS[@]}"
 	done
 }
 
 bind_conditional() {
-	title=
-	if ! [ -z "$TITLE" ]; then
-		title="-t $TITLE"
+	if [ -z ${FLAGS+x} ] || [ -z "$FLAGS" ]; then
+		FLAGS=()
 	fi
 
 	for ((i = 0; i < ${#BINDINGS[@]}; i += 3)); do
@@ -40,9 +38,7 @@ bind_conditional() {
 		command=${bin#*:}
 
 		if command -v $binary; then
-			rhkc bind "$PREFIX$hotkey" -c "$command" -d "$description" "$title"
-		else
-			dunstify "Not Bound: $PREFIX $hotkey" "$binary not found"
+			rhkc bind "$PREFIX$hotkey" -c "$command" -d "$description" "${FLAGS[@]}"
 		fi
 	done
 }
@@ -59,8 +55,22 @@ common_apps() {
 		pavucontrol p 'pavucontrol'
 	)
 	PREFIX='super + r ; '
-
-	TITLE="Launch Proggram" bind_conditional
+	FLAGS=(-t "Launch Program")
+	bind_conditional
 }
 
 common_apps
+
+terminal() {
+	PREFIX='super + '
+	FLAGS=()
+	# Set xfce4-terminal as main terminal, and wezterm as fallback
+	BINDINGS=(
+		'xfce4-terminal' Return 'xfce4-terminal'
+		'wezterm:wezterm start' Return 'Wezterm'
+	)
+
+	bind_conditional
+}
+
+terminal
