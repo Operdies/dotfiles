@@ -53,7 +53,9 @@ common_apps() {
 		qutebrowser q 'Qutebrowser'
 		firefox f 'Firefox'
 		pavucontrol p 'pavucontrol'
+		'xfce4-terminal:xfce4-terminal -e "tmux attach"' x 'tmux attach most recent'
 	)
+
 	PREFIX='super + r ; '
 	FLAGS=(-t "Launch Program")
 	bind_conditional

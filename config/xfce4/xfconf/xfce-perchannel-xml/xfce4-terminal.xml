@@ -11,7 +11,7 @@
   <property name="color-bold" type="string" value=""/>
   <property name="color-palette" type="string" value="#45475A;#F38BA8;#A6E3A1;#F9E2AF;#89B4FA;#F5C2E7;#94E2D5;#BAC2DE;#585B70;#F38BA8;#A6E3A1;#F9E2AF;#89B4FA;#F5C2E7;#94E2D5;#A6ADC8"/>
   <property name="color-bold-is-bright" type="bool" value="true"/>
-  <property name="font-name" type="string" value="Source Code Pro 10"/>
+  <property name="font-name" type="string" value="MesloLGS NF 10"/>
   <property name="misc-always-show-tabs" type="bool" value="false"/>
   <property name="misc-bell" type="bool" value="false"/>
   <property name="misc-bell-urgent" type="bool" value="false"/>
