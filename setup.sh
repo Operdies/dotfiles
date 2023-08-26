@@ -28,6 +28,7 @@ ensure_binaries() {
 		gcc gcc
 		npm npm
 		wezterm wezterm
+		tmux tmux
 	)
 
 	missing=()
@@ -71,7 +72,7 @@ ensure_links() {
 	for item in "$(dirname "$0")/config/"*; do
 		item="$(readlink -f "$item")"
 		target="$HOME/.config/$(basename "$item")"
-		if [ -h "$target" ] && readlink -f "$target" ; then
+		if [ -h "$target" ] && readlink -f "$target"; then
 			echo "Skipping target '$target': File exists and is a symlink"
 		else
 			if [ -e "$target" ]; then
