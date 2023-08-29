@@ -178,3 +178,5 @@ super + s ; { s, a, w }
 super + F1
   ~/.config/bspwm/scripts/keybindings_rofi.sh2
 
+super + shift + d 
+  tmux list-sessions -F#S | rofi -dmenu -window-title 'Pick tmux session' | xargs -I _ xfce4-terminal -e 'tmux attach -t "_"'
