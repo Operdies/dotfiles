@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <channel name="xfce4-terminal" version="1.0">
-  <property name="background-mode" type="string" value="TERMINAL_BACKGROUND_TRANSPARENT"/>
   <property name="background-darkness" type="double" value="0.85999999999999999"/>
   <property name="color-foreground" type="string" value="#CDD6F4"/>
   <property name="color-background" type="string" value="#1E1E2E"/>
@@ -15,19 +14,19 @@
   <property name="misc-always-show-tabs" type="bool" value="false"/>
   <property name="misc-bell" type="bool" value="false"/>
   <property name="misc-bell-urgent" type="bool" value="false"/>
-  <property name="misc-borders-default" type="bool" value="true"/>
+  <property name="misc-borders-default" type="bool" value="false"/>
   <property name="misc-cursor-blinks" type="bool" value="false"/>
   <property name="misc-cursor-shape" type="string" value="TERMINAL_CURSOR_SHAPE_BLOCK"/>
   <property name="misc-default-geometry" type="string" value="100x30"/>
   <property name="misc-inherit-geometry" type="bool" value="false"/>
   <property name="misc-menubar-default" type="bool" value="false"/>
-  <property name="misc-mouse-autohide" type="bool" value="false"/>
+  <property name="misc-mouse-autohide" type="bool" value="true"/>
   <property name="misc-mouse-wheel-zoom" type="bool" value="true"/>
   <property name="misc-toolbar-default" type="bool" value="false"/>
   <property name="misc-confirm-close" type="bool" value="false"/>
   <property name="misc-cycle-tabs" type="bool" value="true"/>
   <property name="misc-tab-close-buttons" type="bool" value="true"/>
-  <property name="misc-tab-close-middle-click" type="bool" value="true"/>
+  <property name="misc-tab-close-middle-click" type="bool" value="false"/>
   <property name="misc-tab-position" type="string" value="GTK_POS_TOP"/>
   <property name="misc-highlight-urls" type="bool" value="true"/>
   <property name="misc-middle-click-opens-uri" type="bool" value="false"/>
@@ -41,6 +40,8 @@
   <property name="misc-right-click-action" type="string" value="TERMINAL_RIGHT_CLICK_ACTION_CONTEXT_MENU"/>
   <property name="scrolling-bar" type="string" value="TERMINAL_SCROLLBAR_NONE"/>
   <property name="scrolling-unlimited" type="bool" value="true"/>
+  <property name="shortcuts-no-menukey" type="bool" value="true"/>
+  <property name="shortcuts-no-mnemonics" type="bool" value="true"/>
   <property name="title-mode" type="string" value="TERMINAL_TITLE_REPLACE"/>
   <property name="tab-activity-color" type="string" value="#FAB387"/>
   <property name="text-blink-mode" type="string" value="TERMINAL_TEXT_BLINK_MODE_FOCUSED"/>
