@@ -1,5 +1,10 @@
 #!/bin/env bash
 
+setxkbmap us -variant altgr-intl
+setxkbmap -option caps:escape
+
+DEFAULT_PREFIX='@Super_L'
+
 pkill -USR1 -x rhkd
 
 rhkc() {
@@ -48,14 +53,14 @@ common_apps() {
 		'xfce4-terminal:xfce4-terminal -e "tmux attach"' x 'tmux attach most recent'
 	)
 
-	PREFIX='alt + Escape ; r ; '
+	PREFIX="$DEFAULT_PREFIX ; r ; "
 	bind_conditional -t "Launch Program" --overwrite
 }
 
 common_apps
 
 terminal() {
-	PREFIX='alt + Escape ; '
+	PREFIX="$DEFAULT_PREFIX ; "
 	# Set xfce4-terminal as main terminal, and wezterm as fallback
 	BINDINGS=(
 		'xfce4-terminal' Return 'xfce4-terminal'
@@ -63,37 +68,75 @@ terminal() {
 	)
 
 	bind_conditional -t terminal
+
+	# crutch
+	PREFIX='super + '
+	bind_conditional -t terminal
 }
 
 terminal
 
-rest() {
-	PREFIX='alt + Escape ; '
+etcetera() {
+	PREFIX="$DEFAULT_PREFIX ; "
 	BINDINGS=(
-		'rofi -modi drun -show drun -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"' d 'Rofi Launcher'
+		'rofi -modi drun -show drun -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"'
+		d
+		'Rofi Launcher'
 	)
 	bind_unconditional -t "Do.." -o
 	BINDINGS=(
-		'bspc node -t {tiled,floating,fullscreen}' 't ; {t,s,f}' '{tiled,floating,fullscreen}'
+		'bspc node -t {tiled;bsp-layout set tiled,floating,fullscreen}'
+		't ; {t,s,f}'
+		'{tiled,floating,fullscreen}'
 	)
 	bind_unconditional -t "Manage Layout" -o
 	BINDINGS=(
-		'bspc node -{c,k,f next.local.!hidden.window}' 'n : {c,k,f}' '{close,kill,next} window'
+		'bspc node -{c,k,f next.local.!hidden.window}'
+		'n : {c,k,f}'
+		'{close,kill,next} window'
 	)
 	bind_unconditional -t "Manage Windows" -o
 
 	BINDINGS=(
-    'bspc desktop -f ^{1-9,10}' 'c : {1-9,0}' 'Switch to workspace {1-9,10}'
+		'bspc desktop -f ^{1-9,10}'
+		'c : {q,w,e,r,t,y,u,i,o,p}'
+		'Switch to workspace {1-9,10}'
 	)
 	bind_unconditional -t "Switch Workspace" -o
 	BINDINGS=(
-    'bspc node -d ^{1-9,10}' 'c : {q,w,e,r,t,y,u,i,o,p}' 'Send window to workspace {1-9,10}'
+		'bspc node -d ^{1-9,10}'
+		'c : {a,s,d,f,g,h,j,k,l,semicolon}'
+		'Send window to workspace {1-9,10}'
 	)
 	bind_unconditional -t "Move Windows" -o
 	BINDINGS=(
-		'bspc node -f {next,prev}.local.!hidden.window' 'c : {c,v}' '{next,previous} window'
+		'bspc node -f {next,prev}.local.!hidden.window'
+		'c : {c,x}'
+		'{next,previous} window'
 	)
 	bind_unconditional -t "Cycle Windows" -o
 }
 
-rest
+etcetera
+
+power() {
+	PREFIX="$DEFAULT_PREFIX ; "
+	lock='~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh'
+	BINDINGS=(
+		"{$lock,bspc quit,systemctl poweroff,systemctl reboot,$lock; systemctl suspend}"
+		'e ; {1,2,3,4,5}'
+		'{ Lock,󰗼 Logout, Shutdown,󰁯 Reboot, Sleep}'
+	)
+	bind_unconditional -t "Power Menu" -o
+}
+power
+
+reload() {
+	PREFIX="$DEFAULT_PREFIX ; q ; "
+	BINDINGS=(
+		'bspc wm -r' w 'Reload bspwm'
+		'~/.config/sxhkd/bash_config.bash' r 'Reload rhkd'
+	)
+	bind_unconditional -t 'Reload' -o
+}
+reload

@@ -47,8 +47,6 @@ start_sxhkd() {
 	# This should run before sxhkd starts so caps can be mapped to ESCAPE_KEYSYM
 	setxkbmap us -variant altgr-intl
 	setxkbmap -option caps:escape
-	# set the usless key left of 'z' to backtick / tilde
-	xmodmap -e 'keycode 94 = grave asciitilde'
 
 	pgrep -x rhkd || rhkd -c ~/.config/sxhkd/sxhkdrc &
 	pgrep -x rhkd-whichkey || rhkd-whichkey -c ~/.config/sxhkd/sxhkdrc &
@@ -206,7 +204,7 @@ pip-mode() {
 # Configure the screen so the is a single 2560x1440 monitor in the middle, and two 1280x1440 monitors surrounding it
 virtual-triple-pip-mode() {
 	default-config
-	bspc config single_monocle true
+	bspc config single_monocle false
 	bspc config gapless_monocle true
 
 	$MONITOR_SCRIPT
