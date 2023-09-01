@@ -36,7 +36,7 @@ super + {_,shift + }q
 # Manage Windows 
 # {close,kill,next} window
 super + n : { c, k, f }
-  bspc node -{c,k,f next.local.!hidden.window } # -c:"close window" -k:kill\ window -f:'next' $(2)
+  bspc node -{c,k,f next.local.!hidden.window }
 
 
 # Manage Tiling Layout
@@ -55,6 +55,10 @@ super + x : {m,x,y,z}
 # focus {next,previous}
 super + x : {_, shift+}c
   bspc node -f {next,prev}.local.!hidden.window # 
+
+# select {parent,brother,first child,second child}
+super + x : {p,b,f,s}
+  bspc node -f @{parent,brother,first,second}
 
 # focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
