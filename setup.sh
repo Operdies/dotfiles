@@ -68,20 +68,28 @@ ensure_binaries() {
 	fi
 }
 
+mylink() {
+	item="$(readlink -f "$1")"
+	target="$2"
+	if [ -h "$target" ] && readlink -f "$target"; then
+		echo "Skipping target '$target': File exists and is a symlink"
+	else
+		if [ -e "$target" ]; then
+			echo "'$target' exists. Renaming to '$target.bak'."
+			mv "$target" "$target.bak"
+		fi
+		ln -s "$item" "$target"
+		echo "Created symlink: '$item' -> '$target'"
+	fi
+
+}
+
 ensure_links() {
+	mylink "$(dirname "$0")/zshrc" "$HOME/.zshrc"
 	for item in "$(dirname "$0")/config/"*; do
 		item="$(readlink -f "$item")"
 		target="$HOME/.config/$(basename "$item")"
-		if [ -h "$target" ] && readlink -f "$target"; then
-			echo "Skipping target '$target': File exists and is a symlink"
-		else
-			if [ -e "$target" ]; then
-				echo "'$target' exists. Renaming to '$target.bak'."
-				mv "$target" "$target.bak"
-			fi
-			ln -s "$item" "$target"
-			echo "Created symlink: '$item' -> '$target'"
-		fi
+		mylink "$item" "$target"
 	done
 }
 
