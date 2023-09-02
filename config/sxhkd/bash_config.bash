@@ -1,4 +1,5 @@
 #!/bin/env bash
+start_at=$(date +%s,%N)
 
 setxkbmap us -variant altgr-intl
 setxkbmap -option caps:escape
@@ -11,12 +12,20 @@ rhkc() {
 	~/.cargo/bin/rhkc "$@"
 }
 
+bind() {
+	hk="$1"
+	shift
+	cmd="$1"
+	shift
+
+	rhkc bind "$hk" -c "$cmd" "$@"
+}
+
 bind_unconditional() {
 	for ((i = 0; i < ${#BINDINGS[@]}; i += 3)); do
 		bin="${BINDINGS[i]}"
 		hotkey="${BINDINGS[i + 1]}"
 		description="${BINDINGS[i + 2]}"
-		dunstify unconditional "c $bin h $hotkey d $description"
 		rhkc bind "$PREFIX$hotkey" -c "$bin" -d "$description" "$@"
 	done
 }
@@ -140,3 +149,27 @@ reload() {
 	bind_unconditional -t 'Reload' -o
 }
 reload
+
+tmuxes(){
+  PREFIX="$DEFAULT_PREFIX ; a ; "
+  readarray -t <<<`tmux list-sessions -F#S`
+  keys=(q w e r t)
+
+  for ((i=0;i<${#keys[*]};i++)); do 
+    if ((i >= ${#MAPFILE[@]})); then 
+      return; 
+    fi
+    session="${MAPFILE[i]}"
+    bind "$PREFIX ${keys[i]}" "xfce4-terminal -e 'tmux attach -t \"$session\"'" -d "Attach to '$session'" -t "Attach to tmux session"
+  done
+}
+
+tmuxes
+
+end_at=$(date +%s,%N)
+_s1=$(echo $start_at | cut -d',' -f1)   # sec
+_s2=$(echo $start_at | cut -d',' -f2)   # nano sec
+_e1=$(echo $end_at | cut -d',' -f1)
+_e2=$(echo $end_at | cut -d',' -f2)
+time_cost=$(bc <<< "scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")
+dunstify rhkd "Reloaded rhkd in $time_cost seconds"
