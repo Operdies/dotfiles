@@ -13,7 +13,7 @@ rhkc() {
 }
 
 bind() {
-	hk="$1"
+	hk="$DEFAULT_PREFIX ; $1"
 	shift
 	cmd="$1"
 	shift
@@ -108,19 +108,19 @@ etcetera() {
 
 	BINDINGS=(
 		'bspc desktop -f ^{1-9,10}'
-		'c : {q,w,e,r,t,y,u,i,o,p}'
+		'@Super_L : {q,w,e,r,t,y,u,i,o,p}'
 		'Switch to workspace {1-9,10}'
 	)
 	bind_unconditional -t "Switch Workspace" -o
 	BINDINGS=(
 		'bspc node -d ^{1-9,10}'
-		'c : {a,s,d,f,g,h,j,k,l,semicolon}'
+		'@Super_L : {a,s,d,f,g,h,j,k,l,semicolon}'
 		'Send window to workspace {1-9,10}'
 	)
 	bind_unconditional -t "Move Windows" -o
 	BINDINGS=(
 		'bspc node -f {next,prev}.local.!hidden.window'
-		'c : {c,x}'
+		'@Super_L : {c,x}'
 		'{next,previous} window'
 	)
 	bind_unconditional -t "Cycle Windows" -o
@@ -141,35 +141,41 @@ power() {
 power
 
 reload() {
-	PREFIX="$DEFAULT_PREFIX ; q ; "
+	PREFIX="$DEFAULT_PREFIX ; w ; "
 	BINDINGS=(
 		'bspc wm -r' w 'Reload bspwm'
 		'~/.config/sxhkd/bash_config.bash' r 'Reload rhkd'
+    'polybar-msg cmd restart' p 'Reload polybar'
 	)
 	bind_unconditional -t 'Reload' -o
 }
 reload
 
-tmuxes(){
-  PREFIX="$DEFAULT_PREFIX ; a ; "
-  readarray -t <<<`tmux list-sessions -F#S`
-  keys=(q w e r t)
+tmuxes() {
+	readarray -t <<<$(tmux list-sessions -F#S)
+	keys=(q w e r t)
 
-  for ((i=0;i<${#keys[*]};i++)); do 
-    if ((i >= ${#MAPFILE[@]})); then 
-      return; 
-    fi
-    session="${MAPFILE[i]}"
-    bind "$PREFIX ${keys[i]}" "xfce4-terminal -e 'tmux attach -t \"$session\"'" -d "Attach to '$session'" -t "Attach to tmux session"
-  done
+	for ((i = 0; i < ${#keys[*]}; i++)); do
+		if ((i >= ${#MAPFILE[@]})); then
+			return
+		fi
+		session="${MAPFILE[i]}"
+		bind "a ; ${keys[i]}" "xfce4-terminal -e 'tmux attach -t \"$session\"'" -d "Attach to '$session'" -t "Attach to tmux session"
+	done
 }
 
 tmuxes
 
-end_at=$(date +%s,%N)
-_s1=$(echo $start_at | cut -d',' -f1)   # sec
-_s2=$(echo $start_at | cut -d',' -f2)   # nano sec
-_e1=$(echo $end_at | cut -d',' -f1)
-_e2=$(echo $end_at | cut -d',' -f2)
-time_cost=$(bc <<< "scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")
-dunstify rhkd "Reloaded rhkd in $time_cost seconds"
+print_time() {
+	end_at=$(date +%s,%N)
+	_s1=$(echo $start_at | cut -d',' -f1) # sec
+	_s2=$(echo $start_at | cut -d',' -f2) # nano sec
+	_e1=$(echo $end_at | cut -d',' -f1)
+	_e2=$(echo $end_at | cut -d',' -f2)
+	time_cost=$(bc <<<"scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")
+	dunstify rhkd "Reloaded rhkd in $time_cost seconds"
+}
+
+print_time
+
+bind 's ; {s,a,w}' '~/.config/bspwm/scripts/screenshot.sh {screen,area,window}' -d 'screenshot {screen,area,window}' -t 'Screenshot'

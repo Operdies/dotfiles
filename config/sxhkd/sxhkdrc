@@ -5,22 +5,11 @@ super + d
     -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
 
 # show open window
-super + ctrl + d
+super + Tab
 	rofi -modi drun -show window -line-padding 4 \
     -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
     -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
 
-
-# Power Menu
-# { Lock,󰗼 Logout, Shutdown,󰁯 Reboot, Sleep}
-super + shift + e ; { 1, 2, 3, 4, 5}
-  { ~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh \
-    , bspc quit \
-    , systemctl poweroff \
-    , systemctl reboot \
-    , ~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh; systemctl suspend \
-  }
-  
 # make sxhkd reload its configuration files:
 super + Escape
 	~/.config/sxhkd/bash_config.bash
@@ -68,11 +57,6 @@ super + {_,shift + }{h,j,k,l}
 super + {_,shift + }c
 	bspc node -f {next,prev}.local.!hidden.window
 
-# tab desktops
-# focus {next,previous} local desktop
-super + Tab : bracket{left,right}
-	bspc desktop -f {prev,next}.local
-
 # focus the older or newer node in the focus history
 # super + {o,i}
 # 	bspc wm -h off; \
@@ -100,7 +84,7 @@ super + p ; space
 	bspc node -p cancel
 
 # Move focused node to selected area
-super + p : s
+super + p ; s
   bspc node -g marked && bspc node newest.marked.local -n newest.!automatic # Insert current node in preselection area
 
 # Focus {previous,next} node

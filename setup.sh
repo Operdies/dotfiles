@@ -97,7 +97,6 @@ ensure_clones() {
 	REPO_DIR="$HOME/repos"
 	[ -d "$REPO_DIR" ] || mkdir -p "$REPO_DIR"
 	projects=(
-		LazyVim
 		gwatch.nvim
 		gwatch
 		sxhkd-whichkey
