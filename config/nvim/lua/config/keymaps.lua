@@ -15,13 +15,13 @@ map("n", "]<space>", "mlo<Esc>`l", opts)
 
 
 map("i", "<M-h>", '<C-o>b', opts)
-map("i", "<M-l>", '<C-o>e', opts)
+map("i", "<M-l>", '<C-o>e<C-o>l', opts)
 
 map("i", "<C-h>", '<C-o>h', opts)
 map('i', '<C-l>', '<C-o>l', opts)
 
 map("i", "<M-C-h>", '<C-o>B', opts)
-map("i", "<M-C-l>", '<C-o>E', opts)
+map("i", "<M-C-l>", '<C-o>E<C-o>l', opts)
 
 map('i', '<M-C-j>', '<C-o>gj', opts)
 map('i', '<M-C-k>', '<C-o>gk', opts)

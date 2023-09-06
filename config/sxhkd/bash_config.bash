@@ -124,6 +124,8 @@ etcetera() {
 		'{next,previous} window'
 	)
 	bind_unconditional -t "Cycle Windows" -o
+	BINDINGS=('xfce4-terminal' '@Super_L ; Return' 'Open Terminal')
+	bind_unconditional -t "Terminal" -o
 }
 
 etcetera
@@ -145,7 +147,7 @@ reload() {
 	BINDINGS=(
 		'bspc wm -r' w 'Reload bspwm'
 		'~/.config/sxhkd/bash_config.bash' r 'Reload rhkd'
-    'polybar-msg cmd restart' p 'Reload polybar'
+		'polybar-msg cmd restart' p 'Reload polybar'
 	)
 	bind_unconditional -t 'Reload' -o
 }
