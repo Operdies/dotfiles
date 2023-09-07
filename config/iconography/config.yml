@@ -16,9 +16,13 @@ icons:
             icon: 
           - contains: outlook
             icon: 
+          - matches: .*Mozilla Firefox$
+            icon: 
       - discord: ﭮ
       - Steam: 
       - Spotify: 
       - jetbrains-rider: 
       - teams-for-linux: 󰊻
       - HakuNeko: 
+      - matches: .*
+        icon: 
