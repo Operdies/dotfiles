@@ -4,7 +4,7 @@ start_at=$(date +%s,%N)
 setxkbmap us -variant altgr-intl
 setxkbmap -option caps:escape
 
-DEFAULT_PREFIX='@Super_L'
+DEFAULT_PREFIX='super + space ; '
 
 pkill -USR1 -x rhkd
 
@@ -13,7 +13,7 @@ rhkc() {
 }
 
 bind() {
-	hk="$DEFAULT_PREFIX ; $1"
+	hk="$DEFAULT_PREFIX $1"
 	shift
 	cmd="$1"
 	shift
@@ -62,14 +62,14 @@ common_apps() {
 		'xfce4-terminal:xfce4-terminal -e "tmux attach"' x 'tmux attach most recent'
 	)
 
-	PREFIX="$DEFAULT_PREFIX ; r ; "
+	PREFIX="$DEFAULT_PREFIX r ; "
 	bind_conditional -t "Launch Program" --overwrite
 }
 
 common_apps
 
 terminal() {
-	PREFIX="$DEFAULT_PREFIX ; "
+	PREFIX="$DEFAULT_PREFIX "
 	# Set xfce4-terminal as main terminal, and wezterm as fallback
 	BINDINGS=(
 		'xfce4-terminal' Return 'xfce4-terminal'
@@ -86,7 +86,7 @@ terminal() {
 terminal
 
 etcetera() {
-	PREFIX="$DEFAULT_PREFIX ; "
+	PREFIX="$DEFAULT_PREFIX "
 	BINDINGS=(
 		'rofi -modi drun -show drun -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"'
 		d
@@ -131,7 +131,7 @@ etcetera() {
 etcetera
 
 power() {
-	PREFIX="$DEFAULT_PREFIX ; "
+	PREFIX="$DEFAULT_PREFIX "
 	lock='~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh'
 	BINDINGS=(
 		"{$lock,bspc quit,systemctl poweroff,systemctl reboot,$lock; systemctl suspend}"
@@ -143,7 +143,7 @@ power() {
 power
 
 reload() {
-	PREFIX="$DEFAULT_PREFIX ; w ; "
+	PREFIX="$DEFAULT_PREFIX w ; "
 	BINDINGS=(
 		'bspc wm -r' w 'Reload bspwm'
 		'~/.config/sxhkd/bash_config.bash' r 'Reload rhkd'
