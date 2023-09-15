@@ -106,26 +106,26 @@ etcetera() {
 	)
 	bind_unconditional -t "Manage Windows" -o
 
-	BINDINGS=(
-		'bspc desktop -f ^{1-9,10}'
-		'@Super_L : {q,w,e,r,t,y,u,i,o,p}'
-		'Switch to workspace {1-9,10}'
-	)
-	bind_unconditional -t "Switch Workspace" -o
-	BINDINGS=(
-		'bspc node -d ^{1-9,10}'
-		'@Super_L : {a,s,d,f,g,h,j,k,l,semicolon}'
-		'Send window to workspace {1-9,10}'
-	)
-	bind_unconditional -t "Move Windows" -o
-	BINDINGS=(
-		'bspc node -f {next,prev}.local.!hidden.window'
-		'@Super_L : {c,x}'
-		'{next,previous} window'
-	)
-	bind_unconditional -t "Cycle Windows" -o
-	BINDINGS=('xfce4-terminal' '@Super_L ; Return' 'Open Terminal')
-	bind_unconditional -t "Terminal" -o
+	# BINDINGS=(
+	# 	'bspc desktop -f ^{1-9,10}'
+	# 	'@Super_L : {q,w,e,r,t,y,u,i,o,p}'
+	# 	'Switch to workspace {1-9,10}'
+	# )
+	# bind_unconditional -t "Switch Workspace" -o
+	# BINDINGS=(
+	# 	'bspc node -d ^{1-9,10}'
+	# 	'@Super_L : {a,s,d,f,g,h,j,k,l,semicolon}'
+	# 	'Send window to workspace {1-9,10}'
+	# )
+	# bind_unconditional -t "Move Windows" -o
+	# BINDINGS=(
+	# 	'bspc node -f {next,prev}.local.!hidden.window'
+	# 	'@Super_L : {c,x}'
+	# 	'{next,previous} window'
+	# )
+	# bind_unconditional -t "Cycle Windows" -o
+	# BINDINGS=('xfce4-terminal' '@Super_L ; Return' 'Open Terminal')
+	# bind_unconditional -t "Terminal" -o
 }
 
 etcetera
