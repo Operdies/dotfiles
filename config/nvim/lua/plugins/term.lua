@@ -7,7 +7,7 @@ return {
       toggleterm.setup(opts)
     end,
     keys = {
-      { "<c-\\>" },
+      { "<c-t>" },
       {
         "<leader>gg",
         function() require'toggleterm.terminal'.Terminal:new({ cmd = 'lazygit', hidden = true, direction = 'float' }):toggle() end,
@@ -17,7 +17,7 @@ return {
     opts = {
       direction = "float",
       size = 20,
-      open_mapping = [[<c-\>]],
+      open_mapping = [[<c-t>]],
       hide_numbers = true,
       shade_terminals = true,
       shading_factor = 2,
