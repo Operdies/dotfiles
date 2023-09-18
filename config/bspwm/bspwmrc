@@ -137,7 +137,6 @@ laptop() {
 }
 
 work_laptop() {
-	bspc monitor DP1 --remove
 	if is_monitor "DP1"; then
 		~/.screenlayout/monitor.sh
 		default-config
@@ -176,6 +175,7 @@ work_laptop() {
 		laptop
 		bspc wm --adopt-orphans
 	fi
+	bspc monitor DP1 --remove
 }
 
 ultrawide() {

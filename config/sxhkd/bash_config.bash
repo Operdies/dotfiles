@@ -64,6 +64,8 @@ common_apps() {
 
 	PREFIX="$DEFAULT_PREFIX r ; "
 	bind_conditional -t "Launch Program" --overwrite
+	PREFIX="super + r ; "
+	bind_conditional -t "Launch Program" --overwrite
 }
 
 common_apps
@@ -131,11 +133,11 @@ etcetera() {
 etcetera
 
 power() {
-	PREFIX="$DEFAULT_PREFIX "
+	PREFIX=""
 	lock='~/.config/bspwm/scripts/i3lock-fancy/i3lock-minimalist.sh'
 	BINDINGS=(
 		"{$lock,bspc quit,systemctl poweroff,systemctl reboot,$lock; systemctl suspend}"
-		'e ; {q,w,e,r,t}'
+		'super + shift + e ; {q,w,e,r,t}'
 		'{ Lock,󰗼 Logout, Shutdown,󰁯 Reboot, Sleep}'
 	)
 	bind_unconditional -t "Power Menu" -o
