@@ -24,5 +24,13 @@ icons:
       - jetbrains-rider: 
       - teams-for-linux: 󰊻
       - HakuNeko: 
+      - matches: ^code
+        icon: 
+      - matches: thunar|dolphin
+        icon: 
+      - matches: emacs
+        icon: 
+      - matches: pavucontrol
+        icon: 
       - matches: .*
         icon: 
