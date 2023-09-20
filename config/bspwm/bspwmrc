@@ -273,20 +273,17 @@ bspc rule -a 'Virt-manager:*' state=floating
 bspc rule -a 'Arandr:*' state=floating
 bspc rule -a 'Blueman-manager:*' state=floating
 bspc rule -a "Thunar:*" state=floating
+bspc rule -a 'steam:*' desktop=^7
+bspc rule -a 'steamwebhelper:*' desktop=^7
+bspc rule -a 'discord:*' desktop=^7
 
 if is_work_laptop; then
 	bspc rule -a teams-for-linux desktop=^10
 	work_laptop
 elif is_laptop; then
 	laptop
-	bspc rule -a 'discord:*' desktop=^3
-	bspc rule -a 'Steam:*' desktop=^4
-	bspc rule -a 'steamwebhelper:*' desktop=^4
 else
 	virtual-triple-pip-mode
-	bspc rule -a 'discord:*' desktop=^7
-	bspc rule -a 'Steam:*' desktop=^7
-	bspc rule -a 'steamwebhelper:*' desktop=^7
 	# Some wine applications behave weird with borders.
 	# Floating windows move diagonally off the screen unless tiled.
 	~/.config/bspwm/scripts/window-management/no_border_wine &
