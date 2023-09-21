@@ -16,6 +16,8 @@ icons:
             icon: 
           - contains: outlook
             icon: 
+          - matches: .* - qutebrowser$
+            icon: 󰄛
           - matches: .*Mozilla Firefox$
             icon: 
       - discord: ﭮ
