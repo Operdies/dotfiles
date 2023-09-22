@@ -14,14 +14,12 @@ map("n", "[<space>", "mlO<Esc>`l", opts)
 map("n", "]<space>", "mlo<Esc>`l", opts)
 
 
-map("i", "<M-h>", '<C-o>b', opts)
-map("i", "<M-l>", '<C-o>e<C-o>a', opts)
-
-map("i", "<C-h>", '<C-o>h', opts)
-map('i', '<C-l>', '<C-o>a', opts)
-
-map("i", "<M-C-h>", '<C-o>B', opts)
-map("i", "<M-C-l>", '<C-o>E<C-o>a', opts)
+map("i", "<C-b>", '<C-o>h', opts)
+map('i', '<C-f>', '<C-o>a', opts)
+map("i", "<M-b>", '<C-o>b', opts)
+map("i", "<M-f>", '<C-o>e<C-o>a', opts)
+map("i", "<M-C-b>", '<C-o>B', opts)
+map("i", "<M-C-f>", '<C-o>E<C-o>a', opts)
 
 map('i', '<M-C-j>', '<C-o>gj', opts)
 map('i', '<M-C-k>', '<C-o>gk', opts)
