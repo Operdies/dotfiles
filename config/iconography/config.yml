@@ -16,6 +16,10 @@ icons:
             icon: 
           - contains: outlook
             icon: 
+          - matches: (.*pull requests?|.*issues?|^opentap/|^opentap - ).*
+            icon: 
+          - contains: gitlab
+            icon: 
           - matches: .* - qutebrowser$
             icon: 󰄛
           - matches: .*Mozilla Firefox$
