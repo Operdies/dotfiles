@@ -249,7 +249,7 @@ virtual-triple-pip-mode() {
 	# Explicitly reorder the monitors to ensure the workspace order is correct
 	bspc wm --reorder-monitors $LEFT $MIDDLE $RIGHT
 
-	# Open steam games workspace ^10
+	# Open steam games workspace ^6
 	GAMES=$(fd -d 1 "appmanifest" ~/.steam/steam/steamapps -x echo '{/.}' | sed 's/[^0-9]//g')
 	for game in $GAMES; do
 		bspc rule -a steam_app_"$game" desktop=^6 state=fullscreen
@@ -276,6 +276,9 @@ bspc rule -a "Thunar:*" state=floating
 bspc rule -a 'steam:*' desktop=^7
 bspc rule -a 'steamwebhelper:*' desktop=^7
 bspc rule -a 'discord:*' desktop=^7
+bspc rule -a 'Spotify:*' desktop=^9
+bspc rule -a 'leagueclientux.exe:*' state=floating desktop=^6
+bspc rule -a 'league of legends.exe:*'  state=fullscreen desktop=^6
 
 if is_work_laptop; then
 	bspc rule -a teams-for-linux desktop=^10
@@ -325,3 +328,4 @@ _e1=$(echo $end_at | cut -d',' -f1)
 _e2=$(echo $end_at | cut -d',' -f2)
 time_cost=$(bc <<<"scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")
 notify "Reloaded bspwm in $time_cost seconds"
+
