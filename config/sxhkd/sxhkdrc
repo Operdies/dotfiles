@@ -121,13 +121,18 @@ super + w : alt + {h,j,k,l}
 super + v : { j, k, super + j, super + k }
   pactl set-sink-volume 0 { -5%, +5%, -20%, +20% } && pactl set-sink-mute 0 0
 
+# Spotify
+# {next,pause,previous}
+super + v : {n,p}
+  playerctl --player=spotify {next,previous}
+
+# Pause
+super + v ; space
+  playerctl --player=spotify play-pause
+
 # Mute
 super + v ; m 
   amixer -D pulse sset Master toggle-mute # Toggle Mute
-
-# Pavucontrol
-super + v ; p 
-  pavucontrol
 
 # Set brightness
 # {1-9,10}0% brightness
@@ -168,3 +173,4 @@ super + F1
 
 super + shift + d 
   tmux list-sessions -F#S | rofi -dmenu -window-title 'Pick tmux session' | xargs -I _ xfce4-terminal -e 'tmux attach -t "_"'
+
