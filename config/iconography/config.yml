@@ -16,7 +16,7 @@ icons:
             icon: 
           - contains: outlook
             icon: 
-          - matches: (.*pull requests?|.*issues?|^opentap/|^opentap - ).*
+          - matches: (.*pull requests?|.*issues?|^opentap/|^opentap - |.*opentap/opentap).*
             icon: 
           - contains: gitlab
             icon: 

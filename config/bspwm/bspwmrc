@@ -150,8 +150,8 @@ work_laptop() {
 		fi
 
 		if ! bspc query -M --names | grep -q vir; then
-			bspc wm -a "$LEFT" "1920x1600+0+0"
-			bspc wm -a "$RIGHT" "1920x1600+1920+0"
+			bspc wm -a "$LEFT" "2200x1600+0+0"
+			bspc wm -a "$RIGHT" "1640x1600+2200+0"
 		fi
 
 		bspc monitor "$LEFT" -d 1 2 3
