@@ -75,6 +75,7 @@ is_work_laptop() {
 if is_monitor "DisplayPort-0"; then
 	export DISPLAY_NAME="DisplayPort-0"
 	export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
+  export NETWORK_INTERFACE='enp34s0'
 elif ! is_monitor "eDP1"; then
 	error "Unrecognized monitor setup. Proceeding with laptop config."
 fi
@@ -106,6 +107,7 @@ default-config() {
 
 laptop() {
 	export MONITOR="eDP1"
+  export NETWORK_INTERFACE='wlan0'
 	default-config
 	bspc config single_monocle true
 	bspc config gapless_monocle true
@@ -137,6 +139,7 @@ laptop() {
 }
 
 work_laptop() {
+  export NETWORK_INTERFACE='wlan0'
 	if is_monitor "DP1"; then
 		~/.screenlayout/monitor.sh
 		default-config
@@ -279,6 +282,7 @@ bspc rule -a 'discord:*' desktop=^7
 bspc rule -a 'Spotify:*' desktop=^9
 bspc rule -a 'leagueclientux.exe:*' state=floating desktop=^6
 bspc rule -a 'league of legends.exe:*'  state=fullscreen desktop=^6
+bspc rule -a 'cs2:*' state=fullscreen desktop=^6  
 
 if is_work_laptop; then
 	bspc rule -a teams-for-linux desktop=^10
