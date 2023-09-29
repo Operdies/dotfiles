@@ -1,9 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Install package manager
---    https://github.com/folke/lazy.nvim
---    `:help lazy.nvim.txt` for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system {
@@ -207,7 +204,7 @@ vim.keymap.set('n', '<leader>fg', require('telescope.builtin').git_files, { desc
 vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>fw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>fd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>f;', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
 
@@ -415,6 +412,9 @@ vim.o.mouse = 'a'
 -- Enable break indent
 vim.o.breakindent = true
 
+-- Disable swap file
+vim.o.swapfile = false
+
 -- Save undo history
 vim.o.undofile = true
 
@@ -446,11 +446,11 @@ local function map_keys()
   local map = vim.keymap.set
   local opts = { silent = true, remap = true, noremap = false }
 
-
   -- Insert blank line before/after cursor and restore position
   map("n", "[<space>", "mlO<Esc>`l", opts)
   map("n", "]<space>", "mlo<Esc>`l", opts)
 
+  map("n", "<C-s>", ":w<CR>", opts)
 
   map("i", "<C-b>", '<C-o>h', opts)
   map('i', '<C-f>', '<C-o>a', opts)
@@ -480,5 +480,3 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
