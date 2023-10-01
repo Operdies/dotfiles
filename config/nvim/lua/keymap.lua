@@ -1,5 +1,18 @@
 -- Map some cool keys
-local map = vim.keymap.set
+local function map(mode, lhs, rhs, opts)
+	local keys = require("lazy.core.handler").handlers.keys
+	---@cast keys LazyKeysHandler
+	-- do not create the keymap if a lazy keys handler exists
+	if not keys.active[keys.parse({ lhs, mode = mode }).id] then
+		opts = opts or {}
+		opts.silent = opts.silent ~= false
+		if opts.remap and not vim.g.vscode then
+			opts.remap = nil
+		end
+		vim.keymap.set(mode, lhs, rhs, opts)
+	end
+end
+
 local opts = { silent = true, remap = true, noremap = false }
 
 -- Insert blank line before/after cursor and restore position
@@ -15,7 +28,7 @@ map("i", "<M-b>", '<C-o>b', opts)
 map("i", "<M-f>", '<C-o>e<C-o>a', opts)
 
 map("i", "<S-Tab>", '<C-o>b', opts)
-map("i", "<Tab>", '<C-o>e<C-o>a', opts)
+map("i", "<Tab>", '<C-o>w<C-o>i', opts)
 
 map("i", "<M-C-b>", '<C-o>B', opts)
 map("i", "<M-C-f>", '<C-o>E<C-o>a', opts)
@@ -23,31 +36,19 @@ map("i", "<M-C-f>", '<C-o>E<C-o>a', opts)
 map('i', '<M-C-j>', '<C-o>gj', opts)
 map('i', '<M-C-k>', '<C-o>gk', opts)
 
-local function megamap(mode, lhs, rhs, opts)
-  local keys = require("lazy.core.handler").handlers.keys
-  ---@cast keys LazyKeysHandler
-  -- do not create the keymap if a lazy keys handler exists
-  if not keys.active[keys.parse({ lhs, mode = mode }).id] then
-    opts = opts or {}
-    opts.silent = opts.silent ~= false
-    if opts.remap and not vim.g.vscode then
-      opts.remap = nil
-    end
-    vim.keymap.set(mode, lhs, rhs, opts)
-  end
-end
+
 -- escape to clear search
-megamap({ "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
+map({ "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 -- Double escape to enter normal mode in a terminal
-megamap("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
-megamap("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" })
-megamap("t", "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to lower window" })
-megamap("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" })
-megamap("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" })
+map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
+map("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" })
+map("t", "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to lower window" })
+map("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" })
+map("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" })
 
 -- Indent visual selection and re-select
-megamap("v", "<", "<gv")
-megamap("v", ">", ">gv")
+map("v", "<", "<gv")
+map("v", ">", ">gv")
 
 map({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
@@ -56,11 +57,11 @@ map({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 map('n', '<leader>fr', require('telescope.builtin').oldfiles, { desc = 'Find Recent' })
 map('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Find Buffer' })
 map('n', '<leader>fs', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = true,
-  })
+	-- You can pass additional configuration to telescope to change theme, layout, etc.
+	require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+		winblend = 10,
+		previewer = true,
+	})
 end, { desc = 'Find In Buffer' })
 
 map('n', '<leader>fg', require('telescope.builtin').git_files, { desc = 'Find Git Files' })
@@ -69,6 +70,7 @@ map('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Find He
 map('n', '<leader>/', require('telescope.builtin').live_grep, { desc = 'Live Grep' })
 map('n', '<leader>fd', require('telescope.builtin').diagnostics, { desc = 'Find Diagnostic' })
 map('n', '<leader>f;', require('telescope.builtin').resume, { desc = 'Resume Search' })
+map('n', '<leader>wc', "<cmd>w !diff % -<CR>", { desc = "Diff unsaved buffer content" })
 
 -- Diagnostic keymaps
 map('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
