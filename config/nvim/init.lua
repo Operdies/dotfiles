@@ -21,7 +21,7 @@ require('lazy').setup({
 	'tpope/vim-rhubarb',
 
 	-- Detect tabstop and shiftwidth automatically
-	-- 'tpope/vim-sleuth',
+	'tpope/vim-sleuth',
 
 	{
 		-- LSP Configuration & Plugins
@@ -355,15 +355,5 @@ cmp.setup {
 	},
 }
 
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-	group = highlight_group,
-	pattern = '*',
-})
-
 require('keymap')
+require('autocommands')
