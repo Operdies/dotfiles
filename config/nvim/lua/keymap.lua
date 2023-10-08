@@ -5,10 +5,8 @@ local function map(mode, lhs, rhs, opts)
 	-- do not create the keymap if a lazy keys handler exists
 	if not keys.active[keys.parse({ lhs, mode = mode }).id] then
 		opts = opts or {}
-		opts.silent = opts.silent ~= false
-		if opts.remap and not vim.g.vscode then
-			opts.remap = nil
-		end
+		opts.silent = true
+		opts.remap = true
 		vim.keymap.set(mode, lhs, rhs, opts)
 	end
 end
@@ -38,7 +36,7 @@ map('i', '<M-C-k>', '<C-o>gk', opts)
 
 
 -- escape to clear search
-map({ "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
+-- map({ "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 -- Double escape to enter normal mode in a terminal
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 map("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" })
@@ -77,3 +75,8 @@ map('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic mes
 map('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 map('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+
+-- Map Y to yank into unnamedplus
+map({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'Yank into plus' })
+map({ 'n', 'v' }, '<leader>p', '"+p', { desc = 'Paste from plus' })
+map({ 'n', 'v' }, '<leader>P', '"+P', { desc = 'Paste above from plus' })

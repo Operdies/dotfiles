@@ -120,3 +120,5 @@ export POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
 
 autoload -U compinit; compinit
 autoload -U +X bashcompinit && bashcompinit
+
+alias yank='xclip -selection clipboard'
