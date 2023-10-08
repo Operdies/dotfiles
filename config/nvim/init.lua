@@ -154,7 +154,42 @@ require('lazy').setup({
 	},
 
 	{ import = 'plugins' },
-}, {})
+}, {
+	change_detection = {
+		enabled = false,
+		notify = false,
+	},
+	dev = {
+		-- directory where you store your local plugin projects
+		path = "~/repos",
+		---@type string[] plugins that match these patterns will use your local versions instead of being fetched from GitHub
+		patterns = { "Operdies" }, -- For example {"folke"}
+		fallback = false,        -- Fallback to git when local plugin doesn't exist
+	},
+	checker = {
+		enabled = false },
+	performance = {
+		cache = {
+			enabled = true,
+		},
+		reset_packpath = true, -- reset the package path to improve startup time
+		rtp = {
+			reset = true,        -- reset the runtime path to $VIMRUNTIME and your config directory
+			---@type string[] list any plugins you want to disable here
+			disabled_plugins = {
+				-- "gzip",
+				"matchit",
+				"matchparen",
+				"netrwPlugin",
+				-- "tarPlugin",
+				"tohtml",
+				"tutor",
+				-- "zipPlugin",
+			},
+		},
+	},
+}
+)
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`

@@ -1,7 +1,6 @@
 return {
 	{
 		"Operdies/gwatch.nvim",
-		dev = true,
 		event = "VeryLazy",
 		keys = {
 			{ "<leader>cc", '<cmd>GwatchStart<cr>',    desc = "Start Gwatch",    mode = "n" },
