@@ -74,7 +74,8 @@ require('lazy').setup({
 				untracked = { text = '*' },
 			},
 			on_attach = function(bufnr)
-				vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk, { buffer = bufnr, desc = 'Preview git hunk' })
+				vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk,
+					{ buffer = bufnr, desc = 'Preview git hunk' })
 
 				-- don't override the built-in and fugitive keymaps
 				local gs = package.loaded.gitsigns
@@ -111,12 +112,8 @@ require('lazy').setup({
 		'lukas-reineke/indent-blankline.nvim',
 		-- Enable `lukas-reineke/indent-blankline.nvim`
 		-- See `:help indent_blankline.txt`
-		config = function()
-			require('ibl').setup {
-				char = '┊',
-				show_trailing_blankline_indent = false,
-			}
-		end,
+		main = 'ibl',
+		opts = {},
 	},
 
 	-- "gc" to comment visual regions/lines
@@ -164,7 +161,7 @@ require('lazy').setup({
 		path = "~/repos",
 		---@type string[] plugins that match these patterns will use your local versions instead of being fetched from GitHub
 		patterns = { "Operdies" }, -- For example {"folke"}
-		fallback = false,        -- Fallback to git when local plugin doesn't exist
+		fallback = false, -- Fallback to git when local plugin doesn't exist
 	},
 	checker = {
 		enabled = false },
@@ -174,7 +171,7 @@ require('lazy').setup({
 		},
 		reset_packpath = true, -- reset the package path to improve startup time
 		rtp = {
-			reset = true,        -- reset the runtime path to $VIMRUNTIME and your config directory
+			reset = true, -- reset the runtime path to $VIMRUNTIME and your config directory
 			---@type string[] list any plugins you want to disable here
 			disabled_plugins = {
 				-- "gzip",
