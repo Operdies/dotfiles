@@ -61,7 +61,13 @@ if [ -n "$NVIM" ]; then
 fi
 
 alias yank='xclip -selection clipboard'
+#
+# some more ls aliases
 alias ls='ls --color=tty'
+alias l=ls
+alias ll='ls -l'
+alias la='ls -A'
+
 
 ZSH_CUSTOM="$HOME/.zsh_plugins"
 [ -d $ZSH_CUSTOM/themes/powerlevel10k ] || sh -c "git clone --depth 1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k"
