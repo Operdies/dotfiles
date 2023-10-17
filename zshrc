@@ -122,3 +122,5 @@ autoload -U compinit; compinit
 autoload -U +X bashcompinit && bashcompinit
 
 alias yank='xclip -selection clipboard'
+# Disable gdb download prompt
+unset DEBUGINFOD_URLS

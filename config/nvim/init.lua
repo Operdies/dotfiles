@@ -388,5 +388,8 @@ cmp.setup {
 	},
 }
 
+-- enable term debug
+vim.cmd[[packadd termdebug]]
+
 require('keymap')
 require('autocommands')

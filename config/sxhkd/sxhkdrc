@@ -29,9 +29,9 @@ super + n : { c, k, f }
 
 
 # Manage Tiling Layout
-# Set layout to {tall,rtall,monocle,rwide}
-super + t ; { l, h, m, w }
-  bsp-layout set {tall,rtall,monocle,rwide}
+# Set layout to {tall,rtall,monocle,rwide,even}
+super + t ; { l, h, m, w, e}
+  bsp-layout set {tall,rtall,monocle,rwide,even}
 
 # {tiled,floating,fullscreen}
 super + t ; {t, s, f}
