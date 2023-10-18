@@ -124,3 +124,5 @@ autoload -U +X bashcompinit && bashcompinit
 alias yank='xclip -selection clipboard'
 # Disable gdb download prompt
 unset DEBUGINFOD_URLS
+
+export KUBECONFIG=~/repos/helm-charts/charts/ks8500/.debug/output/kubeconfig.yaml
