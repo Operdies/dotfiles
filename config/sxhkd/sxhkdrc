@@ -112,9 +112,9 @@ super + w : {_,shift + }c
 super + w : alt + {h,j,k,l}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
-# Balance the size of all windows 
-# super + shift + b 
-#   bspc node @/ -B
+Balance the size of all windows 
+super + equal
+  bspc node @/ -B
 
 # Volume Controls
 # Volume { -5%, +5%,-20%,+20%}

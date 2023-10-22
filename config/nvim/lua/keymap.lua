@@ -37,6 +37,7 @@ map('i', '<M-C-k>', '<C-o>gk', opts)
 
 -- escape to clear search
 -- map({ "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
+map({ "n" }, "<esc>", "<cmd>noh<cr>", { desc = "Escape and clear hlsearch" })
 -- Double escape to enter normal mode in a terminal
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 map("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" })

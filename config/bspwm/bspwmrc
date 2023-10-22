@@ -1,7 +1,14 @@
 #!/bin/bash
 
-# This fixes an issue causing Jetbrains windows to be tiny
-export _JAVA_AWT_WM_NONREPARENTING=1
+# Fix various java issues. Taken from https://wiki.gentoo.org/wiki/Dwm#Fix_Java_application_misbehaving
+# Primarily for ghidra and jebtrains IDEs
+fix-java() {
+	export _JAVA_AWT_WM_NONREPARENTING=1
+	export AWT_TOOLKIT=MToolkit
+	wmname LG3D
+}
+
+fix-java
 
 start_at=$(date +%s,%N)
 
@@ -197,6 +204,8 @@ work_laptop() {
 ultrawide() {
 	export RIGHT="$DISPLAY_NAME"
 	$MONITOR_SCRIPT
+	# apply the default config
+	default-config
 	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
 	~/.config/polybar/launch.sh kill
 	~/.config/polybar/launch.sh right
@@ -303,10 +312,11 @@ if is_work_laptop; then
 elif is_laptop; then
 	laptop
 else
-	virtual-triple-pip-mode
+	ultrawide
+	# virtual-triple-pip-mode
 	# Some wine applications behave weird with borders.
 	# Floating windows move diagonally off the screen unless tiled.
-	~/.config/bspwm/scripts/window-management/no_border_wine &
+	# ~/.config/bspwm/scripts/window-management/no_border_wine &
 fi
 
 # Polkit

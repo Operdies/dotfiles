@@ -160,7 +160,7 @@ my_sites = [
 # Only accept cookies and javascript from specific sites
 config.set('content.cookies.accept', 'no-3rdparty')
 config.set('content.javascript.enabled', True)
-config.set('content.javascript.clipboard', 'none')
+config.set('content.javascript.clipboard', 'access')
 
 for site in my_sites:
     config.set('content.javascript.enabled', True, site)
