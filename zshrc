@@ -1,3 +1,6 @@
+# Disable omz update prompts
+zstyle ':omz:update' mode disabled
+
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH:$HOME/go/bin:$HOME/.cargo/bin
 
@@ -119,3 +122,4 @@ alias yank='xclip -selection clipboard'
 unset DEBUGINFOD_URLS
 
 export KUBECONFIG=~/repos/helm-charts/charts/ks8500/.debug/output/kubeconfig.yaml
+
