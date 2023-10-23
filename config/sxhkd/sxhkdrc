@@ -53,6 +53,9 @@ super + x : {p,b,f,s}
 super + {_,shift + }{h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
 
+super + shift + {o,i}
+  bspc node @parent --rotate {-90,90}
+
 # focus the next/previous window in the current desktop
 super + {_,shift + }c
 	bspc node -f {next,prev}.local.!hidden.window
