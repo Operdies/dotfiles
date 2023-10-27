@@ -125,7 +125,7 @@ laptop() {
 	bspc config window_gap "$(rand 7 9)"
 	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
 	~/.config/polybar/launch.sh kill
-	~/.config/polybar/launch.sh eDP1 rand &
+	~/.config/polybar/launch.sh eDP1 &
 	~/.config/sxhkd/scripts/libinput.sh set 'natural scrolling' 1
 	~/.config/sxhkd/scripts/libinput.sh set 'disable while typing' 1
 
@@ -322,7 +322,8 @@ fi
 # Polkit
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 # Dex
-dex -a -s /etc/xdg/autostart/:~/.config/autostart/
+# dex -a -s /etc/xdg/autostart/:~/.config/autostart/
+dex -a -s ~/.config/autostart/
 
 # the firewall-applet in /etc/xdg/autostart/firewall-applet.desktop
 # does not check if it is already running and will launch new instances.

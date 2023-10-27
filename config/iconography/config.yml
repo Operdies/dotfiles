@@ -38,5 +38,7 @@ icons:
         icon: 
       - matches: pavucontrol
         icon: 
+      - matches: .*ghidra.*
+        icon: 
       - matches: .*
         icon: 

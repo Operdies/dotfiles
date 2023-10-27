@@ -56,6 +56,7 @@ common_apps() {
 		steam s Steam
 		teams-for-linux t 'Teams'
 		hakuneko-desktop m 'Manga Reader'
+		chromium q 'Chromium'
 		qutebrowser q 'Qutebrowser'
 		firefox f 'Firefox'
 		pavucontrol p 'pavucontrol'
