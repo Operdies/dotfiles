@@ -1,83 +1,131 @@
 return {
 	{
+		"XXiaoA/auto-save.nvim",
+		event = "BufReadPre",
+		keys = {
+			{
+				"<leader>ua",
+				"<cmd>ASToggle<cr>",
+				desc = "Toggle auto-save",
+			},
+		},
+		opts = {
+			condition = function(buf)
+				local utils = require("auto-save.utils.data")
+
+				return vim.fn.getbufvar(buf, "&modifiable") == 1
+					and utils.not_in(vim.fn.getbufvar(buf, "&filetype"), {})
+					and not string.match(vim.fn.getcwd(), "%/nvim%-config$")
+					and utils.not_in(vim.fn.expand("%:t"), {
+						"picom.conf",
+						"wezterm.lua",
+					})
+					and not string.match(vim.fn.expand("%"), "^oil://")
+			end,
+			execution_message = {
+				message = function()
+					return ""
+				end,
+			},
+		},
+	},
+	{
 		"chaoren/vim-wordmotion",
 		init = function()
 			vim.g.wordmotion_prefix = "<BS>"
 		end,
 		keys = { "<BS>" },
 	},
-	-- Improved picker UI
 	{
-		"stevearc/dressing.nvim",
-		lazy = true,
-		init = function()
-			---@diagnostic disable-next-line: duplicate-set-field
-			vim.ui.select = function(...)
-				require("lazy").load({ plugins = { "dressing.nvim" } })
-				return vim.ui.select(...)
-			end
-			---@diagnostic disable-next-line: duplicate-set-field
-			vim.ui.input = function(...)
-				require("lazy").load({ plugins = { "dressing.nvim" } })
-				return vim.ui.input(...)
-			end
-		end,
-	},
-	{
-		"folke/todo-comments.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		opts = {}
+		"wellle/targets.vim",
+		event = "BufReadPost",
 	},
 	{
 		"airblade/vim-rooter",
 		init = function()
 			vim.g.rooter_cd_cmd = "lcd"
 		end,
-		event = "VeryLazy"
+		lazy = false,
 	},
-	-- Highlight the word under the cursor and enable jumping between instances of the word
 	{
-		"RRethy/vim-illuminate",
-		event = { "BufReadPost", "BufNewFile" },
+		"windwp/nvim-autopairs",
+		config = function(_, opts)
+			local nvim_autopairs = require("nvim-autopairs")
+			nvim_autopairs.setup(opts)
+
+			local cmp_status_ok, cmp = pcall(require, "cmp")
+			if not cmp_status_ok then
+				return
+			end
+			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+		end,
 		opts = {
-			delay = 200,
-			large_file_cutoff = 2000,
-			large_file_overrides = {
-				providers = { "lsp" },
+			check_ts = true,
+		},
+	},
+	{
+		"kylechui/nvim-surround",
+		opts = {
+			keymaps = {
+				insert = nil,
+				insert_line = nil,
+				normal = "gzs",
+				normal_cur = "gzss",
+				normal_line = "gzS",
+				normal_cur_line = "gzSS",
+				visual = "gzs",
+				visual_line = "gzS",
+				delete = "gzd",
+				change = "gzc",
 			},
 		},
-		config = function(_, opts)
-			require("illuminate").configure(opts)
-
-			local function map(key, dir, buffer)
-				vim.keymap.set("n", key, function()
-					require("illuminate")["goto_" .. dir .. "_reference"](false)
-				end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
-			end
-
-			map("]]", "next")
-			map("[[", "prev")
-
-			-- also set it after loading ftplugins, since a lot overwrite [[ and ]]
-			vim.api.nvim_create_autocmd("FileType", {
-				callback = function()
-					local buffer = vim.api.nvim_get_current_buf()
-					map("]]", "next", buffer)
-					map("[[", "prev", buffer)
-				end,
-			})
-		end,
+	},
+	{
+		"L3MON4D3/LuaSnip",
 		keys = {
-			{ "]]", desc = "Next Reference" },
-			{ "[[", desc = "Prev Reference" },
+			{
+				"<C-n>",
+				function()
+					_ = require("luasnip").choice_active() and require("luasnip.extras.select_choice")()
+				end,
+				mode = { "i", "s" },
+			},
 		},
 	},
 	{
-		"rcarriga/nvim-notify",
+		"echasnovski/mini.animate",
 		event = "VeryLazy",
-		opts = {},
-		config = function()
-			vim.notify = require('notify')
-		end
-	}
+		opts = function()
+			-- don't use animate when scrolling with the mouse
+			local mouse_scrolled = false
+			for _, scroll in ipairs({ "Up", "Down" }) do
+				local key = "<ScrollWheel" .. scroll .. ">"
+				vim.keymap.set({ "", "i" }, key, function()
+					mouse_scrolled = true
+					return key
+				end, { expr = true })
+			end
+
+			local animate = require("mini.animate")
+			return {
+				resize = { enable = false },
+				open = { enable = false },
+				cursor = { enable = false },
+				close = { enable = false },
+				scroll = {
+					timing = animate.gen_timing.linear({ duration = 60, unit = "total" }),
+					subscroll = animate.gen_subscroll.equal({
+						predicate = function(total_scroll)
+							if mouse_scrolled then
+								mouse_scrolled = false
+								return false
+							end
+							return total_scroll > 1
+						end,
+					}),
+				},
+			}
+		end,
+	},
 }
