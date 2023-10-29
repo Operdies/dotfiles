@@ -5,7 +5,6 @@ return {
       "Hoffs/omnisharp-extended-lsp.nvim",
     },
     opts = function(_, opts)
-      opts.autoformat = false
       ---@type lspconfig.options
       opts.servers = {
         helm_ls = {
