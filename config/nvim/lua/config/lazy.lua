@@ -39,18 +39,23 @@ require("lazy").setup({
 		patterns = {},
 	},
 	checker = { enabled = false }, -- automatically check for plugin updates
+	change_detection = {
+		-- automatically check for config file changes and reload the ui
+		enabled = false,
+		notify = false,
+	},
 	performance = {
 		rtp = {
 			-- disable some rtp plugins
 			disabled_plugins = {
-				"gzip",
+				-- "gzip",
 				-- "matchit",
 				-- "matchparen",
 				-- "netrwPlugin",
-				"tarPlugin",
+				-- "tarPlugin",
 				"tohtml",
 				"tutor",
-				"zipPlugin",
+				-- "zipPlugin",
 			},
 		},
 	},

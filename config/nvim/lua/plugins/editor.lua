@@ -1,6 +1,7 @@
 return {
 	{
 		"XXiaoA/auto-save.nvim",
+		enabled = false,
 		event = "BufReadPre",
 		keys = {
 			{
