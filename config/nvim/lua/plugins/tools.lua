@@ -5,12 +5,10 @@ return {
 		"Operdies/gwatch.nvim",
 		dev = true,
 		keys = {
-			{ "<leader>ct", '<cmd>lua require("gwatch").toggle()<cr>', desc = "Toggle Gwatch", mode = "n" },
-			{ "<leader>cs", '<cmd>lua require("gwatch").start()<cr>', desc = "Start Gwatch", mode = "n" },
-			{ "<leader>cx", '<cmd>lua require("gwatch").stop()<cr>', desc = "Stop Gwatch", mode = "n" },
-			{ "<leader>cc", '<cmd>lua require("gwatch").reload()<cr>', desc = "Reload Gwatch", mode = "n" },
-			{ "<leader>c,", '<cmd>lua require("gwatch").settings()<cr>', desc = "Override Settings", mode = "n" },
-			{ "<C-q>", '<cmd>lua require("gwatch").trigger()<cr>', desc = "Trigger gwatch run", mode = "n" },
+			{ "<leader>cc", "<cmd>GwatchStart<cr>", desc = "Start Gwatch", mode = "n" },
+			{ "<leader>cx", "<cmd>GwatchStop<cr>", desc = "Stop Gwatch", mode = "n" },
+			{ "<leader>c,", "<cmd>GwatchSettings<cr>", desc = "Gwatch Settings", mode = "n" },
+			{ "<C-q>", "<cmd>GwatchTrigger<cr>", desc = "Gwatch Trigger", mode = "n" },
 		},
 		opts = {
 			-- The width of the UI window
@@ -18,41 +16,6 @@ return {
 			["window height"] = 10,
 			["window position"] = "bottom",
 			["trigger"] = "hotkey",
-			-- Options in this block are the default independent of language
-			default = {
-				-- Check the output of `gwatch --help` for specific information about flags
-				eventMask = "write",
-				mode = "block",
-				patterns = "**",
-				-- %e and %f respectively expand to the event, and the file it affected
-				command = "echo %e %f",
-			},
-			-- Settings for a specific filetype override default settings
-			lang = {
-				-- lua = {
-				--   patterns = "**.lua",
-				--   callback = function()
-				--     require("sniprun").run("n")
-				--   end,
-				-- },
-				c = {
-					patterns = { "**.c", "Makefile" },
-					command = "make",
-					mode = "block",
-				},
-				go = {
-					patterns = { "**.go", "go.mod" },
-					-- Not using 'go run .' because that doesn't return the actual running process PID.
-					-- gwatch will be unable to kill spawned instances of the process.
-					command = "clear; go build -o ./out .; ./out",
-				},
-				rust = {
-					mode = "kill",
-					patterns = { "**.rs", "Cargo.toml" },
-					-- command = "cargo test -- --nocapture",
-					command = "cargo run",
-				},
-			},
 		},
 	},
 	{
