@@ -122,4 +122,5 @@ alias yank='xclip -selection clipboard'
 unset DEBUGINFOD_URLS
 
 export KUBECONFIG=~/repos/helm-charts/charts/ks8500/.debug/output/kubeconfig.yaml
+export OPENTAP_COLOR=auto
 
