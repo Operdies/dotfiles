@@ -2,6 +2,17 @@ require("utils").create_keymap_group("<leader>r", "+run")
 
 return {
 	{
+		"Operdies/rev.nvim",
+		lazy = false,
+		dev = true,
+		keys = {
+			{ "<leader>rr", "<cmd>RReload<cr>", desc = "Reload Reverse" },
+		},
+		opts = {},
+		-- empty string should mean binary
+		ft = { "hex", "binary" },
+	},
+	{
 		"Operdies/gwatch.nvim",
 		dev = true,
 		keys = {
@@ -104,7 +115,6 @@ return {
 	{
 		"codethread/qmk.nvim",
 		config = function()
-			---@type qmk.UserConfig
 			local conf = {
 				name = "LAYOUT_split_3x5_2",
 				layout = {
@@ -116,13 +126,5 @@ return {
 			}
 			require("qmk").setup(conf)
 		end,
-	},
-	{
-		"NStefan002/speedtyper.nvim",
-		branch = "main",
-		cmd = "Speedtyper",
-		opts = {
-			-- your config
-		},
 	},
 }
