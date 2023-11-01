@@ -27,6 +27,7 @@ vim.opt.writebackup = false -- if a file is being edited by another program (or 
 vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
 vim.wo.foldmethod = "expr"
 vim.opt.relativenumber = false
+vim.g.autoformat = false
 
 -- Set shiftwidth to 4 for csharp files
 vim.cmd([[autocmd FileType cs setlocal shiftwidth=4]])
