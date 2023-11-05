@@ -5,6 +5,7 @@ return {
 		"Operdies/rev.nvim",
 		lazy = false,
 		dev = true,
+		dependencies = { "shiracamus/vim-syntax-x86-objdump-d" },
 		keys = {
 			{ "<leader>rr", "<cmd>RReload<cr>", desc = "Reload Reverse" },
 		},
