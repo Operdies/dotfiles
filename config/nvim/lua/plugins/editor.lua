@@ -129,4 +129,18 @@ return {
 			}
 		end,
 	},
+	{
+		"zbirenbaum/copilot.lua",
+		keys = {
+			{
+				"<M-l>",
+				function()
+					require("copilot.suggestion").next()
+				end,
+				-- require("copilot.suggestion").next,
+				desc = "Select next copilot suggestion",
+				mode = "i",
+			},
+		},
+	},
 }
