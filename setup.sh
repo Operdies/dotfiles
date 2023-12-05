@@ -24,7 +24,7 @@ ensure_binaries() {
 		xwininfo xorg-xwininfo
 		cargo rustup
 		zsh zsh
-		qutebrowser "qutebrowser python-adblock"
+		zathura zathura
 		gcc gcc
 		npm npm
 		wezterm wezterm
@@ -85,7 +85,6 @@ mylink() {
 }
 
 ensure_links() {
-	mylink "$(dirname "$0")/zshrc" "$HOME/.zshrc"
 	for item in "$(dirname "$0")/config/"*; do
 		item="$(readlink -f "$item")"
 		target="$HOME/.config/$(basename "$item")"
@@ -115,6 +114,11 @@ ensure_clones() {
 	popd || return
 }
 
+set_default_apps() {
+	xdg-mime default org.pwmt.zathura.desktop application/pdf
+}
+
 ensure_links
 ensure_binaries
 ensure_clones
+set_default_apps
