@@ -15,6 +15,7 @@ return {
 	},
 	{
 		"Operdies/gwatch.nvim",
+		lazy = false,
 		dev = true,
 		keys = {
 			{ "<leader>cc", "<cmd>GwatchStart<cr>", desc = "Start Gwatch", mode = "n" },
@@ -130,20 +131,19 @@ return {
 	},
 	{
 		"mfussenegger/nvim-dap",
-		config = function()
-			local dap = require("dap")
-
-			local repofs = {
-				name = "repofs",
-				type = "codelldb", -- matches the adapter
-				request = "launch", -- could also attach to a currently running process
-				program = vim.fn.getcwd() .. "/bin/repofs",
-				cwd = "${workspaceFolder}",
-				stopOnEntry = false,
-				args = { "-f", "-s", "-o", "auto_unmount", "/home/alex/mounts/repo" },
-				runInTerminal = false,
-			}
-			table.insert(dap.configurations.c, 1, repofs)
+		_config = function()
+			-- local dap = require("dap")
+			-- local repofs = {
+			-- 	name = "repofs",
+			-- 	type = "codelldb", -- matches the adapter
+			-- 	request = "launch", -- could also attach to a currently running process
+			-- 	program = "${workspaceFolder}/bin/repofs",
+			-- 	cwd = "${workspaceFolder}",
+			-- 	stopOnEntry = false,
+			-- 	args = { "-f", "-s", "-o", "auto_unmount", "/home/alex/mounts/repo" },
+			-- 	runInTerminal = false,
+			-- }
+			-- table.insert(dap.configurations.c, 1, repofs)
 		end,
 	},
 }
