@@ -75,10 +75,6 @@ is_laptop() {
 	is_monitor "eDP1"
 }
 
-is_work_laptop() {
-	cat /sys/class/net/*/address | grep -q "c0:b8:83:38:0f:04"
-}
-
 if is_monitor "DisplayPort-0"; then
 	export DISPLAY_NAME="DisplayPort-0"
 	export MONITOR_SCRIPT="$HOME/.screenlayout/amd.sh"
@@ -89,8 +85,6 @@ fi
 
 default-config() {
 	bspc config split_ratio 0.51
-	bspc config borderless_monocle true
-	bspc config gapless_monocle false
 	bspc config pointer_follows_focus true
 	bspc config focus_follows_pointer true
 
@@ -100,37 +94,20 @@ default-config() {
 	bspc config window_gap 8
 	# Border
 	bspc config border_width 1
-	bspc config focused_border_color "#ac21c4"
+  bspc config focused_border_color "#8c1a9b"
 	bspc config normal_border_color "#073642"
 	bspc config active_border_color "#073642"
 
-	bspc config single_monocle fale
-	bspc config gapless_monocle false
+	bspc config single_monocle true
+	bspc config gapless_monocle true
+	bspc config borderless_monocle true
 
 	# Some wine applications behave weird with borders.
 	# Floating windows move diagonally off the screen unless tiled.
 	~/.config/bspwm/scripts/window-management/no_border_wine &
 }
 
-laptop() {
-	export MONITOR="eDP1"
-	export NETWORK_INTERFACE='wlan0'
-	default-config
-	bspc config single_monocle true
-	bspc config gapless_monocle true
-
-	SPLIT_RATIO=0.5$(rand 1 5)
-	bspc config split_ratio "$SPLIT_RATIO"
-	bspc config border_width "$(rand 1 2)"
-	bspc config window_gap "$(rand 7 9)"
-	bspc monitor -d 1 2 3 4 5 6 7 8 9 0
-	~/.config/polybar/launch.sh kill
-	~/.config/polybar/launch.sh eDP1 &
-	~/.config/sxhkd/scripts/libinput.sh set 'natural scrolling' 1
-	~/.config/sxhkd/scripts/libinput.sh set 'disable while typing' 1
-
-	# Enable touchpad gestures
-	libinput-gestures &
+configure_locktime() {
 	# Set blank time to 60 seconds
 	xset +dpms
 	SLEEP_MINTUES=2
@@ -145,60 +122,34 @@ laptop() {
 	fi
 }
 
-work_split() {
-	export LEFT="vir1"
-	export RIGHT="vir2"
-
-	if ! xrandr --listactivemonitors | grep -q "vir"; then
-		# Set the monitors with xrandr so other programs (polybar) know about the virtual displays as well
-		xrandr --setmonitor "$LEFT" 1920/440x1600/370+0+0 none #"$DISPLAY_NAME"
-		xrandr --setmonitor "$RIGHT" 1920/440x1600/370+1920+0 none
-	fi
-
-	if ! bspc query -M --names | grep -q vir; then
-		bspc wm -a "$LEFT" "2200x1600+0+0"
-		bspc wm -a "$RIGHT" "1640x1600+2200+0"
-	fi
-
-	bspc monitor "$LEFT" -d 1 2 3
-	bspc monitor "$RIGHT" -d 4 5 6
-	bspc monitor "eDP1" -d 7 8 9 0
-
-	# Explicitly reorder the monitors to ensure the workspace order is correct
-	bspc wm --reorder-monitors $LEFT $RIGHT "eDP1"
-
-	~/.config/polybar/launch.sh kill
-	~/.config/polybar/launch.sh left
-	~/.config/polybar/launch.sh right
-	~/.config/polybar/launch.sh eDP1
-}
-
-work_laptop() {
+laptop() {
+	export MONITOR="eDP1"
 	export NETWORK_INTERFACE='wlan0'
-	if is_monitor "DP1"; then
+	export SECOND_MONITOR="HDMI1"
+	~/.config/polybar/launch.sh kill
+	if is_monitor "$SECOND_MONITOR"; then
+		notify "$SECOND_MONITOR connected"
 		~/.screenlayout/monitor.sh
-		default-config
-		if false; then 
-			work_split
-		else 
-			bspc monitor "DP1" -d 1 2 3 4 5 6
-			bspc monitor "eDP1" -d 7 8 9 0
-			bspc wm --reorder-monitors DP1 eDP1
-			~/.config/polybar/launch.sh kill
-			~/.config/polybar/launch.sh DP1
-			~/.config/polybar/launch.sh eDP1
-		fi
+		bspc monitor "eDP1" -d 1 2 3 4 5
+		bspc monitor "$SECOND_MONITOR" -d 6 7 8 9 0
+		bspc wm --reorder-monitors eDP1 "$SECOND_MONITOR"
+		~/.config/polybar/launch.sh "$SECOND_MONITOR"
 	else
+		notify "$SECOND_MONITOR not connected"
 		# cleanup
-		bspc monitor DP1 --remove
+		bspc monitor "$SECOND_MONITOR" --remove
 		xrandr --delmonitor vir1
 		xrandr --delmonitor vir2
 		bspc monitor vir1 --remove
 		bspc monitor vir2 --remove
 		~/.screenlayout/laptop.sh
-		laptop
+		bspc monitor "eDP1" -d 1 2 3 4 5 6 7 8 9 0
 		bspc wm --adopt-orphans
 	fi
+	~/.config/polybar/launch.sh eDP1
+	default-config
+	configure_locktime
+	bspc config window_gap 4
 }
 
 ultrawide() {
@@ -305,11 +256,10 @@ bspc rule -a 'Spotify:*' desktop=^9
 bspc rule -a 'leagueclientux.exe:*' state=floating desktop=^6
 bspc rule -a 'league of legends.exe:*' state=fullscreen desktop=^6
 bspc rule -a 'cs2:*' state=fullscreen desktop=^6
+bspc rule -a teams-for-linux desktop=^10
+bspc rule -a 'Zathura:*' state=tiled
 
-if is_work_laptop; then
-	bspc rule -a teams-for-linux desktop=^10
-	work_laptop
-elif is_laptop; then
+if is_laptop; then
 	laptop
 else
 	ultrawide
@@ -342,18 +292,17 @@ if ! is_laptop; then
 	xset s off &
 fi
 
-# if has picom; then
-#	picom -b --config ~/.config/picom.conf &
-# fi
+if has picom; then
+	picom -b --config ~/.config/picom.conf &
+fi
 
 # Wallpaper
 nitrogen --restore &
 
 end_at=$(date +%s,%N)
-_s1=$(echo $start_at | cut -d',' -f1) # sec
-_s2=$(echo $start_at | cut -d',' -f2) # nano sec
-_e1=$(echo $end_at | cut -d',' -f1)
-_e2=$(echo $end_at | cut -d',' -f2)
+_s1=$(echo "$start_at" | cut -d',' -f1) # sec
+_s2=$(echo "$start_at" | cut -d',' -f2) # nano sec
+_e1=$(echo "$end_at" | cut -d',' -f1)
+_e2=$(echo "$end_at" | cut -d',' -f2)
 time_cost=$(bc <<<"scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")
 notify "Reloaded bspwm in $time_cost seconds"
-

@@ -4,7 +4,11 @@ start_at=$(date +%s,%N)
 setxkbmap us -variant altgr-intl
 setxkbmap -option caps:escape
 LIBINPUT="$HOME/.config/sxhkd/scripts/libinput.sh"
-[ -f "$LIBINPUT" ] && sh "$LIBINPUT" set 'natural scrolling' 1
+[ -f "$LIBINPUT" ] && (
+	sh "$LIBINPUT" set 'natural scrolling' 1
+	sh "$LIBINPUT" set 'disable while typing' 1
+)
+libinput-gestures &
 
 DEFAULT_PREFIX='super + space ; '
 
