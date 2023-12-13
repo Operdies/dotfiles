@@ -81,6 +81,7 @@ terminal() {
 	PREFIX="$DEFAULT_PREFIX "
 	# Set xfce4-terminal as main terminal, and wezterm as fallback
 	BINDINGS=(
+		'st' Return 'st'
 		'xfce4-terminal' Return 'xfce4-terminal'
 		'wezterm:wezterm start' Return 'Wezterm'
 	)
