@@ -1,6 +1,6 @@
 icons:
   - class_name:
-      - matches: xfce4-terminal|alacritty|.*wezterm.*
+      - matches: xfce4-terminal|alacritty|.*wezterm.*|st
         icon: 
         window_title:
           - tmux: 

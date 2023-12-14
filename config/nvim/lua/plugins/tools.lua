@@ -131,7 +131,7 @@ return {
 	},
 	{
 		"mfussenegger/nvim-dap",
-		_config = function()
+		config = function()
 			-- local dap = require("dap")
 			-- local repofs = {
 			-- 	name = "repofs",
@@ -145,5 +145,21 @@ return {
 			-- }
 			-- table.insert(dap.configurations.c, 1, repofs)
 		end,
+    -- ctrl / shift mapping f keys does not work. Instead, they get mapped to x+12 / x+24, respectively
+    -- stylua: ignore
+    keys = {
+      { "<f9>", function() require("dap").toggle_breakpoint() end, desc = "Toggle Breakpoint" },
+      { "<f5>", function() require("dap").continue() end, desc = "Continue" },
+      -- <s-f10>
+      { "<f22>", function() require("dap").run_to_cursor() end, desc = "Run to Cursor" },
+      -- <c-f10>
+      { "<f34>", function() require("dap").goto_() end, desc = "Go to line (no execute)" },
+      { "<f11>", function() require("dap").step_into() end, desc = "Step Into" },
+      -- <s-f11>
+      { "<f23>", function() require("dap").step_out() end, desc = "Step Out" },
+      { "<f10>", function() require("dap").step_over() end, desc = "Step Over" },
+      -- <s-f5>
+      { "<f17>", function() require("dap").terminate() end, desc = "Terminate" },
+    },
 	},
 }
