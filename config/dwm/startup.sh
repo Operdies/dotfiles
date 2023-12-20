@@ -61,9 +61,13 @@ nitrogen --restore &
 # This should run before sxhkd starts so caps can be mapped to ESCAPE_KEYSYM
 setxkbmap us -variant altgr-intl
 setxkbmap -option caps:escape
-pgrep -x rhkd || rhkd -c ~/.config/sxhkd/sxhkdrc &
-pgrep -x rhkd-whichkey || rhkd-whichkey -c ~/.config/sxhkd/sxhkdrc &
-
 # rhkd-whichkey doesn't immediately load, so we reload the config in the background
-(sleep 1; ~/.config/sxhkd/bash_config.bash --quiet) &
 
+config_dir="sxhkd"
+if [ "$1" == dwm ]; then
+  config_dir="dwm"
+fi
+
+pgrep -x rhkd || rhkd -c "$HOME/.config/$config_dir/sxhkdrc" &
+pgrep -x rhkd-whichkey || rhkd-whichkey -c "$HOME/.config/$config_dir/sxhkdrc" &
+(sleep 1; "$HOME/.config/$config_dir/bash_config.bash" --quiet) &

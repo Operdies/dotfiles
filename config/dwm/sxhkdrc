@@ -1,0 +1,60 @@
+# program launcher
+super + d
+	rofi -modi drun -show drun -line-padding 4 \
+    -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal \
+    -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"
+
+# make sxhkd reload its configuration files:
+super + Escape
+	~/.config/dwm/bash_config.bash
+
+# Volume Controls
+# Volume { -5%, +5%,-20%,+20%}
+super + v : { j, k, super + j, super + k }
+  pactl set-sink-volume 0 { -5%, +5%, -20%, +20% } && pactl set-sink-mute 0 0
+
+# Spotify
+# {next,pause,previous}
+super + v : {n,p}
+  playerctl --player=spotify {next,previous}
+
+# Pause
+super + v ; space
+  playerctl --player=spotify play-pause
+
+# Mute
+super + v ; m 
+  amixer -D pulse sset Master toggle-mute # Toggle Mute
+
+# Set brightness
+# {1-9,10}0% brightness
+super + b ; {1-9,0}
+  ~/.config/sxhkd/scripts/backlight.sh --set {1-9,10}0
+
+# Adjust brightness
+# {Increase,Decrease} brightness by 5%
+super + b : {l,h} 
+  ~/.config/sxhkd/scripts/backlight.sh {--inc 5,--dec 5}
+
+# {Double,Halve} brightness
+super + b : {j,k} 
+  ~/.config/sxhkd/scripts/backlight.sh {--halve,--double}
+
+# {32%,100%} brightness
+super + b : { shift + h, shift + l }
+  ~/.config/sxhkd/scripts/backlight.sh {--set 32,--set 100}
+
+# {Enable,Disable} screen sleep timer
+super + b : { c,z }
+  xset s {on,off}
+  
+# Screenshot
+Print
+  scrot ~/Pictures/Screenshot-$(date +%F_%T).png
+
+# Screenshot
+# Screenshot {screen,area,window}
+super + s ; { s, a, w }
+  ~/.config/bspwm/scripts/screenshot.sh { screen, area, window }
+
+
