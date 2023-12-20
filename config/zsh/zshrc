@@ -123,3 +123,11 @@ export KUBECONFIG=~/repos/helm-charts/charts/ks8500/.debug/output/kubeconfig.yam
 export OPENTAP_COLOR=auto
 
 export DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
+
+if [ -z "$CC" ]; then
+  export CC=gcc
+fi
+
+# startx on login
+[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] || return
+startx
