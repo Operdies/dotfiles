@@ -3,3 +3,5 @@ os:
   editAtLine: '~/.config/lazygit/nvim-wrapper.sh +{{line}} -- {{filename}}'
   editAtLineAndWait: '~/.config/lazygit/nvim-wrapper.sh +{{line}} -- {{filename}}'
   editInTerminal: true
+gui:
+  skipDiscardChangeWarning: true

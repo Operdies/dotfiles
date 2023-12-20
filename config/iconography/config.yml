@@ -36,6 +36,8 @@ icons:
         icon: 
       - matches: emacs
         icon: 
+      - matches: zathura
+        icon: 󰈦
       - matches: pavucontrol
         icon: 
       - matches: .*ghidra.*

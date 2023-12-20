@@ -1,71 +1,9 @@
 #!/bin/bash
 
-# Fix various java issues. Taken from https://wiki.gentoo.org/wiki/Dwm#Fix_Java_application_misbehaving
-# Primarily for ghidra and jebtrains IDEs
-fix-java() {
-	export _JAVA_AWT_WM_NONREPARENTING=1
-	export AWT_TOOLKIT=MToolkit
-	wmname LG3D
-}
-
-fix-java
-
 start_at=$(date +%s,%N)
 
-# Notifications
-/usr/bin/dunst &
-dunstctl close-all
 
-rand() {
-	MIN="$1"
-	MAX="$2"
-	mod=$((MAX - MIN + 1))
-	roll=$((RANDOM % mod))
-	echo $((roll + MIN))
-}
-
-notify() {
-	msg="$*"
-	dunstify -u normal -t 2000 bspwmrc "$msg"
-}
-
-error() {
-	msg="$*"
-	dunstify -u critical bspwmrc "$msg"
-}
-
-has() {
-	command -v "$1"
-}
-
-num_monitors() {
-	xrandr --listactivemonitors | head -n 1 | cut -d':' -f2 | xargs
-}
-
-rhkd() {
-	~/.cargo/bin/rhkd "$@"
-}
-rhkd-whichkey() {
-	~/.cargo/bin/rhkd-whichkey "$@"
-}
-
-start_sxhkd() {
-	# Set caps = escape
-	# This should run before sxhkd starts so caps can be mapped to ESCAPE_KEYSYM
-	setxkbmap us -variant altgr-intl
-	setxkbmap -option caps:escape
-
-	pgrep -x rhkd || rhkd -c ~/.config/sxhkd/sxhkdrc &
-	pgrep -x rhkd-whichkey || rhkd-whichkey -c ~/.config/sxhkd/sxhkdrc &
-
-	~/.config/sxhkd/bash_config.bash
-}
-
-start_sxhkd
-
-if has redshift; then
-	pgrep -x redshift >/dev/null || redshift &
-fi
+source "$HOME/.config//dwm/startup.sh"
 
 is_monitor() {
 	xrandr | grep -q "^$1 connected"
@@ -84,7 +22,7 @@ elif ! is_monitor "eDP1"; then
 fi
 
 default-config() {
-	bspc config split_ratio 0.51
+	bspc config split_ratio 0.60
 	bspc config pointer_follows_focus true
 	bspc config focus_follows_pointer true
 
@@ -135,7 +73,6 @@ laptop() {
 		bspc wm --reorder-monitors eDP1 "$SECOND_MONITOR"
 		~/.config/polybar/launch.sh "$SECOND_MONITOR"
 	else
-		notify "$SECOND_MONITOR not connected"
 		# cleanup
 		bspc monitor "$SECOND_MONITOR" --remove
 		xrandr --delmonitor vir1
@@ -148,7 +85,7 @@ laptop() {
 	fi
 	~/.config/polybar/launch.sh eDP1
 	default-config
-	configure_locktime
+	# configure_locktime
 	bspc config window_gap 4
 }
 
@@ -269,20 +206,6 @@ else
 	# ~/.config/bspwm/scripts/window-management/no_border_wine &
 fi
 
-# Polkit
-/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-# Dex
-# dex -a -s /etc/xdg/autostart/:~/.config/autostart/
-dex -a -s ~/.config/autostart/
-
-# the firewall-applet in /etc/xdg/autostart/firewall-applet.desktop
-# does not check if it is already running and will launch new instances.
-# This hack just kills them all and starts a new one
-pkill firewall-applet
-firewall-applet &
-# Network Applet
-nm-applet --indicator &
-
 # Cursor
 xsetroot -cursor_name left_ptr &
 
@@ -291,13 +214,6 @@ if ! is_laptop; then
 	xset -dpms &
 	xset s off &
 fi
-
-if has picom; then
-	picom -b --config ~/.config/picom.conf &
-fi
-
-# Wallpaper
-nitrogen --restore &
 
 end_at=$(date +%s,%N)
 _s1=$(echo "$start_at" | cut -d',' -f1) # sec
