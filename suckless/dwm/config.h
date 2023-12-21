@@ -9,8 +9,8 @@
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int bar_tick_rate      = 1;
-static int gap_y                    = 4;
-static int gap_x                    = 4;
+static int gap_y                    = 0;
+static int gap_x                    = 0;
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char col_gray1[]       = "#222222";
@@ -90,7 +90,7 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "st", NULL };
+static const char *termcmd[]  = { "st", "-e", "tmux", NULL };
 
 enum { CHARGING, DISCHARGING };
 typedef struct {
@@ -281,22 +281,10 @@ bar_cpu_usage(const BarElementFuncArgs *data) {
 }
 
 static void
-setgapy(const Arg *arg) {
-	if (!arg) return;
-	gap_y += arg->i;
-	arrange(selmon);
-}
-static void
-setgapx(const Arg *arg) {
-	if (!arg) return;
-	gap_x += arg->i;
-	arrange(selmon);
-}
-static void
 setgap(const Arg *arg) {
 	if (!arg) return;
-	gap_y += arg->i;
-	gap_x += arg->i;
+	gap_y = MAX(gap_y + arg->i, 0);
+	gap_x = MAX(gap_x + arg->i, 0);
 	arrange(selmon);
 }
 
@@ -317,8 +305,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_j,      pushdown,       {0} },
 	{ MODKEY|ShiftMask,             XK_k,      pushup,         {0} },
-	// { MODKEY,                       XK_i,      setgap,         {.i = +4 } },
-	// { MODKEY,                       XK_o,      setgap,         {.i = -4 } },
+	{ MODKEY|ShiftMask,             XK_i,      setgap,         {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_o,      setgap,         {.i = +1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_o,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },

@@ -13,7 +13,11 @@ set wildmode=full
 
 set number
 set foldmethod=syntax
-set foldlevel=0
+set foldlevel=99
+" close all folds
+nmap zC :setlocal foldlevel=0<cr>
+" open all folds
+nmap zO :setlocal foldlevel=99<cr>
 
 set ttimeout
 set ttimeoutlen=100
