@@ -26,14 +26,15 @@ static const char col_black[]       = "#000000";
 static const char col_blue[]        = "#1B5378";
 static const char col_green[]       = "#1E854A";
 static const char col_white[]       = "#ffffff";
-enum { SchemeBattery = SchemeSel + 1, SchemeClock, SchemeCpu };
+enum { SchemeBattery = SchemeSel + 1, SchemeClock, SchemeCpu, SchemeMemory };
 static const char *colors[][3]      = {
-	/*                  fg         bg         border   */
-	[SchemeNorm]    = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]     = { col_gray4, active_bg, active_border  },
-	[SchemeBattery] = { col_white, col_green, NULL },
-	[SchemeClock]   = { col_white, col_gray2, NULL },
-	[SchemeCpu]     = { col_white, col_blue,  NULL },
+	/*                     fg         bg         border   */
+	[SchemeNorm]       = { col_gray3, col_gray1, col_gray2 },
+	[SchemeSel]        = { col_gray4, active_bg, active_border  },
+	[SchemeBattery]    = { col_gray4, col_green, NULL },
+	[SchemeClock]      = { col_gray4, col_gray2, NULL },
+	[SchemeCpu]        = { col_gray4, col_blue,  NULL },
+	[SchemeMemory]     = { col_gray4, col_gold,  NULL },
 };
 
 static const char *fonts[]          = { 
@@ -177,6 +178,45 @@ static int bar_clock(const BarElementFuncArgs *data) {
 }
 
 typedef unsigned long long u64;
+
+static int bar_mem_usage(const BarElementFuncArgs *data) {
+	const char *memicon = "";
+	unsigned long memtotal;
+	unsigned long active;
+	char *memtotal_s, *active_s;
+
+	FILE *f = fopen("/proc/meminfo", "r");
+	if (!f) return 0;
+	int r = fread(data->e->buffer, 1, CHARBUFSIZE, f);
+	data->e->buffer[r] = 0;
+	fclose(f);
+
+	memtotal_s = strstr(data->e->buffer, "MemTotal:");
+	if (!memtotal_s)
+		return 0;
+	active_s = strstr(data->e->buffer, "Active:");
+	if (!active_s)
+		return 0;
+
+	if (!sscanf(memtotal_s, "MemTotal: %lu kB", &memtotal))
+		return 0;
+	if (!sscanf(active_s, "Active: %lu kB", &active))
+		return 0;
+
+	double gbtotal = (double)memtotal / (1 << 20);
+	double gbused = (double)active / (1 << 20);
+	double pct = (gbused / gbtotal) * 100;
+
+	if (gbused >= 1.0) {
+		sprintf(data->e->buffer, "%s %.1lf Gi / %.1lf Gi %d%%", memicon, gbused, gbtotal, (int)pct);
+	} else {
+		gbused *= (1 << 10);
+		sprintf(data->e->buffer, "%s %.0lf Mi / %.1lf Gi %d%%", memicon, gbused, gbtotal, (int)pct);
+	}
+
+	return 1;
+}
+
 typedef struct {
 	u64 user;
 	u64 nice;
@@ -186,7 +226,6 @@ typedef struct {
 	u64 irq;
 	u64 softirq;
 } proc_stat;
-
 static int bar_cpu_usage(const BarElementFuncArgs *data) {
 #define NPROC 8
 #define SCAN_LINE(f, n) fscanf(f, JIFFLE_FMT(n), JIFFLE_ARGS(n));
@@ -201,7 +240,7 @@ static int bar_cpu_usage(const BarElementFuncArgs *data) {
 	const char *levels[] = { "⡀", "⣀", "⣄", "⣤", "⣦", "⣶", "⣷", "⣿" };
 
 	FILE *f = fopen("/proc/stat", "r");
-	if (!f) return 1;
+	if (!f) return 0;
 
 	for (int i = 0; i < NPROC+1; i++) {
 		proc_stat *jiffle = jiffles + i;
@@ -213,7 +252,7 @@ static int bar_cpu_usage(const BarElementFuncArgs *data) {
 	fclose(f);
 
 	int n = 0;
-	n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, "%d%%  ", (int)UTILIZATION(prev_jiffles, jiffles));
+	n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, " ");
 
 	for (int i = 1; i < NPROC+1; i++) {
 		double utilization = UTILIZATION(prev_jiffles+i, jiffles+i);
@@ -222,6 +261,7 @@ static int bar_cpu_usage(const BarElementFuncArgs *data) {
 		index = CLAMP(index, 0, LENGTH(levels)-1);
 		n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, "%s", levels[index]);
 	}
+	n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, " %d%%", (int)UTILIZATION(prev_jiffles, jiffles));
 
 	memcpy(prev_jiffles, jiffles, sizeof(jiffles));
 
@@ -253,6 +293,7 @@ setgap(const Arg *arg) {
 }
 
 static BarElement BarElements[] = {
+	{ .func = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 3 },
 	{ .func = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 3 },
 	{ .func = bar_battery_status, .scheme = SchemeBattery, .interval = 5 },
 	{ .func = bar_clock,          .scheme = SchemeClock,   .interval = 5 },
