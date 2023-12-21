@@ -6,9 +6,9 @@
 #include <stdio.h>
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static int bar_tick_rate						= 1;
+static const int bar_tick_rate      = 1;
 static int gap_y                    = 4;
 static int gap_x                    = 4;
 static const int showbar            = 1;        /* 0 means no bar */
@@ -135,7 +135,7 @@ read_bat(battery_info *bat) {
 static int
 bar_battery_status(const BarElementFuncArgs *data) {
 	static int cursor = 0;
-	static int chargebuf[5] = {0};
+	static int chargebuf[10] = {0};
 
 	int charge_rate, seconds_remaining, hours, minutes, percentage;
 	double left;
@@ -164,7 +164,7 @@ bar_battery_status(const BarElementFuncArgs *data) {
 	hours = seconds_remaining / 3600;
 	minutes = (seconds_remaining % 3600) / 60;
 	percentage = ((double)bat.charge_now / bat.charge_full) * 100;
-	if (cursor % 5 == 0) 
+	if (cursor == 0) 
 		snprintf(data->e->buffer, sizeof data->e->buffer - 1, "%d%% %s %d:%02d", percentage,
 					 bat.state == CHARGING ? "" : "", hours, minutes);
 	cursor = (cursor + 1) % LENGTH(chargebuf);
@@ -280,19 +280,19 @@ bar_cpu_usage(const BarElementFuncArgs *data) {
 #undef UTILIZATION
 }
 
-void
+static void
 setgapy(const Arg *arg) {
 	if (!arg) return;
 	gap_y += arg->i;
 	arrange(selmon);
 }
-void
+static void
 setgapx(const Arg *arg) {
 	if (!arg) return;
 	gap_x += arg->i;
 	arrange(selmon);
 }
-void
+static void
 setgap(const Arg *arg) {
 	if (!arg) return;
 	gap_y += arg->i;
@@ -301,9 +301,9 @@ setgap(const Arg *arg) {
 }
 
 static BarElement BarElements[] = {
-	{ .func = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 2 },
-	{ .func = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 2 },
-	{ .func = bar_battery_status, .scheme = SchemeBattery, .interval = 5 },
+	{ .func = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 1 },
+	{ .func = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 1 },
+	{ .func = bar_battery_status, .scheme = SchemeBattery, .interval = 1 },
 	{ .func = bar_clock,          .scheme = SchemeClock,   .interval = 1 },
 };
 
@@ -327,9 +327,11 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_g,      zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
+	{ MODKEY,                       XK_t,      setnmaster,     {.i = 1 } },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                       XK_w,      setnmaster,     {.i = 2 } },
 	{ MODKEY,                       XK_w,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
