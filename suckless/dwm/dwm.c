@@ -153,9 +153,11 @@ typedef struct  {
 struct BarElement {
 	const int mode;
 	int scheme;
-	int (*func)(const BarElementFuncArgs*);
+	int (*update)(const BarElementFuncArgs*);
+	void (*click)(const BarElementFuncArgs*);
 	int interval;
 	int last_call;
+	void *data;
 	char buffer[CHARBUFSIZE];
 };
 
@@ -459,6 +461,27 @@ attachstack(Client *c)
 	c->mon->stack = c;
 }
 
+int
+maybeclickbarelem(XButtonPressedEvent *ev)
+{
+	Monitor *m = selmon;
+	int x = m->ww;
+	for (int i = LENGTH(BarElements)-1; i >= 0; i--) {
+		BarElement *elem = BarElements + i;
+		if (elem->buffer[0]) {
+			x -= TEXTW(elem->buffer);
+			if (ev->x > x) {
+				if (elem->click) {
+					elem->click(&(BarElementFuncArgs) { .m = m, .e = elem });
+					elem->last_call = 0;
+				}
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
 void
 buttonpress(XEvent *e)
 {
@@ -476,6 +499,10 @@ buttonpress(XEvent *e)
 		focus(NULL);
 	}
 	if (ev->window == selmon->barwin) {
+		if (maybeclickbarelem(ev)) {
+			drawbar(selmon);
+			return;
+		}
 		i = x = 0;
 		do
 			x += TEXTW(tags[i]);
@@ -796,9 +823,9 @@ drawbar(Monitor *m)
 	int now = time(NULL);
 	for (int i = 0; i < LENGTH(BarElements); i++) {
 		BarElement *elem = BarElements + i;
-		if (elem->func) {
+		if (elem->update) {
 			if (elem->interval == 0 || now - elem->last_call >= elem->interval) {
-				int keep = elem->func(&(BarElementFuncArgs) { .m = m, .e = elem });
+				int keep = elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
 				elem->last_call = now;
 				if (!keep) 
 					continue;

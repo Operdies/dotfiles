@@ -132,8 +132,14 @@ read_bat(battery_info *bat) {
 #undef PATH
 }
 
+typedef struct {
+	int show_time;
+	int force_update;
+} battery_settings;
+
 static int
 bar_battery_status(const BarElementFuncArgs *data) {
+	battery_settings *settings = (battery_settings*)data->e->data;
 	static int cursor = 0;
 	static int chargebuf[10] = {0};
 
@@ -164,21 +170,46 @@ bar_battery_status(const BarElementFuncArgs *data) {
 	hours = seconds_remaining / 3600;
 	minutes = (seconds_remaining % 3600) / 60;
 	percentage = ((double)bat.charge_now / bat.charge_full) * 100;
-	if (cursor == 0) 
-		snprintf(data->e->buffer, sizeof data->e->buffer - 1, "%d%% %s %d:%02d", percentage,
-					 bat.state == CHARGING ? "" : "", hours, minutes);
+	if (cursor == 0 || settings->force_update) {
+		settings->force_update = 0;
+		int n = snprintf(data->e->buffer, sizeof data->e->buffer - 1, "%d%% %s", percentage,
+					 bat.state == CHARGING ? "" : "");
+		if (settings->show_time)
+			sprintf(data->e->buffer + n, " %d:%02d", hours, minutes);
+	}
 	cursor = (cursor + 1) % LENGTH(chargebuf);
 	return 1;
 }
 
+static void
+bar_battery_toggle_timer(const BarElementFuncArgs *data) {
+	battery_settings *settings = (battery_settings*)data->e->data;
+	settings->show_time = !settings->show_time;
+	settings->force_update = 1;
+}
+
+typedef struct {
+	int show_seconds;
+} clock_settings;
+
 static int
 bar_clock(const BarElementFuncArgs *data) {
+	clock_settings *s = (clock_settings*)data->e->data;
 	time_t t;
 	time(&t);
 	struct tm *tm;
 	tm = localtime(&t);
-	strftime(data->e->buffer, 100, "%a %b %d %H:%M", tm);
+	if (s && s->show_seconds)
+		strftime(data->e->buffer, 100, "%a %b %d %H:%M:%S", tm);
+	else
+		strftime(data->e->buffer, 100, "%a %b %d %H:%M", tm);
 	return 1;
+}
+
+static void
+bar_clock_click(const BarElementFuncArgs *data) {
+	clock_settings *s = (clock_settings*)data->e->data;
+	s->show_seconds = !s->show_seconds;
 }
 
 typedef unsigned long long u64;
@@ -231,6 +262,11 @@ typedef struct {
 	u64 irq;
 	u64 softirq;
 } proc_stat;
+
+typedef struct {
+	int show_braille;
+} cpu_settings;
+
 static int
 bar_cpu_usage(const BarElementFuncArgs *data) {
 #define NPROC 8
@@ -240,6 +276,7 @@ bar_cpu_usage(const BarElementFuncArgs *data) {
 #define TOTAL(j) (WORK(j) + IDLE(j))
 #define UTILIZATION(p, c) ((double)(WORK(c) - WORK(p)) / (TOTAL(c) - TOTAL(p)) * 100)
 
+	cpu_settings *s = (cpu_settings*)data->e->data;
 	static proc_stat prev_jiffles[NPROC+1] = {0};
 	proc_stat jiffles[NPROC+1] = {0};
 
@@ -260,14 +297,15 @@ bar_cpu_usage(const BarElementFuncArgs *data) {
 	int n = 0;
 	n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, " ");
 
-	for (int i = 1; i < NPROC+1; i++) {
-		double utilization = UTILIZATION(prev_jiffles+i, jiffles+i);
-		double increment = 100.0 / LENGTH(levels);
-		int index = utilization / increment;
-		index = CLAMP(index, 0, LENGTH(levels)-1);
-		n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, "%s", levels[index]);
-	}
-	n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, " %d%%", (int)UTILIZATION(prev_jiffles, jiffles));
+	if (s && s->show_braille)
+		for (int i = 1; i < NPROC+1; i++) {
+			double utilization = UTILIZATION(prev_jiffles+i, jiffles+i);
+			double increment = 100.0 / LENGTH(levels);
+			int index = utilization / increment;
+			index = CLAMP(index, 0, LENGTH(levels)-1);
+			n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, "%s", levels[index]);
+		}
+	n += snprintf(data->e->buffer + n, CHARBUFSIZE - n - 1, "%d%%", (int)UTILIZATION(prev_jiffles, jiffles));
 
 	memcpy(prev_jiffles, jiffles, sizeof(jiffles));
 
@@ -281,6 +319,12 @@ bar_cpu_usage(const BarElementFuncArgs *data) {
 }
 
 static void
+bar_cpu_braille(const BarElementFuncArgs *data) {
+	cpu_settings *s = (cpu_settings*)data->e->data;
+	s->show_braille = !s->show_braille;
+}
+
+static void
 setgap(const Arg *arg) {
 	if (!arg) return;
 	gap_y = MAX(gap_y + arg->i, 0);
@@ -289,10 +333,10 @@ setgap(const Arg *arg) {
 }
 
 static BarElement BarElements[] = {
-	{ .func = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 1 },
-	{ .func = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 1 },
-	{ .func = bar_battery_status, .scheme = SchemeBattery, .interval = 1 },
-	{ .func = bar_clock,          .scheme = SchemeClock,   .interval = 1 },
+	{ .update = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 1 },
+	{ .update = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 1, .click = bar_cpu_braille, .data = &(cpu_settings) { .show_braille = 1 } },
+	{ .update = bar_battery_status, .scheme = SchemeBattery, .interval = 1, .click = bar_battery_toggle_timer, .data = &(battery_settings) { .show_time = 1 }  },
+	{ .update = bar_clock,          .scheme = SchemeClock,   .interval = 1, .click = bar_clock_click, .data = &(clock_settings) { .show_seconds = 0 } },
 };
 
 static const Key keys[] = {
