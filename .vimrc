@@ -65,3 +65,5 @@ autocmd BufReadPost *
 	\ |   execute "normal! g`\""
 	\ | endif
 
+set termguicolors
+colorscheme catppuccin_mocha
