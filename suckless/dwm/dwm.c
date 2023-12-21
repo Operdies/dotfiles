@@ -232,6 +232,7 @@ static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
+static void tilewide(Monitor *m);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -1857,16 +1858,18 @@ tile(Monitor *m)
 	if (n == 0)
 		return;
 
-	if (n > m->nmaster){
-		mw = m->nmaster ? m->ww * m->mfact : 0;
+	if (n > 1) {
 		gapx = gap_x;
 		gapy = gap_y;
+	} else {
+		gapx = gapy = 0;
 	}
-	else {
+
+	if (n > m->nmaster)
+		mw = m->nmaster ? m->ww * m->mfact : 0;
+	else 
 		mw = m->ww;
-		gapx = 0;
-		gapy = 0;
-	}
+	
 	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
 		if (i < m->nmaster) {
 			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
@@ -1888,6 +1891,50 @@ tile(Monitor *m)
 				ty += HEIGHT(c) + gapy;
 		}
 	}
+}
+
+void
+tilewide(Monitor *m)
+{
+	unsigned int i, n, w, h, mw, mx, ty;
+	int gapx, gapy;
+	Client *c;
+
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+	if (n == 0)
+		return;
+
+	if (n > 1) {
+		gapx = gap_x;
+		gapy = gap_y;
+	} else {
+		gapx = gapy = 0;
+	}
+
+	if (n > m->nmaster)
+		mw = m->nmaster ? m->ww * m->mfact : 0;
+	else
+		mw = m->ww;
+	for (i = mx = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+		if (i < m->nmaster) {
+			w = (mw - mx) / (MIN(n, m->nmaster) - i);
+			int x = m->wx + mx;
+			int y = m->wy;
+			int w2 = w - (2*c->bw);
+			int h2 = (m->wh - ty) - (2*c->bw);
+			resize(c, x + gapx, y + gapy, w2 - gapx, h2 - (2 * gapy), 0);
+			if  (mx + WIDTH(c) < m->ww)
+				mx += WIDTH(c) + gapx;
+		} else {
+			h = (m->wh - ty) / (n - i);
+			int x = m->wx + mw;
+			int y = m->wy + ty;
+			int w2 = m->ww - mw - (2*c->bw);
+			int h2 = h - (2*c->bw);
+			resize(c, x + gapx, y + gapy, w2 - (2 * gapx), h2 - (2 * gapy), 0);
+			if (ty + HEIGHT(c) < m->wh)
+				ty += HEIGHT(c) + gapy;
+		}
 }
 
 void
