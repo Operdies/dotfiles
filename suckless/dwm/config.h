@@ -13,7 +13,6 @@ static int gap_y                    = 4;
 static int gap_x                    = 4;
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -37,9 +36,8 @@ static const char *colors[][3]      = {
 	[SchemeMemory]     = { col_gray4, col_gold,  NULL },
 };
 
-static const char *fonts[]          = { 
-	"MesloLGS NF:size=11:style=Bold" 
-};
+static const char dmenufont[]       = "MesloLGS NF:size=11";
+static const char *fonts[]          = { "MesloLGS NF:size=11:style=Bold" };
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -101,7 +99,8 @@ typedef struct {
   int state;
 } battery_info;
 
-static int read_bat(battery_info *bat) {
+static int 
+read_bat(battery_info *bat) {
 #define PATH(x) "/sys/class/power_supply/BAT0/" #x
 #define read_thing(thing)                          \
   fp = fopen(PATH(thing), "r");                    \
@@ -132,7 +131,8 @@ static int read_bat(battery_info *bat) {
 #undef PATH
 }
 
-static int bar_battery_status(const BarElementFuncArgs *data) {
+static int
+bar_battery_status(const BarElementFuncArgs *data) {
 	static int cursor = 0;
 	static int chargebuf[5] = {0};
 
@@ -170,7 +170,8 @@ static int bar_battery_status(const BarElementFuncArgs *data) {
 	return 1;
 }
 
-static int bar_clock(const BarElementFuncArgs *data) {
+static int
+bar_clock(const BarElementFuncArgs *data) {
 	time_t t;
 	time(&t);
 	struct tm *tm;
@@ -181,7 +182,8 @@ static int bar_clock(const BarElementFuncArgs *data) {
 
 typedef unsigned long long u64;
 
-static int bar_mem_usage(const BarElementFuncArgs *data) {
+static int
+bar_mem_usage(const BarElementFuncArgs *data) {
 	const char *memicon = "";
 	unsigned long memtotal;
 	unsigned long active;
@@ -228,7 +230,8 @@ typedef struct {
 	u64 irq;
 	u64 softirq;
 } proc_stat;
-static int bar_cpu_usage(const BarElementFuncArgs *data) {
+static int
+bar_cpu_usage(const BarElementFuncArgs *data) {
 #define NPROC 8
 #define SCAN_LINE(f, n) fscanf(f, JIFFLE_FMT(n), JIFFLE_ARGS(n));
 #define WORK(j) ((j)->user + (j)->nice + (j)->system)
@@ -276,12 +279,14 @@ static int bar_cpu_usage(const BarElementFuncArgs *data) {
 #undef UTILIZATION
 }
 
-void setgapy(const Arg *arg) {
+void
+setgapy(const Arg *arg) {
 	if (!arg) return;
 	gap_y += arg->i;
 	arrange(selmon);
 }
-void setgapx(const Arg *arg) {
+void
+setgapx(const Arg *arg) {
 	if (!arg) return;
 	gap_x += arg->i;
 	arrange(selmon);
@@ -295,15 +300,16 @@ setgap(const Arg *arg) {
 }
 
 static BarElement BarElements[] = {
-	{ .func = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 3 },
-	{ .func = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 3 },
+	{ .func = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 2 },
+	{ .func = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 2 },
 	{ .func = bar_battery_status, .scheme = SchemeBattery, .interval = 5 },
-	{ .func = bar_clock,          .scheme = SchemeClock,   .interval = 5 },
+	{ .func = bar_clock,          .scheme = SchemeClock,   .interval = 1 },
 };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },

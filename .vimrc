@@ -11,6 +11,10 @@ set showcmd
 set wildmenu
 set wildmode=full
 
+set number
+set foldmethod=syntax
+set foldlevel=0
+
 set ttimeout
 set ttimeoutlen=100
 
