@@ -101,19 +101,18 @@ typedef struct {
   int state;
 } battery_info;
 
-static battery_info read_bat(void) {
+static int read_bat(battery_info *bat) {
 #define PATH(x) "/sys/class/power_supply/BAT0/" #x
 #define read_thing(thing)                          \
   fp = fopen(PATH(thing), "r");                    \
 	if (fp) { 																			 \
 		fgets(pathbuf, 40, fp);                        \
 		fclose(fp);                                    \
-		bat.thing = atoi(pathbuf);										 \
+		bat->thing = atoi(pathbuf);										 \
 	} else { 																				 \
-	  fprintf(stderr, "Error opening " #thing); 		 \
+	  return 0;																			 \
 	}
 
-  static battery_info bat = {0};
   FILE *fp;
   char pathbuf[40];
 
@@ -125,10 +124,10 @@ static battery_info read_bat(void) {
 	if (fp) {
 		fgets(pathbuf, 40, fp);
 		fclose(fp);
-		bat.state = pathbuf[0] == 'C' ? CHARGING : DISCHARGING;
+		bat->state = pathbuf[0] == 'C' ? CHARGING : DISCHARGING;
 	}
 
-  return bat;
+  return 1;
 #undef read_thing
 #undef PATH
 }
@@ -139,9 +138,12 @@ static int bar_battery_status(const BarElementFuncArgs *data) {
 
 	int charge_rate, seconds_remaining, hours, minutes, percentage;
 	double left;
-	battery_info bat;
+	battery_info bat = {0};
 
-	bat = read_bat();
+	if (!read_bat(&bat)) {
+		return 0;
+	}
+
 	chargebuf[cursor] = bat.current_now;
 	charge_rate = 0;
 	{

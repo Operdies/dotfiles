@@ -790,7 +790,7 @@ drawbar(Monitor *m)
 
 	x = m->ww;
 	/* first pass: calculate string lengths for alignment purposes */
-	int wbuf[LENGTH(BarElements)];
+	int wbuf[LENGTH(BarElements)] = {0};
 	int now = time(NULL);
 	for (int i = 0; i < LENGTH(BarElements); i++) {
 		BarElement *elem = BarElements + i;
@@ -802,13 +802,17 @@ drawbar(Monitor *m)
 					continue;
 			}
 		}
-		w = TEXTW(elem->buffer);
-		x -= w;
-		wbuf[i] = w;
+		if (elem->buffer[0]) {
+			w = TEXTW(elem->buffer);
+			x -= w;
+			wbuf[i] = w;
+		}
 	}
 
 	/* second pass: write at computed alignment */
 	for (int i = 0; i < LENGTH(BarElements); i++) {
+		if (wbuf[i] == 0)
+			continue;
 		BarElement *elem = BarElements + i;
 		if (elem->buffer[0]) {
 			w = wbuf[i];
