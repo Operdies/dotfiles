@@ -16,6 +16,7 @@ ensure_binaries() {
 		tldr tldr
 		bsp-layout bsp-layout
 		git git
+		libinput-gestures "libinput libinput-gestures xf86-input-libinput"
 		curl curl
 		go go
 		yq go-yq
