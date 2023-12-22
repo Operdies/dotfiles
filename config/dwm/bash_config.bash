@@ -163,6 +163,24 @@ reload() {
 }
 # reload
 
+tmuxes2() {
+	readarray -t <<< "$(tmux list-sessions -F#S)"
+	keys=(q w e r t)
+
+	PREFIX="super + shift + a ; "
+	BINDINGS=()
+	for ((i = 0; i < ${#keys[*]}; i++)); do
+		if ((i >= ${#MAPFILE[@]})); then
+			break;
+		fi
+		session="${MAPFILE[i]}"
+		BINDINGS+=("st -e tmux attach -t '$session'" "${keys[i]}" "Attach to $session")
+	done
+	bind_unconditional -t 'Tmux Sessions' -o
+}
+
+tmuxes2
+
 tmuxes() {
 	readarray -t <<< "$(tmux list-sessions -F#S)"
 	keys=(q w e r t)
