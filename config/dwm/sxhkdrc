@@ -57,4 +57,8 @@ Print
 super + s ; { s, a, w }
   ~/.config/bspwm/scripts/screenshot.sh { screen, area, window }
 
+# Rein in Firefox
+# {Stop,Continue} Firefox
+super + shift + w ; { s, c }
+  pkill -{SIGSTOP,SIGCONT} firefox
 

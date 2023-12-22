@@ -75,3 +75,7 @@ autocmd BufReadPost *
 
 set termguicolors
 colorscheme catppuccin_mocha
+
+nmap <space>o :e %:p:h<cr>
+nmap <space>cd :cd %:p:h<cr>
+nmap <space>fw /\<
