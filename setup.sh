@@ -14,17 +14,20 @@ ensure_binaries() {
 		htop htop
 		lazygit lazygit
 		tldr tldr
-		hush hush-bin
 		bsp-layout bsp-layout
 		git git
 		curl curl
 		go go
 		yq go-yq
 		nvim neovim
+		gvim gvim
+		dmenu dmenu
+		picom picom
 		xwininfo xorg-xwininfo
 		cargo rustup
 		zsh zsh
-		zathura zathura
+		zathura "zathura zathura-pdf-mupdf"
+		gsimplecal gsimplecal
 		gcc gcc
 		npm npm
 		wezterm wezterm
@@ -114,11 +117,22 @@ ensure_clones() {
 	popd || return
 }
 
+ensure_make() {
+	for item in "$(dirname "$0")/src/"*; do
+		dir="$(readlink -f "$item")"
+		pushd "$dir"
+		make
+		popd
+	done
+}
+
 set_default_apps() {
 	xdg-mime default org.pwmt.zathura.desktop application/pdf
+	xdg-mime default firefox.desktop x-scheme-handler/https x-scheme-handler/http
 }
 
 ensure_links
 ensure_binaries
 ensure_clones
+ensure_make
 set_default_apps
