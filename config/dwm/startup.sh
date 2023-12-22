@@ -71,3 +71,5 @@ fi
 pgrep -x rhkd || rhkd -c "$HOME/.config/$config_dir/sxhkdrc" &
 pgrep -x rhkd-whichkey || rhkd-whichkey -c "$HOME/.config/$config_dir/sxhkdrc" &
 (sleep 1; "$HOME/.config/$config_dir/bash_config.bash" --quiet) &
+
+~/repos/dotfiles/suckless/xautobacklight/xautobacklight -t 5 -f "/sys/class/leds/asus::kbd_backlight/brightness" &
