@@ -817,40 +817,26 @@ drawbar(Monitor *m)
 		}
 	}
 
-	x = m->ww;
-	/* first pass: calculate string lengths for alignment purposes */
-	int wbuf[LENGTH(BarElements)] = {0};
 	int now = time(NULL);
-	for (int i = 0; i < LENGTH(BarElements); i++) {
+	x = m->ww;
+
+	for (int i = LENGTH(BarElements) - 1; i >= 0; i--) {
 		BarElement *elem = BarElements + i;
 		if (elem->update) {
 			if (elem->interval == 0 || now - elem->last_call >= elem->interval) {
-				int keep = elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
 				elem->last_call = now;
-				if (!keep) 
+				if (!elem->update(&(BarElementFuncArgs) { .m = m, .e = elem }))
 					continue;
 			}
 		}
 		if (elem->buffer[0]) {
 			w = TEXTW(elem->buffer);
 			x -= w;
-			wbuf[i] = w;
-		}
-	}
-
-	/* second pass: write at computed alignment */
-	for (int i = 0; i < LENGTH(BarElements); i++) {
-		if (wbuf[i] == 0)
-			continue;
-		BarElement *elem = BarElements + i;
-		if (elem->buffer[0]) {
-			w = wbuf[i];
 			if (elem->scheme) 
 				drw_setscheme(drw, scheme[elem->scheme]);
 			else 
 				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, elem->buffer, 0);
-			x += w;
 		}
 	}
 
