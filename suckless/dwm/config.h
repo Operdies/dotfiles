@@ -325,6 +325,12 @@ bar_cpu_braille(const BarElementFuncArgs *data) {
 }
 
 static void
+open_calendar(const BarElementFuncArgs *data) {
+	const char *args[] = { "gsimplecal", NULL };
+	spawn(&(Arg) { .v = args });
+}
+
+static void
 setgap(const Arg *arg) {
 	if (!arg) return;
 	gap_y = MAX(gap_y + arg->i, 0);
@@ -332,16 +338,37 @@ setgap(const Arg *arg) {
 	arrange(selmon);
 }
 
-static BarElement BarElements[] = {
-	{ .update = bar_mem_usage, 			.scheme = SchemeMemory,  .interval = 1 },
-	{ .update = bar_cpu_usage, 			.scheme = SchemeCpu,     .interval = 1, .click = bar_cpu_braille, .data = &(cpu_settings) { .show_braille = 1 } },
-	{ .update = bar_battery_status, .scheme = SchemeBattery, .interval = 1, .click = bar_battery_toggle_timer, .data = &(battery_settings) { .show_time = 1 }  },
-	{ .update = bar_clock,          .scheme = SchemeClock,   .interval = 1, .click = bar_clock_click, .data = &(clock_settings) { .show_seconds = 0 } },
+static BarElement BarElements[]    = {
+	{ 
+		.interval = 1,
+		.scheme = SchemeMemory,  
+		.update = bar_mem_usage, 			
+	},
+	{ 
+		.click = { [Button1] = bar_cpu_braille }, 
+		.data = &(cpu_settings) { .show_braille = 1 },
+		.interval = 1, 
+		.scheme = SchemeCpu,     
+		.update = bar_cpu_usage, 			
+	},
+	{ 
+		.click = { [Button1] = bar_battery_toggle_timer },
+		.data = &(battery_settings) { .show_time = 1 },
+		.interval = 1, 
+		.scheme = SchemeBattery, 
+		.update = bar_battery_status, 
+	},
+	{ 
+		.click = { [Button1] = bar_clock_click, [Button3] = open_calendar },
+		.data = &(clock_settings) { .show_seconds = 0 },
+		.interval = 1, 
+		.scheme = SchemeClock,   
+		.update = bar_clock,          
+	},
 };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },

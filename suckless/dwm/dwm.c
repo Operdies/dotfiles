@@ -154,7 +154,7 @@ struct BarElement {
 	const int mode;
 	int scheme;
 	int (*update)(const BarElementFuncArgs*);
-	void (*click)(const BarElementFuncArgs*);
+	void (*click[Button5])(const BarElementFuncArgs*);
 	int interval;
 	int last_call;
 	void *data;
@@ -471,8 +471,8 @@ maybeclickbarelem(XButtonPressedEvent *ev)
 		if (elem->buffer[0]) {
 			x -= TEXTW(elem->buffer);
 			if (ev->x > x) {
-				if (elem->click) {
-					elem->click(&(BarElementFuncArgs) { .m = m, .e = elem });
+				if (elem->click[ev->button]) {
+					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem });
 					elem->last_call = 0;
 				}
 				return 1;
