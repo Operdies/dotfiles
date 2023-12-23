@@ -73,7 +73,9 @@ enum {
 	MiddleClick = Button2, 
 	RightClick = Button3, 
 	ScrollUp = Button4, 
-	ScrollDown = Button5 
+	ScrollDown = Button5,
+	ScrollLeft,
+	ScrollRight,
 };
 
 typedef union {
@@ -161,7 +163,7 @@ struct BarElement {
 	const int mode;
 	int scheme;
 	int (*update)(BarElementFuncArgs*);
-	void (*click[Button5+1])(BarElementFuncArgs*);
+	void (*click[ScrollRight+1])(BarElementFuncArgs*);
 	int interval;
 	int last_call;
 	void *data;
@@ -468,14 +470,6 @@ attachstack(Client *c)
 	c->mon->stack = c;
 }
 
-static const char *button_names[] = {
-	[LeftClick] = "LeftClick",
-	[MiddleClick] = "MiddleClick",
-	[RightClick] = "RightClick",
-	[ScrollUp] = "ScrollUp",
-	[ScrollDown] = "ScrollDown",
-};
-
 int
 maybeclickbarelem(XButtonPressedEvent *ev)
 {
@@ -486,11 +480,9 @@ maybeclickbarelem(XButtonPressedEvent *ev)
 		if (elem->buffer[0]) {
 			x -= TEXTW(elem->buffer);
 			if (ev->x > x) {
-				if (elem->click[ev->button]) {
+				if (ev->button < (ScrollRight+1) && elem->click[ev->button]) {
 					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem });
 					elem->last_call = 0;
-				} else {
-					fprintf(stderr, "Button %s is not implemented for button '%s'\n", button_names[ev->button], elem->buffer);
 				}
 				return 1;
 			}

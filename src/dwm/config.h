@@ -105,11 +105,11 @@ setgap(const Arg *arg) {
 	arrange(selmon);
 }
 
-static BarElement BarElements[] = {
+BarElement BarElements[] = {
 	{
-		.click = {0},
-		.data = &(tail_settings) { .path = "/tmp/dwm.log" },
-		.interval = 1,
+		.click = { [ScrollLeft] = tail_scroll_left, [ScrollRight] = tail_scroll_right },
+		.data = &(tail_settings) { .path = "/tmp/dwm.log", .max_length = 10 },
+		.interval = 0,
 		.scheme = SchemeClock,
 		.update = tail_file,
 	},

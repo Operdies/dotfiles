@@ -5,13 +5,14 @@ include config.mk
 
 SRC = drw.c dwm.c util.c
 OBJ = ${SRC:.c=.o}
+BAR_PLUGINS = $(wildcard bar_plugins/*.c)
 
 all: dwm
 
 .c.o:
 	${CC} -c ${CFLAGS} $<
 
-${OBJ}: config.h config.mk
+${OBJ}: config.h config.mk $(BAR_PLUGINS)
 
 config.h:
 	cp config.def.h $@
