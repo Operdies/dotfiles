@@ -185,7 +185,7 @@ print_time() {
 	_e1=$(echo $end_at | cut -d',' -f1)
 	_e2=$(echo $end_at | cut -d',' -f2)
 	time_cost=$(bc <<<"scale=3; $_e1 - $_s1 + ($_e2 -$_s2)/1000000000")
-	dunstify rhkd "Reloaded rhkd in $time_cost seconds"
+	notify-send rhkd "Reloaded rhkd in $time_cost seconds" &
 }
 
 print_time

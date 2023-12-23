@@ -2,7 +2,7 @@
 
 notify() {
 	msg="$*"
-	dunstify -u normal -t 2000 bspwmrc "$msg"
+	notify-send -u normal -t 2000 bspwmrc "$msg" &
 }
 
 rand() {
