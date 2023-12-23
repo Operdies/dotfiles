@@ -68,6 +68,13 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
+enum { 
+	LeftClick = Button1, 
+	MiddleClick = Button2, 
+	RightClick = Button3, 
+	ScrollUp = Button4, 
+	ScrollDown = Button5 
+};
 
 typedef union {
 	int i;
@@ -153,8 +160,8 @@ typedef struct  {
 struct BarElement {
 	const int mode;
 	int scheme;
-	int (*update)(const BarElementFuncArgs*);
-	void (*click[Button5])(const BarElementFuncArgs*);
+	int (*update)(BarElementFuncArgs*);
+	void (*click[Button5+1])(BarElementFuncArgs*);
 	int interval;
 	int last_call;
 	void *data;
@@ -461,6 +468,14 @@ attachstack(Client *c)
 	c->mon->stack = c;
 }
 
+static const char *button_names[] = {
+	[LeftClick] = "LeftClick",
+	[MiddleClick] = "MiddleClick",
+	[RightClick] = "RightClick",
+	[ScrollUp] = "ScrollUp",
+	[ScrollDown] = "ScrollDown",
+};
+
 int
 maybeclickbarelem(XButtonPressedEvent *ev)
 {
@@ -474,6 +489,8 @@ maybeclickbarelem(XButtonPressedEvent *ev)
 				if (elem->click[ev->button]) {
 					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem });
 					elem->last_call = 0;
+				} else {
+					fprintf(stderr, "Button %s is not implemented for button '%s'\n", button_names[ev->button], elem->buffer);
 				}
 				return 1;
 			}
