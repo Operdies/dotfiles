@@ -1,9 +1,11 @@
+#include <stdlib.h>
 #include <poll.h>
 
 typedef struct {
 	char summary[30];
 	char message[CHARBUFSIZE-30-2];
 	unsigned int urgency;
+	time_t when;
 } notification;
 
 enum { MSG_LOW, MSG_NORMAL, MSG_CRITICAL };
@@ -15,6 +17,7 @@ typedef struct {
 	int count;
 	int max_length;
 	int prev_length;
+	char **icons;
 	notification history[10];
 } tiramisu_settings;
 
@@ -38,6 +41,27 @@ read_quote(char *ch, char *dest, int limit) {
 	dest[MIN(i, limit-1)] = 0;
 #undef SKIPAHEAD
 	return ch;
+}
+
+static void
+pretty_elapsed(char *timestring, int n, time_t when) {
+	const int seconds_per_day = 60*60*24;
+
+	int elapsed = time(NULL) - when;
+	int i = 0;
+	int d = (elapsed / seconds_per_day);
+	int h = (elapsed / 3600) % 24;
+	int m = (elapsed / 60) % 60;
+	int s = elapsed % 60;
+
+	if (d)
+		i += snprintf(timestring+i, n-i-1, "%d %s, ", d, d == 1 ? "day" : "days");
+	if (h)
+		i += snprintf(timestring+i, n-i-1, "%dh", h);
+	if (m)
+		i += snprintf(timestring+i, n-i-1, "%dm", m);
+	i += snprintf(timestring+i, n-i-1, "%ds", s);
+	timestring[i] = 0;
 }
 
 static int
@@ -66,7 +90,7 @@ bar_notifications(BarElementFuncArgs *data) {
 		if (fds[0].revents & POLLIN) {
 			char buf[LINE_MAX];
 			if (fgets(buf, sizeof(buf), s->fp)) {
-				notification n = {0};
+				notification n = { .when = time(NULL) };
 				char *ch = buf;
 				ch = read_quote(ch, n.summary, LENGTH(n.summary));
 				char urgencybuf[100];
@@ -76,6 +100,15 @@ bar_notifications(BarElementFuncArgs *data) {
 				if (!sscanf(urgencybuf, "urgency=0x%x,", &n.urgency)) {
 					fprintf(stderr, "Failed to parse urgency from %s\n", urgencybuf);
 					return 0;
+				}
+
+				for (char **pair = s->icons; *pair; pair += 2) {
+					char *title = pair[0];
+					char *icon = pair[1];
+					if (title && icon && strcmp(title, n.summary) == 0) {
+						strncpy(n.summary, icon, LENGTH(n.summary));
+						break;
+					}
 				}
 
 				memmove(&s->history[1], &s->history[0], sizeof(notification) * (LENGTH(s->history)-1));
@@ -96,8 +129,9 @@ bar_notifications(BarElementFuncArgs *data) {
 
 	notification *n = &s->history[s->selected];
 	data->e->scheme = s->schemes[n->urgency];
-	int i = snprintf(data->e->buffer, CHARBUFSIZE-2,  "(%d/%d) [%s] %s", s->selected+1, s->count, n->summary, n->message);
-	data->e->buffer[i] = 0;
+	char timestring[100];
+	pretty_elapsed(timestring, LENGTH(timestring), n->when);
+	snprintf(data->e->buffer, CHARBUFSIZE,  "(%d/%d) %s %s (%s)", s->selected+1, s->count, n->summary, n->message, timestring);
 
 	// truncate if needed
 	if (limit && i > limit) {

@@ -167,10 +167,16 @@ BarElement BarElements[] = {
 		.data = &(tiramisu_settings) { 
 			.schemes = { [MSG_LOW] = SchemeLow, [MSG_NORMAL] = SchemeNormal, [MSG_CRITICAL] = SchemeCritical  },
 			.max_length = 16,
+			.icons = (char*[]) {
+				"wifi", "󰤩",
+				"rhkd", "X",
+				NULL,
+			},
 		},
 		.update = bar_notifications,
 	},
 };
+
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
