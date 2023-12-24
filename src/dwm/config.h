@@ -14,6 +14,7 @@
 #include "bar_plugins/bar_mem.c"
 #include "bar_plugins/bar_clock.c"
 #include "bar_plugins/bar_cpu.c"
+#include "bar_plugins/bar_tiramisu.c"
 
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
@@ -33,9 +34,18 @@ static const char active_border[]   = "#8c1a9b";
 static const char col_gold[]        = "#9D800A";
 static const char col_black[]       = "#000000";
 static const char col_blue[]        = "#1B5378";
+static const char col_red[]         = "#FF0000";
 static const char col_green[]       = "#1E854A";
 static const char col_white[]       = "#ffffff";
-enum { SchemeBattery = SchemeSel + 1, SchemeClock, SchemeCpu, SchemeMemory };
+enum { 
+	SchemeBattery = SchemeSel + 1, 
+	SchemeClock, 
+	SchemeCpu, 
+	SchemeMemory, 
+	SchemeLow, 
+	SchemeNormal, 
+	SchemeCritical 
+};
 static const char *colors[][3]      = {
 	/*                     fg         bg         border   */
 	[SchemeNorm]       = { col_gray3, col_gray1, col_gray2 },
@@ -44,6 +54,9 @@ static const char *colors[][3]      = {
 	[SchemeClock]      = { col_gray4, col_gray2, NULL },
 	[SchemeCpu]        = { col_gray4, col_blue,  NULL },
 	[SchemeMemory]     = { col_gray4, col_gold,  NULL },
+	[SchemeLow]        = { col_gray4, col_gray1, NULL }, 
+	[SchemeNormal]     = { col_gray4, col_blue,  NULL }, 
+	[SchemeCritical]   = { col_gray4, col_red,   NULL }, 
 };
 
 static const char dmenufont[]       = "MesloLGS NF:size=11";
@@ -107,7 +120,11 @@ setgap(const Arg *arg) {
 
 BarElement BarElements[] = {
 	{
-		.click = { [ScrollLeft] = tail_scroll_left, [ScrollRight] = tail_scroll_right },
+		.click = { 
+			[LeftClick] = tail_toggle_shown,
+			[ScrollLeft] = tail_scroll_left, 
+			[ScrollRight] = tail_scroll_right, 
+		},
 		.data = &(tail_settings) { .path = "/tmp/dwm.log", .max_length = 10 },
 		.interval = 0,
 		.scheme = SchemeClock,
@@ -138,6 +155,20 @@ BarElement BarElements[] = {
 		.interval = 1, 
 		.scheme = SchemeClock,   
 		.update = bar_clock,          
+	},
+	{
+		.click = { 
+			[LeftClick] = bar_toggle_shown,
+			[ScrollDown] = next_notification, 
+			[ScrollLeft] = bar_scroll_left, 
+			[ScrollRight] = bar_scroll_right, 
+			[ScrollUp] = prev_notification, 
+		},
+		.data = &(tiramisu_settings) { 
+			.schemes = { [MSG_LOW] = SchemeLow, [MSG_NORMAL] = SchemeNormal, [MSG_CRITICAL] = SchemeCritical  },
+			.max_length = 16,
+		},
+		.update = bar_notifications,
 	},
 };
 

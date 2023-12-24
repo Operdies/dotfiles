@@ -8,10 +8,6 @@ fix_java() {
 
 fix_java
 
-# Notifications
-/usr/bin/dunst &
-dunstctl close-all
-
 notify() {
 	msg="$*"
 	notify-send -u normal -t 2000 bspwmrc "$msg" &

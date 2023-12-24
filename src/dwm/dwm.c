@@ -166,6 +166,7 @@ struct BarElement {
 	void (*click[ScrollRight+1])(BarElementFuncArgs*);
 	int interval;
 	int last_call;
+	int poll_fd;
 	void *data;
 	char buffer[CHARBUFSIZE];
 };
@@ -1547,14 +1548,24 @@ run(void)
 	XSync(dpy, False);
 	int xfd = ConnectionNumber(dpy);
 	fd_set rd;
+	int sel_max;
 
 	/* main event loop */
 	while (running) {
 		FD_ZERO(&rd);
 		FD_SET(xfd, &rd);
+		sel_max = xfd;
+		for (int i = 0; i < LENGTH(BarElements); i++) {
+			BarElement *elem = &BarElements[i];
+			if (elem->poll_fd) {
+				FD_SET(elem->poll_fd, &rd);
+				sel_max = MAX(sel_max, elem->poll_fd);
+			}
+		}
+
 		struct timeval timeout = { .tv_sec = bar_tick_rate };
 
-		if (select(xfd + 1, &rd, NULL, NULL, &timeout) == -1) {
+		if (select(sel_max + 1, &rd, NULL, NULL, &timeout) == -1) {
 			if (errno == EINTR) {
 				drawbars();
 				continue;
@@ -1562,13 +1573,14 @@ run(void)
 			die("select failed\n");
 		}
 
-		if (!FD_ISSET(xfd, &rd)) {
+		if (FD_ISSET(xfd, &rd)) {
+			while (XPending(dpy)) {
+				XNextEvent(dpy, &ev);
+				if (handler[ev.type])
+					handler[ev.type](&ev); /* call handler */
+			}
+		} else {
 			drawbars();
-		}
-		while (XPending(dpy)) {
-			XNextEvent(dpy, &ev);
-			if (handler[ev.type])
-				handler[ev.type](&ev); /* call handler */
 		}
 	}
 }

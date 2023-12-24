@@ -1,7 +1,9 @@
+#include <ctype.h>
+
 typedef struct {
 	const char *path;
-	size_t prev_end;
 	unsigned int max_length;
+	unsigned int prev_length;
 	char backbuf[CHARBUFSIZE];
 } tail_settings;
 
@@ -11,58 +13,65 @@ tail_file (BarElementFuncArgs *data) {
 	tail_settings *s;
 	s = (tail_settings*)data->e->data;
 
-	if (s && s->max_length > 0) {
-		memcpy(data->e->buffer, s->backbuf, s->max_length);
-		data->e->buffer[s->max_length] = 0;
+	if (s == NULL || s->path == NULL)
+		return 0;
+	f = fopen(s->path, "r");
+	if (!f)
+		return 0;
+
+	char *buf = data->e->buffer;
+
+	int limit = CHARBUFSIZE - 1;
+	if (s->max_length)
+		limit = MIN(limit, s->max_length);
+
+	fseek(f, -limit, SEEK_END);
+	int pos = ftell(f);
+	int read = fread(buf, 1, limit, f);
+	fclose(f);
+
+	buf[read] = 0;
+	int n;
+	for (n = read - 1; n > 0 && isspace(buf[n]); n--)
+		buf[n] = 0;
+	n++;
+	int lastline;
+	for (lastline = n - 1; lastline > 0 && buf[lastline] != '\n'; lastline--);
+	if (pos > 0 && lastline == 0) {
+		// message was truncated
+		buf[0] = buf[1] = buf[2] = '.';
 	}
 
-	if (s && s->path) {
-		f = fopen(s->path, "r");
-		if (f) {
-			fseek(f, 0, SEEK_END);
-			size_t loc = ftell(f);
-			if (loc == s->prev_end)
-				return 1;
-			s->prev_end = loc;
-			loc -= 2; /* skip back past EOF and last newline */
-			while (loc > 0) {
-				fseek(f, loc, SEEK_SET);
-				loc--;
-				char ch = fgetc(f);
-				if (ch == '\n' || loc == 0) {
-					int r = fread(s->backbuf, 1, CHARBUFSIZE-2, f);
+	if (buf[lastline] == '\n')
+		lastline++;
 
-					int i = r-1;
-					while (s->backbuf[i] == '\n')
-						s->backbuf[i] = 0;
+	int count = n - lastline;
+	memmove(buf, buf+lastline, count);
+	buf[count] = 0;
 
-					memcpy(data->e->buffer, s->backbuf, r);
-					for (int i = 0; i < r; i++) {
-						if (data->e->buffer[i] == '\n')
-							data->e->buffer[i] = 0;
-					}
-					if (s->max_length && s->max_length < r)
-						data->e->buffer[s->max_length] = 0;
-					data->e->buffer[r] = 0;
-					fclose(f);
-					return 1;
-				}
-			}
-			fclose(f);
-		}
-	}
-	return 0;
+	return 1;
 }
 
 static void
 tail_scroll_right (BarElementFuncArgs *data) {
-	tail_settings *s;
-	s = (tail_settings*)data->e->data;
-	s->max_length = CLAMP(s->max_length+1, 0, strlen(s->backbuf));
+	tail_settings *s = (tail_settings*)data->e->data;
+	if (s->max_length == 0)
+		return;
+	s->max_length = CLAMP(s->max_length+1, 5, CHARBUFSIZE-1);
 }
 static void
 tail_scroll_left (BarElementFuncArgs *data) {
+	tail_settings *s = (tail_settings*)data->e->data;
+	if (s->max_length == 0)
+		return;
+	s->max_length = CLAMP(s->max_length - 1, 5, CHARBUFSIZE-1);
+}
+
+static void
+tail_toggle_shown(BarElementFuncArgs *data) {
 	tail_settings *s;
 	s = (tail_settings*)data->e->data;
-	s->max_length = CLAMP(s->max_length - 1, 5, strlen(s->backbuf));
+	int tmp = s->prev_length;
+	s->prev_length = s->max_length;
+	s->max_length = tmp;
 }
