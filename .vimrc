@@ -87,15 +87,17 @@ nmap [q :cprev<cr>
 nmap [g :lprev<cr>
 nmap ]g :lnext<cr>
 
-set autochdir
+" indent text after pasting
+nmap p p`[v`]=
+nmap P P`[v`]=
 
-function! s:Grephere()
+function! s:Grephere(title, flags)
 	call inputsave()
-	let what = input("vimgrep: ")
+	let what = input(a:title)
 	call inputrestore()
 	if len(what)
 		try
-			execute 'vimgrep /' . what . '/j `git ls-files`'
+			execute 'vimgrep /' . what . '/' .. a:flags .. ' `git ls-files`'
 			if len(getqflist()) > 0
 				execute 'copen'
 				execute 'wincmd p'
@@ -105,9 +107,11 @@ function! s:Grephere()
 	endif
 endfunction
 
-command! DoGrep silent call s:Grephere()
+command! DoGrep silent call s:Grephere('grep: ', '')
+command! DoFuzzyGrep silent call s:Grephere('fuzzy: ', 'f')
 
 nmap <space>fg :silent DoGrep<cr>
+nmap <space>fG :silent DoFuzzyGrep<cr>
 nmap <space>qf :copen<cr>
 nnoremap <esc> :silent nohlsearch<cr><esc>
 
@@ -160,10 +164,11 @@ augroup END
 
 nmap <space>so :w<cr>:so %<cr>
 
-function! s:MyFunc(ArgLead, CmdLine, CursorPos)
+function! s:CompleteGitFiles(ArgLead, CmdLine, CursorPos)
 	let files = systemlist("git ls-files")
 	return filter(files, 'stridx(v:val, a:ArgLead) != -1')
 endfunction
 
-command -complete=customlist,s:MyFunc -nargs=1 GitEdit :e <args>
-
+command -complete=customlist,s:CompleteGitFiles -nargs=1 GitEdit :e <args>
+nmap <space>ff :GitEdit 
+nmap <C-j> :!tcc -run %<cr>
