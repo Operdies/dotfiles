@@ -1,11 +1,12 @@
 #!/bin/sh
 
-if [ "$(tmux display-message -p '#S')" == "popup" ]; then
+TITLE="$(tmux display-message -p '#S')"
+if [[ "$TITLE" == *"-popup" ]]; then
 	tmux detach-client
 else
 	case "$1" in
 		"")
-			tmux attach -t popup || tmux new -s popup
+			tmux attach -t "$TITLE-popup" || tmux new -s "$TITLE-popup"
 			;;
 		*)
 			"$1"
