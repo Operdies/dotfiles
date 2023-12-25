@@ -11,7 +11,8 @@ set nocompatible
 set ruler
 set showcmd
 set wildmenu
-set wildmode=full
+" first tab: list files. Second tab: cycle matches
+set wildmode=list,full
 
 set number
 " set foldmethod=syntax
@@ -59,6 +60,7 @@ let $PAGER=''
 
 set undofile
 packadd! matchit
+packadd! termdebug
 
 autocmd FileType text setlocal textwidth=80
 
@@ -119,8 +121,6 @@ function! s:SilentMake()
 	let success = 1
 	execute 'cclose'
 	execute 'silent !make --quiet > make.err 2>&1'
-	execute 'silent !ctags `git ls-files` --c-kinds=+p'
-
 	execute 'cfile make.err'
 	if len(getqflist()) > 0
 		let success = 0
@@ -169,6 +169,31 @@ function! s:CompleteGitFiles(ArgLead, CmdLine, CursorPos)
 	return filter(files, 'stridx(v:val, a:ArgLead) != -1')
 endfunction
 
-command -complete=customlist,s:CompleteGitFiles -nargs=1 GitEdit :e <args>
-nmap <space>ff :GitEdit 
+function! s:CompleteProjects(ArgLead, CmdLine, CursorPos)
+	let files = systemlist("ls -d ~/repos/*/ | xargs -I {} basename {}")
+	return filter(files, 'stridx(v:val, a:ArgLead) != -1')
+endfunction
+
+function! s:OpenProject(project)
+	execute "cd ~/repos/" .. a:project
+	execute "e ."
+endfunction
+
+function! s:OldFiles(ArgLead, CmdLine, CursorPos)
+	let files = copy(v:oldfiles)
+	let nontemp = filter(files, 'v:val !~ "[~]$"')
+	let matching = filter(nontemp, 'stridx(v:val, a:ArgLead) != -1')
+	return matching
+endfunction
+
+
+command! -complete=customlist,s:CompleteGitFiles -nargs=1 GitEdit :e <args>
+command! -complete=customlist,s:CompleteProjects -nargs=1 OpenProject :call s:OpenProject("<args>")
+command! -complete=customlist,s:OldFiles -nargs=1 RecentFiles :e <args>
+
+map <space>ff :GitEdit 
 nmap <C-j> :!tcc -run %<cr>
+nmap <space>fp :OpenProject 
+nmap <space>fr :RecentFiles 
+
+set viminfo='30,<100,s100,:100,n~/.vim/viminfo

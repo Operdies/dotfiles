@@ -17,7 +17,6 @@ TITLE="$(tmux display-message -p '#S')"
 if [[ "$TITLE" == *"-popup" ]]; then
 	tmux detach-client
 else
-	cleanup
 	tmux attach -t "$TITLE-popup" || tmux new -s "$TITLE-popup"
 fi
 

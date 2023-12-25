@@ -128,6 +128,8 @@ if [ -z "$CC" ]; then
   export CC=gcc
 fi
 
-# startx on login
-[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] || return
-startx
+
+# startx on login on VT 1
+if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+	startx
+fi
