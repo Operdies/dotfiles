@@ -191,3 +191,11 @@ prev_notification(BarElementFuncArgs *data) {
 	tiramisu_settings *s = (tiramisu_settings*) data->e->data;
 	s->selected = MIN(s->count-1, s->selected + 1);
 }
+
+static void
+dismiss_notifications(BarElementFuncArgs *data) {
+	tiramisu_settings *s = (tiramisu_settings*) data->e->data;
+	s->selected = 0;
+	s->count = 0;
+}
+

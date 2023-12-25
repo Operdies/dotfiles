@@ -168,6 +168,7 @@ struct BarElement {
 	int last_call;
 	int poll_fd;
 	void *data;
+	int hidden;
 	char buffer[CHARBUFSIZE];
 };
 
@@ -478,7 +479,7 @@ maybeclickbarelem(XButtonPressedEvent *ev)
 	int x = m->ww;
 	for (int i = LENGTH(BarElements)-1; i >= 0; i--) {
 		BarElement *elem = BarElements + i;
-		if (elem->buffer[0]) {
+		if (elem->buffer[0] && !elem->hidden) {
 			x -= TEXTW(elem->buffer);
 			if (ev->x > x) {
 				if (ev->button < (ScrollRight+1) && elem->click[ev->button]) {
@@ -835,7 +836,8 @@ drawbar(Monitor *m)
 		if (elem->update) {
 			if (elem->interval == 0 || now - elem->last_call >= elem->interval) {
 				elem->last_call = now;
-				if (!elem->update(&(BarElementFuncArgs) { .m = m, .e = elem }))
+				elem->hidden = !elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
+				if (elem->hidden)
 					continue;
 			}
 		}
@@ -1566,11 +1568,10 @@ run(void)
 		struct timeval timeout = { .tv_sec = bar_tick_rate };
 
 		if (select(sel_max + 1, &rd, NULL, NULL, &timeout) == -1) {
-			if (errno == EINTR) {
-				drawbars();
-				continue;
+			// interrupt
+			if (errno != EINTR) {
+				die("select failed\n");
 			}
-			die("select failed\n");
 		}
 
 		if (FD_ISSET(xfd, &rd)) {

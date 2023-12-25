@@ -159,6 +159,7 @@ BarElement BarElements[] = {
 	{
 		.click = { 
 			[LeftClick] = bar_toggle_shown,
+			[RightClick] = dismiss_notifications,
 			[ScrollDown] = next_notification, 
 			[ScrollLeft] = bar_scroll_left, 
 			[ScrollRight] = bar_scroll_right, 
