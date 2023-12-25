@@ -1,5 +1,7 @@
 #include <stdlib.h>
-#include <poll.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/prctl.h>
 
 typedef struct {
 	char summary[30];
@@ -10,8 +12,6 @@ typedef struct {
 
 enum { MSG_LOW, MSG_NORMAL, MSG_CRITICAL };
 typedef struct {
-	FILE *fp;
-	int fd;
 	int schemes[MSG_CRITICAL+1];
 	int selected;
 	int count;
@@ -67,57 +67,71 @@ pretty_elapsed(char *timestring, int n, time_t when) {
 static int
 bar_notifications(BarElementFuncArgs *data) {
 	tiramisu_settings *s = (tiramisu_settings*) data->e->data;
-	if (!s->fp) {
-		system("pkill -x tiramisu");
-		char proccmd[] = "tiramisu -s -o '\"#summary\" \"#hints\" \"#body\"'";
-		
-		s->fp = popen(proccmd, "r");
-		if (!s->fp) 
-			return 0;
-		s->fd = fileno(s->fp);
-		data->e->poll_fd = s->fd;
+	// If tiramisu was not started yet, start it
+	if (data->e->poll_fd == 0) {
+		const int READ = 0;
+		const int WRITE = 1;
+		int pipes[2] = {0};
+		if (pipe(pipes) == -1)
+			die("pipe:");
+		if (fork()) {
+			close(pipes[WRITE]);
+			if (fcntl(pipes[READ], F_SETFL, O_NONBLOCK) == -1) 
+				die("fcntl");
+			data->e->poll_fd = pipes[READ];
+		} else {
+			close(pipes[READ]);
+			dup2(pipes[WRITE], STDOUT_FILENO);
+			close(pipes[WRITE]);
+			// Make tiramisu die if dwm dies
+			prctl(PR_SET_PDEATHSIG, SIGHUP);
+			execlp("tiramisu", "tiramisu", "-s", "-o", "\"#hints\" \"#summary\" \"#body\"", NULL);
+			die("exec:");
+		}
 	}
 
-	struct pollfd fds[1];
-	fds[0].fd = s->fd;
-	fds[0].events = POLLIN;
+	int r;
 
-	int ready;
-	while ((ready = poll(fds, 1, 0))) {
-		if (ready == -1)
-			die("poll:");
+	if ((r = read(data->e->poll_fd, data->e->buffer, LENGTH(data->e->buffer))) > 0) {
+		notification n = { .when = time(NULL) };
+		char urgencybuf[100];
+		char *ch = data->e->buffer;
+		ch = read_quote(ch, urgencybuf, LENGTH(urgencybuf));
+		ch = read_quote(ch, n.summary, LENGTH(n.summary));
+		read_quote(ch, n.message, LENGTH(n.message));
 
-		if (fds[0].revents & POLLIN) {
-			char buf[LINE_MAX];
-			if (fgets(buf, sizeof(buf), s->fp)) {
-				notification n = { .when = time(NULL) };
-				char *ch = buf;
-				ch = read_quote(ch, n.summary, LENGTH(n.summary));
-				char urgencybuf[100];
-				ch = read_quote(ch, urgencybuf, LENGTH(urgencybuf));
-				read_quote(ch, n.message, LENGTH(n.message));
+		if (!sscanf(urgencybuf, "urgency=0x%x,", &n.urgency)) {
+			fprintf(stderr, "Failed to parse urgency from %s\n", urgencybuf);
+			return 0;
+		}
 
-				if (!sscanf(urgencybuf, "urgency=0x%x,", &n.urgency)) {
-					fprintf(stderr, "Failed to parse urgency from %s\n", urgencybuf);
-					return 0;
-				}
-
-				for (char **pair = s->icons; *pair; pair += 2) {
-					char *title = pair[0];
-					char *icon = pair[1];
-					if (title && icon && strcmp(title, n.summary) == 0) {
-						strncpy(n.summary, icon, LENGTH(n.summary));
-						break;
-					}
-				}
-
-				memmove(&s->history[1], &s->history[0], sizeof(notification) * (LENGTH(s->history)-1));
-				memcpy(&s->history[0], &n, sizeof(notification));
-				s->count = MIN(s->count + 1, LENGTH(s->history));
-				if (s->selected > 0)
-					s->selected = MIN(s->count-1, s->selected + 1);
+		for (char **pair = s->icons; *pair; pair += 2) {
+			char *title = pair[0];
+			char *icon = pair[1];
+			if (title && icon && strcmp(title, n.summary) == 0) {
+				strncpy(n.summary, icon, LENGTH(n.summary));
+				break;
 			}
 		}
+
+		memmove(&s->history[1], &s->history[0], sizeof(notification) * (LENGTH(s->history)-1));
+		memcpy(&s->history[0], &n, sizeof(notification));
+		s->count = MIN(s->count + 1, LENGTH(s->history));
+		if (s->selected > 0)
+			s->selected = MIN(s->count-1, s->selected + 1);
+	}
+
+	while ((r = read(data->e->poll_fd, data->e->buffer, LENGTH(data->e->buffer))) > 0) {
+		fprintf(stderr, "Discarded %d bytes from notification: %.*s\n", r, r, data->e->buffer);
+		// discard the rest of the data. It would be truncated anyway.
+	}
+
+
+	// reset poll_fd so tiramisu will be restarted
+	if (r == 0) {
+		fprintf(stderr, "Tiramisu exited. Will restart later.\n");
+		close(data->e->poll_fd);
+		data->e->poll_fd = 0;
 	}
 
 	if (s->count == 0)
@@ -131,7 +145,7 @@ bar_notifications(BarElementFuncArgs *data) {
 	data->e->scheme = s->schemes[n->urgency];
 	char timestring[100];
 	pretty_elapsed(timestring, LENGTH(timestring), n->when);
-	snprintf(data->e->buffer, CHARBUFSIZE,  "(%d/%d) %s %s (%s)", s->selected+1, s->count, n->summary, n->message, timestring);
+	int i = snprintf(data->e->buffer, CHARBUFSIZE,  "(%d/%d) %s %s (%s)", s->selected+1, s->count, n->summary, n->message, timestring);
 
 	// truncate if needed
 	if (limit && i > limit) {
