@@ -164,7 +164,11 @@ reload() {
 # reload
 
 tmuxes2() {
-	readarray -t <<< "$(tmux list-sessions -F#S)"
+	readarray -t <<< "$(tmux list-sessions -F#S | grep -v '\-popup$')"
+	if [ "${MAPFILE[0]}" == "" ]; then
+		return;
+	fi
+
 	keys=(q w e r t)
 
 	PREFIX="super + shift + a ; "
