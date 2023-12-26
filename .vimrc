@@ -195,5 +195,7 @@ map <space>ff :GitEdit
 nmap <C-j> :!tcc -run %<cr>
 nmap <space>fp :OpenProject 
 nmap <space>fr :RecentFiles 
+nmap <tab> :wincmd w<cr>
+nmap <esc><tab> :wincmd W<cr>
 
 set viminfo='30,<100,s100,:100,n~/.vim/viminfo
