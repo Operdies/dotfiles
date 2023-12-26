@@ -33,7 +33,7 @@ set nrformats-=octal
 
 nmap <C-s> :w<cr>
 nmap H :bprev<cr>
-nmap L :bprev<cr>
+nmap L :bnext<cr>
 nmap [<tab> :tabprev<cr>
 nmap ]<tab> :tabnext<cr>
 nmap <space>bd :bdelete<cr>
@@ -142,7 +142,44 @@ endfunction
 command! SilentMake call s:SilentMake()
 
 nmap <C-q> :wa<cr>:SilentMake<cr>
-nmap <space>fb :b 
+
+nmap gb :ls<cr>:b<space>
+nmap <space>fb :ls<cr>:b<space>
+
+set showtabline=2
+function! s:UpdateBufferline(abuf, del)
+	let bufnames = filter(copy(getbufinfo()), 'v:val.listed')
+	execute 'set tabline='
+	let focused=bufnr()
+	let newtabline = ""
+	let sel = '%#TabLineSel#'
+	let nosel = '%#TabLine#'
+	let fill = '%#TabLineFill#'
+	for b in bufnames
+		if a:del && a:abuf == b.bufnr
+			continue
+		endif
+		let name = fnamemodify(b.name, ":t") . ' [' . b.bufnr . ']'
+		if b.bufnr == focused
+			let name = sel . name . nosel . ' '
+		else
+			let name = nosel . name . ' '
+		endif
+		let newtabline .= name
+	endfor
+	let newtabline .= nosel
+	execute 'set tabline=' .. fnameescape(newtabline)
+endfunction
+
+command! UpdateBufferline call s:UpdateBufferline()
+
+augroup bufferlinegrp
+	autocmd!
+	autocmd BufEnter * call s:UpdateBufferline(expand("<abuf>"), 0)
+	autocmd BufDelete * call s:UpdateBufferline(expand("<abuf>"), 1)
+	autocmd BufNew * call s:UpdateBufferline(expand("<abuf>"), 0)
+augroup END
+
 
 augroup qf
 	autocmd!
@@ -197,5 +234,8 @@ nmap <space>fp :OpenProject
 nmap <space>fr :RecentFiles 
 nmap <tab> :wincmd w<cr>
 nmap <esc><tab> :wincmd W<cr>
+" open tag in preview window
+nmap <C-k> :wincmd }<cr>
 
 set viminfo='30,<100,s100,:100,n~/.vim/viminfo
+" set tags+=~/.cache/ctags/tags
