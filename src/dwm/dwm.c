@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <sys/wait.h>
-#include <sys/select.h>
+#include <poll.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -1549,32 +1549,27 @@ run(void)
 	XEvent ev;
 	XSync(dpy, False);
 	int xfd = ConnectionNumber(dpy);
-	fd_set rd;
-	int sel_max;
+
+	struct pollfd fds[LENGTH(BarElements)+1] = {0};
+	fds[0].fd = xfd;
+	fds[0].events = POLLIN;
 
 	/* main event loop */
 	while (running) {
-		FD_ZERO(&rd);
-		FD_SET(xfd, &rd);
-		sel_max = xfd;
 		for (int i = 0; i < LENGTH(BarElements); i++) {
 			BarElement *elem = &BarElements[i];
-			if (elem->poll_fd) {
-				FD_SET(elem->poll_fd, &rd);
-				sel_max = MAX(sel_max, elem->poll_fd);
-			}
+			fds[i+1].fd = elem->poll_fd ? elem->poll_fd : -1;
+			fds[i+1].events = POLLIN;
 		}
 
-		struct timeval timeout = { .tv_sec = bar_tick_rate };
-
-		if (select(sel_max + 1, &rd, NULL, NULL, &timeout) == -1) {
+		if (poll(fds, LENGTH(fds), bar_tick_rate) == -1) {
 			// interrupt
 			if (errno != EINTR) {
-				die("select failed\n");
+				die("poll:");
 			}
 		}
 
-		if (FD_ISSET(xfd, &rd)) {
+		if (fds[0].revents & POLLIN) {
 			while (XPending(dpy)) {
 				XNextEvent(dpy, &ev);
 				if (handler[ev.type])
