@@ -17,7 +17,7 @@ ${OBJ}: config.h config.mk $(BAR_PLUGINS)
 config.h:
 	cp config.def.h $@
 
-dwm: ${OBJ}
+dwm: ${OBJ} Makefile
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
@@ -43,4 +43,6 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/dwm\
 		${DESTDIR}${MANPREFIX}/man1/dwm.1
 
+tags: dwm
+	ctags -R --kinds-C=+p --fields=+aS --extras=+q --sort=foldcase
 .PHONY: all clean dist install uninstall

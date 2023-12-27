@@ -76,6 +76,7 @@ enum {
 	ScrollDown = Button5,
 	ScrollLeft,
 	ScrollRight,
+	MouseButtonsLast,
 };
 
 typedef union {
@@ -163,7 +164,7 @@ struct BarElement {
 	const int mode;
 	int scheme;
 	int (*update)(BarElementFuncArgs*);
-	void (*click[ScrollRight+1])(BarElementFuncArgs*);
+	void (*click[MouseButtonsLast])(BarElementFuncArgs*);
 	int interval;
 	int last_call;
 	int poll_fd;
@@ -482,7 +483,7 @@ maybeclickbarelem(XButtonPressedEvent *ev)
 		if (elem->buffer[0] && !elem->hidden) {
 			x -= TEXTW(elem->buffer);
 			if (ev->x > x) {
-				if (ev->button < (ScrollRight+1) && elem->click[ev->button]) {
+				if (ev->button < MouseButtonsLast && elem->click[ev->button]) {
 					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem });
 					elem->last_call = 0;
 				}

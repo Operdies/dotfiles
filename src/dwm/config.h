@@ -9,12 +9,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "bar_plugins/bar_tail.c"
 #include "bar_plugins/bar_battery.c"
 #include "bar_plugins/bar_mem.c"
 #include "bar_plugins/bar_clock.c"
 #include "bar_plugins/bar_cpu.c"
 #include "bar_plugins/bar_tiramisu.c"
+#include "bar_plugins/bar_tail.c"
 
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
@@ -119,17 +119,6 @@ setgap(const Arg *arg) {
 }
 
 BarElement BarElements[] = {
-	{
-		.click = { 
-			[LeftClick] = tail_toggle_shown,
-			[ScrollLeft] = tail_scroll_left, 
-			[ScrollRight] = tail_scroll_right, 
-		},
-		.data = &(tail_settings) { .path = "/tmp/dwm.log", .max_length = 10 },
-		.interval = 0,
-		.scheme = SchemeClock,
-		.update = tail_file,
-	},
 	{ 
 		.interval = 1,
 		.scheme = SchemeMemory,  
@@ -176,6 +165,7 @@ BarElement BarElements[] = {
 		},
 		.update = bar_notifications,
 	},
+	// BAR_MK_TAIL("/tmp/dwm.log", 10, SchemeMemory ),
 };
 
 
@@ -228,16 +218,16 @@ static const Key keys[] = {
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
 static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
-	{ ClkLtSymbol,          0,              LeftClick,        setlayout,      {0} },
-	{ ClkLtSymbol,          0,              RightClick,        setlayout,      {.v = &layouts[2]} },
+	{ ClkLtSymbol,          0,              LeftClick,      setlayout,      {0} },
+	{ ClkLtSymbol,          0,              RightClick,     setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
-	{ ClkClientWin,         MODKEY,         LeftClick,        movemouse,      {0} },
+	{ ClkClientWin,         MODKEY,         LeftClick,      movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         RightClick,        resizemouse,    {0} },
-	{ ClkTagBar,            0,              LeftClick,        view,           {0} },
-	{ ClkTagBar,            0,              RightClick,        toggleview,     {0} },
-	{ ClkTagBar,            MODKEY,         LeftClick,        tag,            {0} },
-	{ ClkTagBar,            MODKEY,         RightClick,        toggletag,      {0} },
+	{ ClkClientWin,         MODKEY,         RightClick,     resizemouse,    {0} },
+	{ ClkTagBar,            0,              LeftClick,      view,           {0} },
+	{ ClkTagBar,            0,              RightClick,     toggleview,     {0} },
+	{ ClkTagBar,            MODKEY,         LeftClick,      tag,            {0} },
+	{ ClkTagBar,            MODKEY,         RightClick,     toggletag,      {0} },
 };
 

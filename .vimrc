@@ -1,13 +1,16 @@
+﻿set nocompatible
+
 set shiftwidth=2
 set tabstop=2
 set noexpandtab
 
-set autoread
-set autowrite
+" set autoread
+" set autowrite
+" set hidden
 
 set ignorecase
 set smartcase
-set nocompatible
+set tagcase=match
 set ruler
 set showcmd
 set wildmenu
@@ -32,8 +35,8 @@ set incsearch
 set nrformats-=octal
 
 nmap <C-s> :w<cr>
-nmap H :bprev<cr>
-nmap L :bnext<cr>
+nmap H :bprev!<cr>
+nmap L :bnext!<cr>
 nmap [<tab> :tabprev<cr>
 nmap ]<tab> :tabnext<cr>
 nmap <space>bd :bdelete<cr>
@@ -147,7 +150,7 @@ nmap gb :ls<cr>:b<space>
 nmap <space>fb :ls<cr>:b<space>
 
 set showtabline=2
-function! s:UpdateBufferline(abuf, del)
+function! s:UpdateBufferline(abuf, del, write)
 	let bufnames = filter(copy(getbufinfo()), 'v:val.listed')
 	execute 'set tabline='
 	let focused=bufnr()
@@ -156,10 +159,18 @@ function! s:UpdateBufferline(abuf, del)
 	let nosel = '%#TabLine#'
 	let fill = '%#TabLineFill#'
 	for b in bufnames
+		" skip buffer if it was deleted
 		if a:del && a:abuf == b.bufnr
 			continue
 		endif
-		let name = fnamemodify(b.name, ":t") . ' [' . b.bufnr . ']'
+		let prefix = ' '
+		if b.changed
+			let prefix = '+'
+		endif
+		if a:write && a:abuf == b.bufnr
+			let prefix = ' '
+		endif
+		let name = prefix . fnamemodify(b.name, ":t") . ' [' . b.bufnr . ']' . ' '
 		if b.bufnr == focused
 			let name = sel . name . nosel . ' '
 		else
@@ -171,13 +182,11 @@ function! s:UpdateBufferline(abuf, del)
 	execute 'set tabline=' .. fnameescape(newtabline)
 endfunction
 
-command! UpdateBufferline call s:UpdateBufferline()
-
 augroup bufferlinegrp
 	autocmd!
-	autocmd BufEnter * call s:UpdateBufferline(expand("<abuf>"), 0)
-	autocmd BufDelete * call s:UpdateBufferline(expand("<abuf>"), 1)
-	autocmd BufNew * call s:UpdateBufferline(expand("<abuf>"), 0)
+	autocmd BufEnter,BufNew * call s:UpdateBufferline(expand("<abuf>"), 0, 0)
+	autocmd BufDelete * call s:UpdateBufferline(expand("<abuf>"), 1, 0)
+	autocmd BufWrite * call s:UpdateBufferline(expand("<abuf>"), 0, 1)
 augroup END
 
 
@@ -223,19 +232,65 @@ function! s:OldFiles(ArgLead, CmdLine, CursorPos)
 	return matching
 endfunction
 
-
 command! -complete=customlist,s:CompleteGitFiles -nargs=1 GitEdit :e <args>
 command! -complete=customlist,s:CompleteProjects -nargs=1 OpenProject :call s:OpenProject("<args>")
 command! -complete=customlist,s:OldFiles -nargs=1 RecentFiles :e <args>
 
 map <space>ff :GitEdit 
-nmap <C-j> :!tcc -run %<cr>
+" nmap <C-j> :!tcc -run %<cr>
 nmap <space>fp :OpenProject 
 nmap <space>fr :RecentFiles 
-nmap <tab> :wincmd w<cr>
-nmap <esc><tab> :wincmd W<cr>
+" nmap <tab> :wincmd w<cr>
+" nmap <esc><tab> :wincmd W<cr>
+
+set previewpopup=height:10,width:100,border:off
+
+function! s:PreviewSymbol(arg, dir)
+	echo 'arg: ' . a:arg . ' dir: ' . a:dir
+	function! Cleanup()
+		let preview_window=popup_findpreview()
+		let preview_buf = winbufnr(preview_window)
+		let readonly = getbufvar(preview_buf, "&readonly")
+		pclose
+		if readonly
+			execute "silent! bdelete " . preview_buf
+			call s:UpdateBufferline(0,0,0)
+		endif
+	endfunction
+
+	let preview_window=popup_findpreview()
+	if preview_window == 0
+		execute "silent wincmd }"
+	else
+		let preview_buf = winbufnr(preview_window)
+		let readonly = getbufvar(preview_buf, "&readonly")
+		if a:dir == '0'
+			execute "silent! ptnext"
+		else
+			execute "silent! ptprev"
+		endif
+		if readonly
+			execute "silent! bdelete " . preview_buf
+		endif
+	endif
+	if a:arg == "i"
+		autocmd InsertLeave * ++once call Cleanup()
+	else
+		autocmd CursorMoved * ++once call Cleanup()
+	endif
+endfunction
 " open tag in preview window
-nmap <C-k> :wincmd }<cr>
+command! -nargs=+ PreviewSymbol call s:PreviewSymbol(<f-args>)
+nmap <C-k> <cmd>PreviewSymbol n 1<cr>
+imap <C-k> <C-c>:PreviewSymbol i 1<cr>gi
+nmap <C-j> <cmd>PreviewSymbol n 0<cr>
+imap <C-j> <C-c>:PreviewSymbol i 0<cr>gi
+
+" set updatetime=2000
+augroup autopreview
+	autocmd!
+	" autocmd CursorHold,CursorHoldI * PreviewSymbol
+augroup END
 
 set viminfo='30,<100,s100,:100,n~/.vim/viminfo
-" set tags+=~/.cache/ctags/tags
+set tags+=~/.cache/ctags/tags

@@ -75,3 +75,16 @@ tail_toggle_shown(BarElementFuncArgs *data) {
 	s->prev_length = s->max_length;
 	s->max_length = tmp;
 }
+
+#define BAR_MK_TAIL(_path, _max_length, _scheme) {                        \
+	.click = {                                                              \
+		[LeftClick] = tail_toggle_shown,                                      \
+		[ScrollLeft] = tail_scroll_left,                                      \
+		[ScrollRight] = tail_scroll_right,                                    \
+	},                                                                      \
+	.data = &(tail_settings) { .path = _path, .max_length = _max_length },  \
+	.interval = 0,                                                          \
+	.update = tail_file,                                                    \
+  .scheme = _scheme                                                       \
+}
+
