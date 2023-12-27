@@ -15,15 +15,16 @@
 #include "bar_plugins/bar_cpu.c"
 #include "bar_plugins/bar_tiramisu.c"
 #include "bar_plugins/bar_tail.c"
+#include "bar_plugins/bar_network.c"
 
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static const int bar_tick_rate      = 1000;
 static int gap_y                    = 0;
 static int gap_x                    = 0;
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+static const int default_tickrate   = 1;
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -119,15 +120,22 @@ setgap(const Arg *arg) {
 }
 
 BarElement BarElements[] = {
+	{
+		.click = { [LeftClick] = bar_network_toggle_transmit, },
+		.data = &(network_settings) { .interface = "wlan0" },
+		.interval = 10,
+		.scheme = SchemeBattery,
+		.update = bar_network_info,
+	},
 	{ 
-		.interval = 1,
+		.interval = 5,
 		.scheme = SchemeMemory,  
 		.update = bar_mem_usage, 			
 	},
 	{ 
 		.click = { [LeftClick] = bar_cpu_braille }, 
 		.data = &(cpu_settings) { .show_braille = 1 },
-		.interval = 1, 
+		.interval = default_tickrate, 
 		.scheme = SchemeCpu,     
 		.update = bar_cpu_usage, 			
 	},
@@ -141,9 +149,9 @@ BarElement BarElements[] = {
 	{ 
 		.click = { [LeftClick] = bar_clock_click, [RightClick] = open_calendar },
 		.data = &(clock_settings) { .show_seconds = 0 },
-		.interval = 1, 
-		.scheme = SchemeClock,   
-		.update = bar_clock,          
+		.interval = default_tickrate,
+		.scheme = SchemeClock,
+		.update = bar_clock,
 	},
 	{
 		.click = { 

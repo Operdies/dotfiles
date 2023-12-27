@@ -7,8 +7,7 @@ bar_clock(BarElementFuncArgs *data) {
 	clock_settings *s = (clock_settings*)data->e->data;
 	time_t t;
 	time(&t);
-	struct tm *tm;
-	tm = localtime(&t);
+	struct tm *tm = localtime(&t);
 	if (s && s->show_seconds)
 		strftime(data->e->buffer, 100, "%a %b %d %H:%M:%S", tm);
 	else

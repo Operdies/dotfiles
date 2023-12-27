@@ -246,7 +246,6 @@ nmap <space>fr :RecentFiles
 set previewpopup=height:10,width:100,border:off
 
 function! s:PreviewSymbol(arg, dir)
-	echo 'arg: ' . a:arg . ' dir: ' . a:dir
 	function! Cleanup()
 		let preview_window=popup_findpreview()
 		let preview_buf = winbufnr(preview_window)

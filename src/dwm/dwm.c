@@ -1550,12 +1550,25 @@ run(void)
 	XEvent ev;
 	XSync(dpy, False);
 	int xfd = ConnectionNumber(dpy);
+	struct timespec timeout = { .tv_sec = 10 };
+	struct timespec now;
+	struct timespec next;
 
 	struct pollfd fds[LENGTH(BarElements)+1] = {0};
 	fds[0].fd = xfd;
 	fds[0].events = POLLIN;
 
+	for (int i = 0; i < LENGTH(BarElements); i++) {
+		BarElement *elem = &BarElements[i];
+		if (elem->interval > 0) {
+			timeout.tv_sec = MIN(timeout.tv_sec, elem->interval);
+		}
+	}
+
 	/* main event loop */
+	clock_gettime(CLOCK_REALTIME, &now);
+	next = (struct timespec) { .tv_sec = now.tv_sec + 1, .tv_nsec = 0 };
+
 	while (running) {
 		for (int i = 0; i < LENGTH(BarElements); i++) {
 			BarElement *elem = &BarElements[i];
@@ -1563,21 +1576,48 @@ run(void)
 			fds[i+1].events = POLLIN;
 		}
 
-		if (poll(fds, LENGTH(fds), bar_tick_rate) == -1) {
+		clock_gettime(CLOCK_REALTIME, &now);
+		struct timespec diff = {0};
+		timespecsub(&next, &now, &diff);
+		int timeout_ms = (int)(diff.tv_sec * 1000) + (int)(diff.tv_nsec / 1e6);
+		timeout_ms += 5;
+
+		int n = poll(fds, LENGTH(fds), timeout_ms);
+		if (n == -1) {
 			// interrupt
 			if (errno != EINTR) {
 				die("poll:");
 			}
 		}
 
-		if (fds[0].revents & POLLIN) {
-			while (XPending(dpy)) {
-				XNextEvent(dpy, &ev);
-				if (handler[ev.type])
-					handler[ev.type](&ev); /* call handler */
+		if (n > 0) {
+			if (fds[0].revents & POLLIN) {
+				n--;
+				while (XPending(dpy)) {
+					XNextEvent(dpy, &ev);
+					if (handler[ev.type])
+						handler[ev.type](&ev); /* call handler */
+				}
 			}
-		} else {
+
+			if (n > 0) {
+				int ready = 0;
+				for (int i = 1; i < LENGTH(fds); i++) {
+					if (fds[i].revents & POLLIN) {
+						ready = 1;
+						break;
+					}
+				}
+				if (ready) {
+					drawbars();
+				}
+			}
+		}
+
+		clock_gettime(CLOCK_REALTIME, &now);
+		if (timespeccmp(&now, &next, >=)) {
 			drawbars();
+			timespecadd(&next, &timeout, &next);
 		}
 	}
 }
