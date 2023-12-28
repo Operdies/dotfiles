@@ -68,11 +68,11 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
-enum { 
-	LeftClick = Button1, 
-	MiddleClick = Button2, 
-	RightClick = Button3, 
-	ScrollUp = Button4, 
+enum {
+	LeftClick = Button1,
+	MiddleClick = Button2,
+	RightClick = Button3,
+	ScrollUp = Button4,
 	ScrollDown = Button5,
 	ScrollLeft,
 	ScrollRight,
@@ -161,16 +161,17 @@ typedef struct  {
 } BarElementFuncArgs;
 
 struct BarElement {
+	char buffer[CHARBUFSIZE];
 	const int mode;
-	int scheme;
-	int (*update)(BarElementFuncArgs*);
-	void (*click[MouseButtonsLast])(BarElementFuncArgs*);
+	int hidden;
 	int interval;
 	int last_call;
 	int poll_fd;
+	int scheme;
+	void (*click[MouseButtonsLast])(BarElementFuncArgs*);
+	void (*init)(BarElementFuncArgs*);
+	void (*update)(BarElementFuncArgs*);
 	void *data;
-	int hidden;
-	char buffer[CHARBUFSIZE];
 };
 
 /* function declarations */
@@ -834,20 +835,20 @@ drawbar(Monitor *m)
 
 	for (int i = LENGTH(BarElements) - 1; i >= 0; i--) {
 		BarElement *elem = BarElements + i;
-		if (elem->update) {
-			if (elem->interval == 0 || now - elem->last_call >= elem->interval) {
+		if (elem->update && elem->interval >= 0) {
+			if (now - elem->last_call >= elem->interval) {
 				elem->last_call = now;
-				elem->hidden = !elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
-				if (elem->hidden)
-					continue;
+				elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
 			}
 		}
+		if (elem->hidden)
+			continue;
 		if (elem->buffer[0]) {
 			w = TEXTW(elem->buffer);
 			x -= w;
-			if (elem->scheme) 
+			if (elem->scheme)
 				drw_setscheme(drw, scheme[elem->scheme]);
-			else 
+			else
 				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, elem->buffer, 0);
 		}
@@ -1560,6 +1561,8 @@ run(void)
 
 	for (int i = 0; i < LENGTH(BarElements); i++) {
 		BarElement *elem = &BarElements[i];
+		if (elem->init)
+			elem->init(&(BarElementFuncArgs) { .m = NULL, .e = elem });
 		if (elem->interval > 0) {
 			timeout.tv_sec = MIN(timeout.tv_sec, elem->interval);
 		}
@@ -1601,16 +1604,15 @@ run(void)
 			}
 
 			if (n > 0) {
-				int ready = 0;
-				for (int i = 1; i < LENGTH(fds); i++) {
-					if (fds[i].revents & POLLIN) {
-						ready = 1;
-						break;
+				for (int i = 0; i < LENGTH(BarElements); i++) {
+					if (fds[i+1].revents & POLLIN) {
+						BarElement *elem = &BarElements[i];
+						if (elem->update) {
+							elem->update(&(BarElementFuncArgs) { .m = NULL, .e = elem });
+						}
 					}
 				}
-				if (ready) {
-					drawbars();
-				}
+				drawbars();
 			}
 		}
 
@@ -1945,9 +1947,9 @@ tile(Monitor *m)
 
 	if (n > m->nmaster)
 		mw = m->nmaster ? m->ww * m->mfact : 0;
-	else 
+	else
 		mw = m->ww;
-	
+
 	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
 		if (i < m->nmaster) {
 			h = (m->wh - my) / (MIN(n, m->nmaster) - i);

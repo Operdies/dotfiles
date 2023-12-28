@@ -12,7 +12,7 @@ typedef struct {
 	int show_braille;
 } cpu_settings;
 
-static int
+static void
 bar_cpu_usage(BarElementFuncArgs *data) {
 #define NPROC 8
 #define SCAN_LINE(f, n) fscanf(f, JIFFLE_FMT(n), JIFFLE_ARGS(n));
@@ -28,7 +28,8 @@ bar_cpu_usage(BarElementFuncArgs *data) {
 	const char *levels[] = { "⡀", "⣀", "⣄", "⣤", "⣦", "⣶", "⣷", "⣿" };
 
 	FILE *f = fopen("/proc/stat", "r");
-	if (!f) return 0;
+	if (!f)
+		return;
 
 	for (int i = 0; i < NPROC+1; i++) {
 		proc_stat *jiffle = jiffles + i;
@@ -54,7 +55,6 @@ bar_cpu_usage(BarElementFuncArgs *data) {
 
 	memcpy(prev_jiffles, jiffles, sizeof(jiffles));
 
-	return 1;
 #undef NPROC
 #undef SCAN_LINE
 #undef WORK

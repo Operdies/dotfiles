@@ -133,3 +133,5 @@ fi
 if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
 	startx
 fi
+
+# vim: set et sw=2 sts=2 tw=78 ft=sh:

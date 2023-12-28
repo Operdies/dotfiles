@@ -8,10 +8,9 @@ typedef struct {
 	char *interface;
 } network_settings;
 
-static int bar_network_info(BarElementFuncArgs *data);
-static void bar_network_toggle_transmit(BarElementFuncArgs *data);
+static void bar_network_info(BarElementFuncArgs *data);
 
-static int 
+static void
 bar_network_info(BarElementFuncArgs *data) {
 	network_settings *s = (network_settings*)data->e->data;
 	int fds[2];
@@ -26,7 +25,7 @@ bar_network_info(BarElementFuncArgs *data) {
 		close(fds[1]);
 		execlp("iw", "iw", "dev", s->interface, "link", NULL);
 		die("execlp:");
-	} 
+	}
 
 	close(fds[1]);
 
@@ -70,7 +69,7 @@ bar_network_info(BarElementFuncArgs *data) {
 			continue;
 		}
 		found++;
-		if (found == 4) 
+		if (found == 4)
 			break;
 	}
 	fclose(fp);
@@ -79,14 +78,15 @@ bar_network_info(BarElementFuncArgs *data) {
 	int status = 0;
 	waitpid(pid, &status, 0);
 	int ret = WEXITSTATUS(status);
+
 	if (ret != 0) {
 		sprintf(data->e->buffer, "%s iw exited with code %d.", wifi_off, ret);
-		return 1;
+		return;
 	}
 
 	if (found < 4) {
 		sprintf(data->e->buffer, "%s", wifi_off);
-		return 1;
+		return;
 	}
 
 	// signal strenght is approxiamtely in the range --150 to -40
@@ -97,10 +97,5 @@ bar_network_info(BarElementFuncArgs *data) {
 	char *icon = wifi_levels[level];
 
 	sprintf(data->e->buffer, "%s %s", icon, ssid);
-
-	return 1;
 }
 
-static void bar_network_toggle_transmit(BarElementFuncArgs *data) {
-	// network_settings *s = (network_settings*)data->e->data;
-}

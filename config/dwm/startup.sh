@@ -64,8 +64,8 @@ if [ "$1" == dwm ]; then
   config_dir="dwm"
 fi
 
-pgrep -x rhkd || rhkd -c "$HOME/.config/$config_dir/sxhkdrc" &
-pgrep -x rhkd-whichkey || rhkd-whichkey -c "$HOME/.config/$config_dir/sxhkdrc" &
-(sleep 1; "$HOME/.config/$config_dir/bash_config.bash" --quiet) &
+rhkd -c "$HOME/.config/$config_dir/sxhkdrc" &
+rhkd-whichkey -c "$HOME/.config/$config_dir/sxhkdrc" &
+(sleep 1; bash "$HOME/.config/$config_dir/bash_config.bash" --quiet) &
 
 ~/repos/dotfiles/src/xautobacklight/xautobacklight -t 5 -f "/sys/class/leds/asus::kbd_backlight/brightness" &

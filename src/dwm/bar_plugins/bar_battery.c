@@ -6,7 +6,7 @@ typedef struct {
   int state;
 } battery_info;
 
-static int 
+static int
 read_bat(battery_info *bat) {
 #define PATH(x) "/sys/class/power_supply/BAT0/" #x
 #define read_thing(thing)                          \
@@ -43,8 +43,9 @@ typedef struct {
 	int force_update;
 } battery_settings;
 
-static int
+static void
 bar_battery_status(BarElementFuncArgs *data) {
+	data->e->hidden = 1;
 	battery_settings *settings = (battery_settings*)data->e->data;
 	static int cursor = 0;
 	static int chargebuf[10] = {0};
@@ -54,7 +55,7 @@ bar_battery_status(BarElementFuncArgs *data) {
 	battery_info bat = {0};
 
 	if (!read_bat(&bat)) {
-		return 0;
+		return;
 	}
 
 	chargebuf[cursor] = bat.current_now;
@@ -84,7 +85,7 @@ bar_battery_status(BarElementFuncArgs *data) {
 			sprintf(data->e->buffer + n, " %d:%02d", hours, minutes);
 	}
 	cursor = (cursor + 1) % LENGTH(chargebuf);
-	return 1;
+	data->e->hidden = 0;
 }
 
 static void

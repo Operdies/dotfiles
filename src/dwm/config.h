@@ -30,6 +30,7 @@ static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#005577";
+static const char col_babyblue[]    = "#207597";
 static const char active_bg[]       = "#5c1a7b";
 static const char active_border[]   = "#8c1a9b";
 static const char col_gold[]        = "#9D800A";
@@ -38,26 +39,30 @@ static const char col_blue[]        = "#1B5378";
 static const char col_red[]         = "#FF0000";
 static const char col_green[]       = "#1E854A";
 static const char col_white[]       = "#ffffff";
-enum { 
-	SchemeBattery = SchemeSel + 1, 
-	SchemeClock, 
-	SchemeCpu, 
-	SchemeMemory, 
-	SchemeLow, 
-	SchemeNormal, 
-	SchemeCritical 
+enum {
+	SchemeBattery = SchemeSel + 1,
+	SchemeClock,
+	SchemeSession,
+	SchemeCpu,
+	SchemeMemory,
+	SchemeNetwork,
+	SchemeLow,
+	SchemeNormal,
+	SchemeCritical
 };
 static const char *colors[][3]      = {
-	/*                     fg         bg         border   */
-	[SchemeNorm]       = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]        = { col_gray4, active_bg, active_border  },
-	[SchemeBattery]    = { col_gray4, col_green, NULL },
-	[SchemeClock]      = { col_gray4, col_gray2, NULL },
-	[SchemeCpu]        = { col_gray4, col_blue,  NULL },
-	[SchemeMemory]     = { col_gray4, col_gold,  NULL },
-	[SchemeLow]        = { col_gray4, col_gray1, NULL }, 
-	[SchemeNormal]     = { col_gray4, col_blue,  NULL }, 
-	[SchemeCritical]   = { col_gray4, col_red,   NULL }, 
+	/*                     fg         bg             border   */
+	[SchemeNorm]       = { col_gray3, col_gray1,     col_gray2 },
+	[SchemeSel]        = { col_gray4, active_bg,     active_border  },
+	[SchemeBattery]    = { col_gray4, col_green,     NULL },
+	[SchemeClock]      = { col_gray4, col_gray2,     NULL },
+	[SchemeSession]    = { col_gray4, col_black,     NULL },
+	[SchemeCpu]        = { col_gray4, col_blue,      NULL },
+	[SchemeMemory]     = { col_gray4, col_gold,      NULL },
+	[SchemeNetwork]    = { col_gray4, col_babyblue,  NULL },
+	[SchemeLow]        = { col_gray4, col_gray1,     NULL },
+	[SchemeNormal]     = { col_gray4, col_blue,      NULL },
+	[SchemeCritical]   = { col_gray4, col_red,       NULL },
 };
 
 static const char dmenufont[]       = "MesloLGS NF:size=11";
@@ -112,57 +117,66 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char *termcmd[]  = { "st", "-e", "tmux", NULL };
 
 static void
-setgap(const Arg *arg) {
+setgap(const Arg *arg)
+{
 	if (!arg) return;
 	gap_y = MAX(gap_y + arg->i, 0);
 	gap_x = MAX(gap_x + arg->i, 0);
 	arrange(selmon);
 }
 
-BarElement BarElements[] = {
+static void
+bar_session_info_init(BarElementFuncArgs *data)
+{
+	char *display = getenv("DISPLAY");
+	char *vtnr = getenv("XDG_VTNR");
+	sprintf(data->e->buffer, "VT%s X%s", vtnr, display);
+}
+
+BarElement BarElements[] =
+{
 	{
-		.click = { [LeftClick] = bar_network_toggle_transmit, },
 		.data = &(network_settings) { .interface = "wlan0" },
 		.interval = 10,
-		.scheme = SchemeBattery,
+		.scheme = SchemeNetwork,
 		.update = bar_network_info,
 	},
-	{ 
+	{
 		.interval = 5,
-		.scheme = SchemeMemory,  
-		.update = bar_mem_usage, 			
+		.scheme = SchemeMemory,
+		.update = bar_mem_usage,
 	},
-	{ 
-		.click = { [LeftClick] = bar_cpu_braille }, 
-		.data = &(cpu_settings) { .show_braille = 1 },
-		.interval = default_tickrate, 
-		.scheme = SchemeCpu,     
-		.update = bar_cpu_usage, 			
+	{
+		.click = { [LeftClick] = bar_cpu_braille },
+		.data = &(cpu_settings) { .show_braille = 0 },
+		.interval = default_tickrate,
+		.scheme = SchemeCpu,
+		.update = bar_cpu_usage,
 	},
-	{ 
+	{
 		.click = { [LeftClick] = bar_battery_toggle_timer },
 		.data = &(battery_settings) { .show_time = 1 },
-		.interval = 1, 
-		.scheme = SchemeBattery, 
-		.update = bar_battery_status, 
+		.interval = 1,
+		.scheme = SchemeBattery,
+		.update = bar_battery_status,
 	},
-	{ 
+	{
 		.click = { [LeftClick] = bar_clock_click, [RightClick] = open_calendar },
 		.data = &(clock_settings) { .show_seconds = 0 },
-		.interval = default_tickrate,
+		.interval = 1,
 		.scheme = SchemeClock,
 		.update = bar_clock,
 	},
 	{
-		.click = { 
+		.click = {
 			[LeftClick] = bar_toggle_shown,
 			[RightClick] = dismiss_notifications,
-			[ScrollDown] = next_notification, 
-			[ScrollLeft] = bar_scroll_left, 
-			[ScrollRight] = bar_scroll_right, 
-			[ScrollUp] = prev_notification, 
+			[ScrollDown] = next_notification,
+			[ScrollLeft] = bar_scroll_left,
+			[ScrollRight] = bar_scroll_right,
+			[ScrollUp] = prev_notification,
 		},
-		.data = &(tiramisu_settings) { 
+		.data = &(tiramisu_settings) {
 			.schemes = { [MSG_LOW] = SchemeLow, [MSG_NORMAL] = SchemeNormal, [MSG_CRITICAL] = SchemeCritical  },
 			.max_length = 16,
 			.icons = (char*[]) {
@@ -171,13 +185,20 @@ BarElement BarElements[] = {
 				NULL,
 			},
 		},
+		.init = tiramisu_init,
+		.interval = 1,
 		.update = bar_notifications,
 	},
-	// BAR_MK_TAIL("/tmp/dwm.log", 10, SchemeMemory ),
+	{
+		.init = bar_session_info_init,
+		.interval = -1,
+		.scheme = SchemeSession,
+	},
 };
 
 
-static const Key keys[] = {
+static const Key keys[] =
+{
 	/* modifier                     key        function        argument */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
@@ -224,7 +245,8 @@ static const Key keys[] = {
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
-static const Button buttons[] = {
+static const Button buttons[] =
+{
 	/* click                event mask      button          function        argument */
 	{ ClkLtSymbol,          0,              LeftClick,      setlayout,      {0} },
 	{ ClkLtSymbol,          0,              RightClick,     setlayout,      {.v = &layouts[2]} },
