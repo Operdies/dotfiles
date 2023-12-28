@@ -59,6 +59,6 @@ super + s ; { s, a, w }
 
 # Rein in Firefox
 # {Stop,Continue} Firefox
-super + shift + w ; { s, c }
-  pkill -{SIGSTOP,SIGCONT} firefox
+# super + shift + w ; { s, c }
+#   pkill -{SIGSTOP,SIGCONT} firefox
 

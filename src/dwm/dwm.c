@@ -158,6 +158,7 @@ typedef struct BarElement BarElement;
 typedef struct  {
 	const Monitor *m;
 	BarElement *e;
+	XEvent *ev;
 } BarElementFuncArgs;
 
 struct BarElement {
@@ -475,8 +476,9 @@ attachstack(Client *c)
 }
 
 int
-maybeclickbarelem(XButtonPressedEvent *ev)
+maybeclickbarelem(XEvent *e)
 {
+	XButtonPressedEvent *ev = &e->xbutton;
 	Monitor *m = selmon;
 	int x = m->ww;
 	for (int i = LENGTH(BarElements)-1; i >= 0; i--) {
@@ -485,7 +487,7 @@ maybeclickbarelem(XButtonPressedEvent *ev)
 			x -= TEXTW(elem->buffer);
 			if (ev->x > x) {
 				if (ev->button < MouseButtonsLast && elem->click[ev->button]) {
-					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem });
+					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem, .ev = e });
 					elem->last_call = 0;
 				}
 				return 1;
@@ -512,7 +514,7 @@ buttonpress(XEvent *e)
 		focus(NULL);
 	}
 	if (ev->window == selmon->barwin) {
-		if (maybeclickbarelem(ev)) {
+		if (maybeclickbarelem(e)) {
 			drawbar(selmon);
 			return;
 		}

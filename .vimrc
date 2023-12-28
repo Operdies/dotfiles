@@ -286,6 +286,10 @@ imap <C-k> <C-c>:PreviewSymbol i 1<cr>gi
 nmap <C-j> <cmd>PreviewSymbol n 0<cr>
 imap <C-j> <C-c>:PreviewSymbol i 0<cr>gi
 
+imap <C-d> <del>
+imap <C-b> <Left>
+imap <C-f> <Right>
+
 " set updatetime=2000
 augroup autopreview
 	autocmd!

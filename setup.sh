@@ -6,33 +6,34 @@ has() {
 
 ensure_binaries() {
 	binaries=(
-		nvr neovim-remote
+		bsp-layout bsp-layout
+		cargo rustup
+		curl curl
 		discord "discord noto-fonts-emoji"
+		dmenu dmenu
 		fd fd
-		rg ripgrep
-		xautolock xautolock
+		gcc gcc
+		git git
+		go go
+		gsimplecal gsimplecal
+		gvim gvim # don't need the gui, but gvim includes X11 clipboard
 		htop htop
 		lazygit lazygit
-		tldr tldr
-		bsp-layout bsp-layout
-		git git
 		libinput-gestures "libinput libinput-gestures xf86-input-libinput"
-		curl curl
-		go go
-		yq go-yq
-		nvim neovim
-		gvim gvim
-		dmenu dmenu
-		picom picom
-		xwininfo xorg-xwininfo
-		cargo rustup
-		zsh zsh
-		zathura "zathura zathura-pdf-mupdf"
-		gsimplecal gsimplecal
-		gcc gcc
+		networkmanager_dmenu networkmanager_dmenu
 		npm npm
-		wezterm wezterm
+		nvim neovim
+		nvr neovim-remote
+		picom picom
+		rg ripgrep
+		tldr tldr
 		tmux tmux
+		wezterm wezterm
+		xautolock xautolock
+		xwininfo xorg-xwininfo
+		yq go-yq
+		zathura "zathura zathura-pdf-mupdf"
+		zsh zsh
 	)
 
 	missing=()

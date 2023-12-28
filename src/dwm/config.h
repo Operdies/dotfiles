@@ -1,22 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-#define CLAMP(x, lower, upper) ((x) < (lower) ? (lower) : (x) > (upper) ? (upper) : (x))
-/* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-#define QUIETCMD(cmd) ((Arg) { .v = (const char*[]){ "/bin/sh", "-c", cmd " > /dev/null 2>&1", NULL }})
-
-#include <time.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "bar_plugins/bar_battery.c"
-#include "bar_plugins/bar_mem.c"
-#include "bar_plugins/bar_clock.c"
-#include "bar_plugins/bar_cpu.c"
-#include "bar_plugins/bar_tiramisu.c"
-#include "bar_plugins/bar_tail.c"
-#include "bar_plugins/bar_network.c"
-
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -68,6 +51,29 @@ static const char *colors[][3]      = {
 static const char dmenufont[]       = "MesloLGS NF:size=11";
 static const char *fonts[]          = { "MesloLGS NF:size=11:style=Bold" };
 
+static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
+#define DMENU_ARGS "-m", dmenumon, "-i", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL
+static const char *dmenucmd[] = { "dmenu_run", DMENU_ARGS };
+static const char *termcmd[]  = { "st", "-e", "tmux", NULL };
+static const char *dmenu_nmcli[]  = { "networkmanager_dmenu", "-l", "10", DMENU_ARGS, };
+
+#define CLAMP(x, lower, upper) ((x) < (lower) ? (lower) : (x) > (upper) ? (upper) : (x))
+/* helper for spawning shell commands in the pre dwm-5.0 fashion */
+#define SHCMD(cmd) ((Arg){ .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } })
+#define QUIETCMD(cmd) ((Arg) { .v = (const char*[]){ "/bin/sh", "-c", cmd " > /dev/null 2>&1", NULL }})
+
+#include <time.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "bar_plugins/bar_battery.c"
+#include "bar_plugins/bar_mem.c"
+#include "bar_plugins/bar_clock.c"
+#include "bar_plugins/bar_cpu.c"
+#include "bar_plugins/bar_tiramisu.c"
+#include "bar_plugins/bar_tail.c"
+#include "bar_plugins/bar_network.c"
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -111,11 +117,6 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|MetaMask,              KEY,      toggletag,      {.ui = 1 << TAG} }
 
-/* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "st", "-e", "tmux", NULL };
-
 static void
 setgap(const Arg *arg)
 {
@@ -133,12 +134,14 @@ bar_session_info_init(BarElementFuncArgs *data)
 	sprintf(data->e->buffer, "VT%s X%s", vtnr, display);
 }
 
+/* commands */
 BarElement BarElements[] =
 {
 	{
 		.data = &(network_settings) { .interface = "wlan0" },
-		.interval = 10,
+		.interval = default_tickrate,
 		.scheme = SchemeNetwork,
+		.click = { [LeftClick] = bar_network_list },
 		.update = bar_network_info,
 	},
 	{
@@ -202,6 +205,7 @@ static const Key keys[] =
 	/* modifier                     key        function        argument */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ MODKEY|ShiftMask,             XK_w,      spawn,          {.v = dmenu_nmcli } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },

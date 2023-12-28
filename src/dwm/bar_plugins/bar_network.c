@@ -9,9 +9,11 @@ typedef struct {
 } network_settings;
 
 static void bar_network_info(BarElementFuncArgs *data);
+static void bar_network_list(BarElementFuncArgs *data);
 
 static void
-bar_network_info(BarElementFuncArgs *data) {
+bar_network_info(BarElementFuncArgs *data)
+{
 	network_settings *s = (network_settings*)data->e->data;
 	int fds[2];
 	if (pipe(fds) == -1)
@@ -99,3 +101,8 @@ bar_network_info(BarElementFuncArgs *data) {
 	sprintf(data->e->buffer, "%s %s", icon, ssid);
 }
 
+static void
+bar_network_list(BarElementFuncArgs *data)
+{
+	spawn(&(Arg) { .v = dmenu_nmcli });
+}
