@@ -14,6 +14,7 @@ set tagcase=match
 set ruler
 set showcmd
 set wildmenu
+set hlsearch
 " first tab: list files. Second tab: cycle matches
 set wildmode=list,full
 
@@ -42,8 +43,8 @@ nmap ]<tab> :tabnext<cr>
 nmap <space>bd :bdelete<cr>
 nmap <space>gg :silent !lazygit<cr><C-l>
 nmap K :Man <cword><cr>
-nmap [<space> mlO<esc>`l
-nmap ]<space> mlo<esc>`l
+nmap [<space> m'O<esc>`'
+nmap ]<space> m'o<esc>`'
 nmap <space>y "+
 nmap gp `[v`]
 vmap < <gv
@@ -237,7 +238,7 @@ command! -complete=customlist,s:CompleteProjects -nargs=1 OpenProject :call s:Op
 command! -complete=customlist,s:OldFiles -nargs=1 RecentFiles :e <args>
 
 map <space>ff :GitEdit 
-" nmap <C-j> :!tcc -run %<cr>
+nmap <space>cr :!tcc -run %<cr>
 nmap <space>fp :OpenProject 
 nmap <space>fr :RecentFiles 
 " nmap <tab> :wincmd w<cr>
@@ -291,5 +292,25 @@ augroup autopreview
 	" autocmd CursorHold,CursorHoldI * PreviewSymbol
 augroup END
 
-set viminfo='30,<100,s100,:100,n~/.vim/viminfo
+set viminfo='100,<100,s100,:100,n~/.vim/viminfo
 set tags+=~/.cache/ctags/tags
+
+if !exists('*Preserve')
+    function! Preserve(command)
+        try
+            " Preparation: save last search, and cursor position.
+            let l:win_view = winsaveview()
+            let l:old_query = getreg('/')
+            silent! execute 'keepjumps' . a:command
+        finally
+            " try restore / reg and cursor position
+            call winrestview(l:win_view)
+            call setreg('/', l:old_query)
+        endtry
+    endfunction
+endif
+
+highlight ExtraWhitespace ctermbg=lightblue guibg=lightblue
+match ExtraWhitespace /\s\+$/
+nnoremap <space>cw <cmd>call Preserve('%s/\s\+$//')<cr>
+tmap <esc><esc> <C-w>N
