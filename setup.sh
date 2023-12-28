@@ -12,6 +12,7 @@ ensure_binaries() {
 		discord "discord noto-fonts-emoji"
 		dmenu dmenu
 		fd fd
+		fzf fzf
 		gcc gcc
 		git git
 		go go

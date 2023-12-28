@@ -237,7 +237,7 @@ command! -complete=customlist,s:CompleteGitFiles -nargs=1 GitEdit :e <args>
 command! -complete=customlist,s:CompleteProjects -nargs=1 OpenProject :call s:OpenProject("<args>")
 command! -complete=customlist,s:OldFiles -nargs=1 RecentFiles :e <args>
 
-map <space>ff :GitEdit 
+nmap <space>ff :FZF<cr>
 nmap <space>cr :!tcc -run %<cr>
 nmap <space>fp :OpenProject 
 nmap <space>fr :RecentFiles 
@@ -290,31 +290,91 @@ imap <C-d> <del>
 imap <C-b> <Left>
 imap <C-f> <Right>
 
-" set updatetime=2000
-augroup autopreview
-	autocmd!
-	" autocmd CursorHold,CursorHoldI * PreviewSymbol
-augroup END
-
 set viminfo='100,<100,s100,:100,n~/.vim/viminfo
-set tags+=~/.cache/ctags/tags
 
 if !exists('*Preserve')
     function! Preserve(command)
         try
             " Preparation: save last search, and cursor position.
             let l:win_view = winsaveview()
-            let l:old_query = getreg('/')
             silent! execute 'keepjumps' . a:command
         finally
             " try restore / reg and cursor position
             call winrestview(l:win_view)
-            call setreg('/', l:old_query)
         endtry
     endfunction
 endif
 
-highlight ExtraWhitespace ctermbg=lightblue guibg=lightblue
-match ExtraWhitespace /\s\+$/
 nnoremap <space>cw <cmd>call Preserve('%s/\s\+$//')<cr>
-tmap <esc><esc> <C-w>N
+
+" highlight ExtraWhitespace ctermbg=lightblue guibg=lightblue
+" match ExtraWhitespace /\s\+$/
+" 
+" augroup ExtraWhitespaceGrp
+" 	autocmd!
+" 	autocmd InsertLeave * highlight ExtraWhitespace ctermbg=lightblue guibg=lightblue
+" 	autocmd InsertEnter * highlight clear ExtraWhitespace
+" augroup END
+" tmap <esc><esc> <C-w>N
+
+nmap <space>p <cmd>.!xclip -o<cr>
+
+function! CommentLines(context = {}, type = '') abort
+	if a:type == ''
+		let context = #{
+					\ dot_command: v:false,
+					\ extend_block: '',
+					\ virtualedit: [&l:virtualedit, &g:virtualedit],
+					\ }
+		let &operatorfunc = function('CommentLines', [context])
+		set virtualedit=block
+		return 'g@'
+	endif
+
+	let save = #{
+				\ virtualedit: [&l:virtualedit, &g:virtualedit],
+				\ }
+
+	let commentstring="// "
+	let commentstrings = #{
+				\ vim: '" ',
+				\ c: '// ',
+				\ cpp: '// ',
+				\ sh: '# ',
+				\ }
+	if commentstrings->has_key(&filetype)
+		let commentstring = commentstrings[&filetype]
+	endif
+
+	try
+		let [_, startline, _, _] = getpos("'[")
+		let [_, endline, _, _] = getpos("']")
+		let commentidx = 999
+
+		let first_line = getline('.')
+		let is_comment = first_line->match('^\s*' .. commentstring) >= 0
+		if is_comment
+			execute startline .. ',' .. endline .. 's:' .. commentstring .. '::'
+		else
+			for lineno in range(startline, endline)
+				let line = getline(lineno)
+				if line->match('^\s*$') >= 0
+					continue
+				endif
+				let matchidx = line->match('[^ 	]')
+				if matchidx >= 0 && matchidx < commentidx
+					let commentidx = matchidx
+				endif
+			endfor
+			execute startline .. ',' .. endline .. 's:^\(\s\{' .. commentidx .. '\}\):\1' .. commentstring .. ':'
+		endif
+	finally
+		let [&l:virtualedit, &g:virtualedit] = get(a:context.dot_command ? save : a:context, 'virtualedit')
+		let a:context.dot_command = v:true
+	endtry
+endfunction
+
+nnoremap <expr> gc CommentLines()
+vnoremap <expr> gc CommentLines()
+xnoremap <expr> gc CommentLines()
+nnoremap <expr> gcc CommentLines() .. '_'
