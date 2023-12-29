@@ -360,3 +360,22 @@ call plug#end()
 
 let g:asyncrun_open=10
 nmap <C-q> :AsyncRun! make<cr>
+
+function! TmuxWinCmd(direction)
+	if winnr(a:direction) != winnr()
+		execute 'wincmd ' .. a:direction
+	else
+		let tmux_dir = #{
+					\	h: 'L', 
+					\ j: 'D', 
+					\ k: 'U', 
+					\ l: 'R'
+					\ }[a:direction]
+		call system('tmux select-pane -' .. tmux_dir)
+	endif
+endfunction
+
+nnoremap <C-w><C-h> :call TmuxWinCmd('h')<cr>
+nnoremap <C-w><C-j> :call TmuxWinCmd('j')<cr>
+nnoremap <C-w><C-k> :call TmuxWinCmd('k')<cr>
+nnoremap <C-w><C-l> :call TmuxWinCmd('l')<cr>
