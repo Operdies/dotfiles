@@ -159,14 +159,14 @@ BarElement BarElements[] =
 	{
 		.click = { [LeftClick] = bar_battery_toggle_timer },
 		.data = &(battery_settings) { .show_time = 1 },
-		.interval = 1,
+		.interval = default_tickrate,
 		.scheme = SchemeBattery,
 		.update = bar_battery_status,
 	},
 	{
 		.click = { [LeftClick] = bar_clock_click, [RightClick] = open_calendar },
 		.data = &(clock_settings) { .show_seconds = 0 },
-		.interval = 1,
+		.interval = default_tickrate,
 		.scheme = SchemeClock,
 		.update = bar_clock,
 	},
@@ -189,7 +189,7 @@ BarElement BarElements[] =
 			},
 		},
 		.init = tiramisu_init,
-		.interval = 1,
+		.interval = default_tickrate,
 		.update = bar_notifications,
 	},
 	{

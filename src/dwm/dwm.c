@@ -1582,7 +1582,10 @@ run(void)
 		}
 
 		clock_gettime(CLOCK_REALTIME, &now);
+		next.tv_sec = now.tv_sec - (now.tv_sec % timeout.tv_sec) + timeout.tv_sec;
+
 		struct timespec diff = {0};
+
 		timespecsub(&next, &now, &diff);
 		int timeout_ms = (int)(diff.tv_sec * 1000) + (int)(diff.tv_nsec / 1e6);
 		timeout_ms += 5;
@@ -1621,7 +1624,6 @@ run(void)
 		clock_gettime(CLOCK_REALTIME, &now);
 		if (timespeccmp(&now, &next, >=)) {
 			drawbars();
-			timespecadd(&next, &timeout, &next);
 		}
 	}
 }
