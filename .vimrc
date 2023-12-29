@@ -119,33 +119,7 @@ command! DoFuzzyGrep silent call s:Grephere('fuzzy: ', 'f')
 nmap <space>fg :silent DoGrep<cr>
 nmap <space>fG :silent DoFuzzyGrep<cr>
 nmap <space>qf :copen<cr>
-nnoremap <esc> :silent nohlsearch<cr><esc>
-
-function! s:SilentMake()
-	let success = 1
-	execute 'cclose'
-	execute 'silent !make --quiet > make.err 2>&1'
-	execute 'cfile make.err'
-	if len(getqflist()) > 0
-		let success = 0
-		execute 'copen'
-		execute 'nnoremap <buffer> q :cclose<cr>'
-		execute 'wincmd p'
-	else
-	endif
-
-	execute 'redraw!'
-
-	if success
-		echo "Build Succeeded"
-	else
-		echo "Build Failed"
-	endif
-endfunction
-
-command! SilentMake call s:SilentMake()
-
-nmap <C-q> :wa<cr>:SilentMake<cr>
+nnoremap <silent> <esc> :nohlsearch<cr>:pclose<cr><esc>
 
 nmap gb :ls<cr>:b<space>
 nmap <space>fb :ls<cr>:b<space>
@@ -237,54 +211,48 @@ command! -complete=customlist,s:CompleteGitFiles -nargs=1 GitEdit :e <args>
 command! -complete=customlist,s:CompleteProjects -nargs=1 OpenProject :call s:OpenProject("<args>")
 command! -complete=customlist,s:OldFiles -nargs=1 RecentFiles :e <args>
 
-nmap <space>ff :FZF<cr>
+nmap <space>ff :GitEdit 
 nmap <space>cr :!tcc -run %<cr>
 nmap <space>fp :OpenProject 
 nmap <space>fr :RecentFiles 
 " nmap <tab> :wincmd w<cr>
 " nmap <esc><tab> :wincmd W<cr>
 
-set previewpopup=height:10,width:100,border:off
+nnoremap <C-c><C-c> :execute getline('.')<cr>j
+set previewpopup=height:10,width:100,border:on
 
+let g:CurrentPreviewSymbol=''
 function! s:PreviewSymbol(arg, dir)
-	function! Cleanup()
+	let cword = expand('<cword>')
+	try
 		let preview_window=popup_findpreview()
-		let preview_buf = winbufnr(preview_window)
-		let readonly = getbufvar(preview_buf, "&readonly")
-		pclose
-		if readonly
-			execute "silent! bdelete " . preview_buf
-			call s:UpdateBufferline(0,0,0)
-		endif
-	endfunction
-
-	let preview_window=popup_findpreview()
-	if preview_window == 0
-		execute "silent wincmd }"
-	else
-		let preview_buf = winbufnr(preview_window)
-		let readonly = getbufvar(preview_buf, "&readonly")
-		if a:dir == '0'
-			execute "silent! ptnext"
+		if preview_window == 0 || g:CurrentPreviewSymbol != cword
+			execute "silent wincmd }"
+			let g:CurrentPreviewSymbol = cword
 		else
-			execute "silent! ptprev"
+			let preview_buf = winbufnr(preview_window)
+			if a:dir == '0'
+				try
+					execute "ptnext"
+				catch
+					execute "silent! ptfirst"
+				endtry
+			else
+				try
+					execute "ptprev"
+				catch
+					execute "silent! ptlast"
+				endtry
+			endif
+			if winbufnr(preview_window) != preview_buf && getbufvar(preview_buf, "&readonly")
+				execute "bdelete " . preview_buf
+			endif
 		endif
-		if readonly
-			execute "silent! bdelete " . preview_buf
-		endif
-	endif
-	if a:arg == "i"
-		autocmd InsertLeave * ++once call Cleanup()
-	else
-		autocmd CursorMoved * ++once call Cleanup()
-	endif
+		return
+	catch
+		echohl ErrorMsg | echo "Tag not found: " .. expand("<cword>") | echohl None
+	endtry
 endfunction
-" open tag in preview window
-command! -nargs=+ PreviewSymbol call s:PreviewSymbol(<f-args>)
-nmap <C-k> <cmd>PreviewSymbol n 1<cr>
-imap <C-k> <C-c>:PreviewSymbol i 1<cr>gi
-nmap <C-j> <cmd>PreviewSymbol n 0<cr>
-imap <C-j> <C-c>:PreviewSymbol i 0<cr>gi
 
 imap <C-d> <del>
 imap <C-b> <Left>
@@ -297,7 +265,7 @@ if !exists('*Preserve')
         try
             " Preparation: save last search, and cursor position.
             let l:win_view = winsaveview()
-            silent! execute 'keepjumps' . a:command
+            execute 'keepjumps ' . a:command
         finally
             " try restore / reg and cursor position
             call winrestview(l:win_view)
@@ -306,6 +274,12 @@ if !exists('*Preserve')
 endif
 
 nnoremap <space>cw <cmd>call Preserve('%s/\s\+$//')<cr>
+" open tag in preview window
+command! -nargs=+ PreviewSymbol call s:PreviewSymbol(<f-args>)
+nnoremap <C-k> <cmd>call Preserve('PreviewSymbol n 1')<cr>
+inoremap <C-k> <C-c><cmd>call Preserve('PreviewSymbol i 1')<cr>
+nnoremap <C-j> <cmd>call Preserve('PreviewSymbol n 0')<cr>
+inoremap <C-j> <C-c><cmd>call Preserve('PreviewSymbol i 0')<cr>
 
 " highlight ExtraWhitespace ctermbg=lightblue guibg=lightblue
 " match ExtraWhitespace /\s\+$/
@@ -378,3 +352,11 @@ nnoremap <expr> gc CommentLines()
 vnoremap <expr> gc CommentLines()
 xnoremap <expr> gc CommentLines()
 nnoremap <expr> gcc CommentLines() .. '_'
+
+call plug#begin()
+Plug 'skywind3000/asyncrun.vim'
+Plug 'tpope/vim-sensible'
+call plug#end()
+
+let g:asyncrun_open=10
+nmap <C-q> :AsyncRun! make<cr>
