@@ -28,6 +28,7 @@ ensure_binaries() {
 		nvr neovim-remote
 		picom picom
 		rg ripgrep
+		tiramisu tiramisu-git
 		tldr tldr
 		tmux tmux
 		wezterm wezterm
