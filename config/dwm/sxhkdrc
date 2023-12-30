@@ -62,3 +62,5 @@ super + s ; { s, a, w }
 # super + shift + w ; { s, c }
 #   pkill -{SIGSTOP,SIGCONT} firefox
 
+XF86TouchpadToggle
+  pkill -SIGUSR1 -x xautobacklight

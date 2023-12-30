@@ -8,12 +8,27 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <sys/select.h>
+#include <errno.h>
+#include <signal.h>
 
 static char *LED_FILE = "/sys/class/leds/asus::kbd_backlight/brightness";
 static char *DISPLAY = ":0";
 static int TIMEOUT = 5;
 static int LED_STATE = 0;
+static int OFF_STATE = 0;
+static int ON_STATE = 1;
 
+void writeled(char msg[static 1]);
+int readled(void);
+void enable_backlight(int force);
+
+void
+toggle_backlight(int sig)
+{
+	ON_STATE = ON_STATE ? 0 : 1;
+	enable_backlight(1);
+	signal(SIGUSR1, toggle_backlight);
+}
 void
 die(const char *fmt, ...)
 {
@@ -54,20 +69,22 @@ readled() {
 
 void 
 disable_backlight() {
-	if (!LED_STATE)
-		return;
-
-	writeled("0");
-	LED_STATE = 0;
+	if (LED_STATE) {
+		char payload[] = "0";
+		payload[0] += OFF_STATE;
+		writeled(payload);
+		LED_STATE = OFF_STATE;
+	}
 }
 
 void 
-enable_backlight() {
-	if (LED_STATE)
-		return;
-
-	writeled("1");
-	LED_STATE = 1;
+enable_backlight(int force) {
+	if (!LED_STATE || force) {
+		char payload[] = "0";
+		payload[0] += ON_STATE;
+		writeled(payload);
+		LED_STATE = ON_STATE;
+	}
 }
 
 void usage(int ret) {
@@ -98,6 +115,8 @@ main(int argc, char * argv[]) {
 			LED_FILE = argv[i];
 		}
 	}
+
+	signal(SIGUSR1, toggle_backlight);
 
 	LED_STATE = readled();
 	char *displayname = getenv("DISPLAY");
@@ -138,7 +157,7 @@ main(int argc, char * argv[]) {
 		while (XPending(display)) {
 			XEvent event;
 			XNextEvent(display, &event);
-			enable_backlight();
+			enable_backlight(0);
 		}
 	}
 }

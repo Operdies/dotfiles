@@ -12,6 +12,7 @@ ensure_binaries() {
 		discord "discord noto-fonts-emoji"
 		dmenu dmenu
 		fd fd
+		feh feh
 		fzf fzf
 		gcc gcc
 		git git
@@ -130,8 +131,11 @@ ensure_make() {
 }
 
 set_default_apps() {
+	# check filetype with e.g. xdg-mime query filetype <file>
 	xdg-mime default org.pwmt.zathura.desktop application/pdf
 	xdg-mime default firefox.desktop x-scheme-handler/https x-scheme-handler/http
+	xdg-mime default feh.desktop image/png
+	xdg-mime default feh.desktop image/jpeg
 }
 
 ensure_links

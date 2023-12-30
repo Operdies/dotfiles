@@ -315,6 +315,7 @@ function! CommentLines(context = {}, type = '') abort
 				\ c: '// ',
 				\ cpp: '// ',
 				\ sh: '# ',
+				\ zsh: '# ',
 				\ }
 	if commentstrings->has_key(&filetype)
 		let commentstring = commentstrings[&filetype]
@@ -375,6 +376,10 @@ function! TmuxWinCmd(direction)
 	endif
 endfunction
 
+nnoremap <C-w>h :call TmuxWinCmd('h')<cr>
+nnoremap <C-w>j :call TmuxWinCmd('j')<cr>
+nnoremap <C-w>k :call TmuxWinCmd('k')<cr>
+nnoremap <C-w>l :call TmuxWinCmd('l')<cr>
 nnoremap <C-w><C-h> :call TmuxWinCmd('h')<cr>
 nnoremap <C-w><C-j> :call TmuxWinCmd('j')<cr>
 nnoremap <C-w><C-k> :call TmuxWinCmd('k')<cr>

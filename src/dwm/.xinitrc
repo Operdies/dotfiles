@@ -1,5 +1,5 @@
 export XSESSION_PID="$$"
-bash "$HOME/.config/dwm/startup.sh" dwm
+sh "$HOME/.config/dwm/startup.sh" dwm
 while true; do
   "$HOME/repos/dotfiles/src/dwm/dwm" 2>> "/tmp/dwm$DISPLAY" || sleep 1
 done
