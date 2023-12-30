@@ -6,6 +6,7 @@ typedef struct {
 
 typedef struct {
 	char *interface;
+	int iw_missing;
 } network_settings;
 
 static void bar_network_info(BarElementFuncArgs *data);
@@ -14,8 +15,25 @@ static void bar_network_list(BarElementFuncArgs *data);
 static void
 bar_network_info(BarElementFuncArgs *data)
 {
-	network_settings *s = (network_settings*)data->e->data;
+	char wifi_off[] = "󰤭";
+	char *wifi_levels[] = {
+		"󰤟",
+		"󰤢",
+		"󰤥",
+		"󰤨",
+	};
+	char ethernet[] = "󰈀";
+
 	int fds[2];
+	char buf[100];
+	char ssid[30] = {0};
+	int signal, rx, tx, found;
+
+	network_settings *s = (network_settings*)data->e->data;
+	if (s->iw_missing) {
+		return;
+	}
+
 	if (pipe(fds) == -1)
 		die("pipe:");
 
@@ -26,27 +44,25 @@ bar_network_info(BarElementFuncArgs *data)
 		dup2(fds[1], STDOUT_FILENO);
 		close(fds[1]);
 		execlp("iw", "iw", "dev", s->interface, "link", NULL);
-		die("execlp:");
+		putchar(0);
+		exit(0);
 	}
 
 	close(fds[1]);
-
-	char wifi_off[] = "󰤭";
-	char *wifi_levels[] = {
-		"󰤟",
-		"󰤢",
-		"󰤥",
-		"󰤨",
-	};
-
-	char buf[100];
-	FILE *fp = fdopen(fds[0], "r");
-	char ssid[30] = {0};
-	int signal, rx, tx, found;
 	signal = rx = tx = found = 0;
 
+	FILE *fp = fdopen(fds[0], "r");
 	while (fgets(buf, LENGTH(buf), fp)) {
 		char *ch;
+		if (buf[0] == 0) {
+			// assume ethernet
+			s->iw_missing = 1;
+			data->e->hidden = 1;
+			strcpy(data->e->buffer, ethernet);
+			fclose(fp);
+			close(fds[0]);
+			return;
+		}
 		if ((ch = strstr(buf, "SSID: "))) {
 			for (int i = 0; i < LENGTH(ssid)-1; i++) {
 				char c = ch[LENGTH("SSID:") + i];

@@ -8,6 +8,7 @@ ensure_binaries() {
 	binaries=(
 		bsp-layout bsp-layout
 		cargo rustup
+		ctags ctags
 		curl curl
 		discord "discord noto-fonts-emoji"
 		dmenu dmenu
@@ -22,7 +23,7 @@ ensure_binaries() {
 		htop htop
 		lazygit lazygit
 		libinput-gestures "libinput libinput-gestures xf86-input-libinput"
-		networkmanager_dmenu networkmanager_dmenu
+		networkmanager_dmenu networkmanager-dmenu-git
 		npm npm
 		nvim neovim
 		nvr neovim-remote

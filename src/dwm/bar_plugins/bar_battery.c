@@ -41,12 +41,15 @@ read_bat(battery_info *bat) {
 typedef struct {
 	int show_time;
 	int force_update;
+	int no_battery;
 } battery_settings;
 
 static void
 bar_battery_status(BarElementFuncArgs *data) {
 	data->e->hidden = 1;
 	battery_settings *settings = (battery_settings*)data->e->data;
+	if (settings->no_battery)
+		return;
 	static int cursor = 0;
 	static int chargebuf[10] = {0};
 
@@ -55,6 +58,7 @@ bar_battery_status(BarElementFuncArgs *data) {
 	battery_info bat = {0};
 
 	if (!read_bat(&bat)) {
+		settings->no_battery = 1;
 		return;
 	}
 
