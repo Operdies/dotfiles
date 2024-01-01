@@ -65,8 +65,7 @@ let $PAGER=''
 set undofile
 packadd! matchit
 packadd! termdebug
-
-autocmd FileType text setlocal textwidth=80
+set textwidth=0
 
 filetype plugin indent on
 syntax on
@@ -138,18 +137,18 @@ function! s:UpdateBufferline(abuf, del, write)
 		if a:del && a:abuf == b.bufnr
 			continue
 		endif
-		let prefix = ' '
-		if b.changed
-			let prefix = '+'
-		endif
+		let prefix = ''
+		let postfix = (b.changed ? '+' : ' ')
 		if a:write && a:abuf == b.bufnr
-			let prefix = ' '
+			let postfix = ' '
 		endif
-		let name = prefix . fnamemodify(b.name, ":t") . ' [' . b.bufnr . ']' . ' '
+
+		let name = prefix .. fnamemodify(b.name, ":t") .. ' [' .. b.bufnr .. ']' .. postfix
+
 		if b.bufnr == focused
-			let name = sel . name . nosel . ' '
+			let name = sel .. name .. nosel .. ' '
 		else
-			let name = nosel . name . ' '
+			let name = nosel .. name .. ' '
 		endif
 		let newtabline .= name
 	endfor
