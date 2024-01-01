@@ -52,17 +52,12 @@ bar_network_info(BarElementFuncArgs *data)
 	signal = rx = tx = found = 0;
 
 	FILE *fp = fdopen(fds[0], "r");
+	int did_read = 0;
 	while (fgets(buf, LENGTH(buf), fp)) {
+		did_read = 1;
+		if (buf[0] == 0)
+			break;
 		char *ch;
-		if (buf[0] == 0) {
-			// assume ethernet
-			s->iw_missing = 1;
-			data->e->hidden = 1;
-			strcpy(data->e->buffer, ethernet);
-			fclose(fp);
-			close(fds[0]);
-			return;
-		}
 		if ((ch = strstr(buf, "SSID: "))) {
 			for (int i = 0; i < LENGTH(ssid)-1; i++) {
 				char c = ch[LENGTH("SSID:") + i];
@@ -92,6 +87,14 @@ bar_network_info(BarElementFuncArgs *data)
 	}
 	fclose(fp);
 	close(fds[0]);
+
+	if (buf[0] == 0 || did_read == 0) {
+		// assume ethernet
+		s->iw_missing = 1;
+		data->e->hidden = 1;
+		strcpy(data->e->buffer, ethernet);
+		return;
+	}
 
 	int status = 0;
 	waitpid(pid, &status, 0);

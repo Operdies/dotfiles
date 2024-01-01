@@ -97,22 +97,29 @@ void usage(int ret) {
 
 int 
 main(int argc, char * argv[]) {
-#define MATCH(short, long) (strcmp("-"#short, argv[i]) == 0 || strcmp("--"#long, argv[i]) == 0)
+#define MATCH(short, long) (strcmp("-" short, argv[i]) == 0 || strcmp("--" long, argv[i]) == 0)
 #define NEXTORDIE if (argc <= i) { printf("Missing positional argument to %s\n", argv[i-1]); usage(1); }
 	for (int i = 1; i < argc; i++) {
-		if (MATCH(h, help))
+		if (MATCH("h", "help"))
 			usage(0);
-		else if (MATCH(t, timeout)) {
+		else if (MATCH("t", "timeout")) {
 			i++;
 			NEXTORDIE;
 			if (sscanf(argv[i], "%d", &TIMEOUT) == 0) {
 				printf("%s is not an integer.\n", argv[i]);
 				usage(1);
 			}
-		} else if (MATCH(f, led-file)) {
+		} else if (MATCH("f", "led-file")) {
 			i++;
 			NEXTORDIE;
 			LED_FILE = argv[i];
+		} else if (MATCH("i", "initial-state")) {
+			i++;
+			NEXTORDIE;
+			if (sscanf(argv[i], "%d", &ON_STATE) == 0) {
+				printf("%s is not an integer.\n", argv[i]);
+				usage(1);
+			}
 		}
 	}
 

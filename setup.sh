@@ -4,16 +4,29 @@ has() {
 	which "$1" 2>/dev/null >/dev/null
 }
 
+ensure_yay() {
+	has yay || {
+		echo "Instlling yay."
+		sudo pacman -Syu --needed base-devel git
+		git clone https://aur.archlinux.org/yay.git /tmp/yay
+		pushd /tmp/yay
+		makepkg -si
+		yay --version || (echo "yay installation failed." && exit 1)
+		popd
+		rm -rf /tmp/yay
+	}
+}
 ensure_binaries() {
 	binaries=(
-		bsp-layout bsp-layout
+		# Install fonts and libraries in addition to X
+		X "xorg-server ttf-meslo-nerd-font-powerlevel10k libx11 libxinerama libxft freetype2 arc-gtk-theme"
 		cargo rustup
 		ctags ctags
 		curl curl
-		discord "discord noto-fonts-emoji"
 		dmenu dmenu
 		fd fd
 		feh feh
+		firefox firefox
 		fzf fzf
 		gcc gcc
 		git git
@@ -21,19 +34,33 @@ ensure_binaries() {
 		gsimplecal gsimplecal
 		gvim gvim # don't need the gui, but gvim includes X11 clipboard
 		htop htop
+		iw iw
+		iwctl iwd
 		lazygit lazygit
+		less less
 		libinput-gestures "libinput libinput-gestures xf86-input-libinput"
+		man 'man-db man-pages'
 		networkmanager_dmenu networkmanager-dmenu-git
+		nitrogen nitrogen
+		nmcli networkmanager
 		npm npm
 		nvim neovim
 		nvr neovim-remote
 		picom picom
+		powertop powertop
+		rofi rofi
 		rg ripgrep
+		startx xorg-xinit
+		sudo sudo
 		tiramisu tiramisu-git
 		tldr tldr
 		tmux tmux
-		wezterm wezterm
+		vi vi
 		xautolock xautolock
+		xclip xclip
+		xdg-mime xdg-utils
+		xdotool xdotool
+		xinput xorg-xinput
 		xwininfo xorg-xwininfo
 		yq go-yq
 		zathura "zathura zathura-pdf-mupdf"
@@ -57,7 +84,7 @@ ensure_binaries() {
 		mpkg="${missing[*]}"
 		echo "Missing packages: $mpkg"
 
-		cmd="yay -Sy $mpkg --noconfirm"
+		cmd="yay -Sy $mpkg --noconfirm --needed"
 		while true; do
 			read -p "Install missing packages? ($cmd) (yn) " yn
 			case $yn in
@@ -128,6 +155,7 @@ ensure_make() {
 		dir="$(readlink -f "$item")"
 		pushd "$dir"
 		make
+		sudo make install || echo "no make install"
 		popd
 	done
 }
@@ -141,6 +169,7 @@ set_default_apps() {
 }
 
 ensure_links
+ensure_yay
 ensure_binaries
 ensure_clones
 ensure_make

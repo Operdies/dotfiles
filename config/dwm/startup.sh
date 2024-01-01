@@ -68,7 +68,7 @@ rhkd -c "$HOME/.config/$config_dir/sxhkdrc" &
 rhkd-whichkey -c "$HOME/.config/$config_dir/sxhkdrc" &
 (sleep 1; bash "$HOME/.config/$config_dir/bash_config.bash" --quiet) &
 
-~/repos/dotfiles/src/xautobacklight/xautobacklight -t 5 -f "/sys/class/leds/asus::kbd_backlight/brightness" &
+~/repos/dotfiles/src/xautobacklight/xautobacklight --initial-state 0 --timeout 5 --led-file "/sys/class/leds/asus::kbd_backlight/brightness" &
 xset +dpms
 xset s 120 120
 
