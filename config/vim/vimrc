@@ -158,7 +158,7 @@ endfunction
 
 augroup bufferlinegrp
 	autocmd!
-	autocmd BufEnter,BufNew * call s:UpdateBufferline(expand("<abuf>"), 0, 0)
+	autocmd BufEnter,BufNew,InsertLeave * call s:UpdateBufferline(expand("<abuf>"), 0, 0)
 	autocmd BufDelete * call s:UpdateBufferline(expand("<abuf>"), 1, 0)
 	autocmd BufWrite * call s:UpdateBufferline(expand("<abuf>"), 0, 1)
 augroup END
@@ -383,3 +383,5 @@ nnoremap <C-w><C-h> :call TmuxWinCmd('h')<cr>
 nnoremap <C-w><C-j> :call TmuxWinCmd('j')<cr>
 nnoremap <C-w><C-k> :call TmuxWinCmd('k')<cr>
 nnoremap <C-w><C-l> :call TmuxWinCmd('l')<cr>
+
+let $PAGER=''

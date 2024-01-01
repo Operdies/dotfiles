@@ -21,6 +21,7 @@ ensure_binaries() {
 		# Install fonts and libraries in addition to X
 		X "xorg-server ttf-meslo-nerd-font-powerlevel10k libx11 libxinerama libxft freetype2 arc-gtk-theme"
 		cargo rustup
+		convert imagemagick
 		ctags ctags
 		curl curl
 		dmenu dmenu
@@ -34,6 +35,7 @@ ensure_binaries() {
 		gsimplecal gsimplecal
 		gvim gvim # don't need the gui, but gvim includes X11 clipboard
 		htop htop
+		i3lock i3lock
 		iw iw
 		iwctl iwd
 		lazygit lazygit
@@ -43,19 +45,19 @@ ensure_binaries() {
 		networkmanager_dmenu networkmanager-dmenu-git
 		nitrogen nitrogen
 		nmcli networkmanager
+		notify-send libnotify
 		npm npm
 		nvim neovim
 		nvr neovim-remote
 		picom picom
 		powertop powertop
-		rofi rofi
 		rg ripgrep
+		rofi rofi
 		startx xorg-xinit
 		sudo sudo
 		tiramisu tiramisu-git
 		tldr tldr
 		tmux tmux
-		vi vi
 		xautolock xautolock
 		xclip xclip
 		xdg-mime xdg-utils

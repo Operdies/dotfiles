@@ -143,7 +143,7 @@ etcetera() {
 
 power() {
 	PREFIX=""
-	lock='sleep 1;xset s activate;~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh'
+	lock='sleep 0.1;xset s activate;~/.config/bspwm/scripts/i3lock-fancy/i3lock-fancy.sh'
 	BINDINGS=(
 		"{$lock,kill $XSESSION_PID,systemctl poweroff,systemctl reboot,$lock; systemctl suspend}"
 		'super + shift + e ; {q,w,e,r,t}'

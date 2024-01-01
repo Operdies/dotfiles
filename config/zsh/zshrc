@@ -8,7 +8,7 @@ export npm_config_prefix=~/.node_modules
 export LANG=en_US.UTF-8
 export EDITOR='vim'
 export FZF_DEFAULT_OPTS='--layout=reverse'
-export MANPAGER='nvim +Man! "+let g:auto_session_enabled = v:false"'
+export MANPAGER="vim +MANPAGER --not-a-term -"
 
 # startx on login on VT 1
 if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
@@ -65,5 +65,8 @@ autoload -U +X bashcompinit && bashcompinit
 
 alias yank='xclip -selection clipboard'
 
+my_ctags() {
+  ctags -R --c++-kinds=+p --fields=+iaS --extras=+q --sort=foldcase $*
+}
 
 # vim: set et sw=2 sts=2 tw=78 ft=sh:
