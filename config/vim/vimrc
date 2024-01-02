@@ -82,8 +82,15 @@ autocmd BufReadPost *
 set termguicolors
 colorscheme catppuccin_mocha
 
+function! RealCd()
+	let fname = expand('%:p')
+	let realpath = system("readlink -f " .. fname)
+	let realdir = fnamemodify(realpath, ":h")
+	execute 'cd ' .. realdir
+endfunction
+
 nmap <space>o :e %:p:h<cr>
-nmap <space>cd :cd %:p:h<cr>
+nmap <space>cd <cmd>call RealCd()<cr>
 nmap <space>fw /\<
 
 nmap ]q :cnext<cr>
@@ -117,7 +124,7 @@ command! DoFuzzyGrep silent call s:Grephere('fuzzy: ', 'f')
 
 nmap <space>fg :silent DoGrep<cr>
 nmap <space>fG :silent DoFuzzyGrep<cr>
-nmap <space>qf :copen<cr>
+nmap <space>qf :cw<cr>
 nnoremap <silent> <esc> :nohlsearch<cr>:pclose<cr><esc>
 
 nmap gb :ls<cr>:b<space>
@@ -289,6 +296,8 @@ inoremap <C-j> <C-c><cmd>call Preserve('PreviewSymbol i 0')<cr>
 " 	autocmd InsertEnter * highlight clear ExtraWhitespace
 " augroup END
 " tmap <esc><esc> <C-w>N
+tmap <esc>[ <cmd>bprev<cr>
+tmap <esc>] <cmd>bnext<cr>
 
 nmap <space>p <cmd>.!xclip -o<cr>
 
@@ -382,11 +391,15 @@ function! AsyncRunMegaMaker()
 		echohl ErrorMsg | echo "No makefile found." | echohl None
 		return
 	endif
-	execute 'AsyncRun! -cwd=' .. makefile .. ' make'
+	execute 'AsyncRun! -cwd=' .. makefile .. ' make --quiet'
 endfunction
 
-let g:asyncrun_open=10
+let g:asyncrun_open=6
 nmap <C-q> :call AsyncRunMegaMaker()<cr>
+augroup asyncrun
+	autocmd!
+	autocmd User AsyncRunStop execute "cwindow"
+augroup END
 
 function! TmuxWinCmd(direction)
 	if winnr(a:direction) != winnr()
@@ -412,3 +425,41 @@ nnoremap <C-w><C-k> :call TmuxWinCmd('k')<cr>
 nnoremap <C-w><C-l> :call TmuxWinCmd('l')<cr>
 
 let $PAGER=''
+
+" termdebug
+let g:termdebug_config = #{
+			\ sign: '>>',
+			\ wide: 120,
+			\ winbar: 0,
+			\ }
+
+nnoremap <F2> <cmd>call TermDebugSendCommand("run")<cr>
+nnoremap <F3> <cmd>call TermDebugSendCommand("quit")<cr>
+nnoremap <F5> <cmd>call TermDebugSendCommand("continue")<cr>
+nnoremap <F9> <cmd>Until<cr>
+nnoremap <F10> <cmd>Over<cr>
+nnoremap <F11> <cmd>Step<cr>
+nnoremap <F12> <cmd>Finish<cr>
+
+nnoremap <space>db <cmd>Break<cr>
+nnoremap <space>dc <cmd>Clear<cr>
+nnoremap <space>dd <cmd>Until<cr>
+nnoremap <space>dq <cmd>call TermDebugSendCommand("quit")<cr>
+nnoremap <space>dr <cmd>call TermDebugSendCommand("run")<cr>
+nnoremap <space>ds <cmd>Stop<cr>
+
+function! CleanBufferList()
+	let vimroot = $VIM_ROOT
+	let bufnames = filter(copy(getbufinfo()), 'v:val.listed')
+	let todelete = ''
+	for buf in bufnames
+		if buf.changed == 0 && len(buf.windows) == 0 && buf.name->match('^' .. vimroot) != 0 
+			let todelete ..= ' ' .. buf.bufnr
+		endif
+	endfor
+	if todelete != ''
+		execute 'bdelete' .. todelete
+	endif
+endfunction
+
+nnoremap <space>bD <cmd>call CleanBufferList()<cr>

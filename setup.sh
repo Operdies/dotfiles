@@ -30,6 +30,7 @@ ensure_binaries() {
 		firefox firefox
 		fzf fzf
 		gcc gcc
+		gdb gdb
 		git git
 		go go
 		gsimplecal gsimplecal
