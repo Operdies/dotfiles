@@ -37,7 +37,3 @@ augroup asyncrun
 	autocmd User AsyncRunStop execute "cwindow"
 augroup END
 
-augroup termdebug
-	autocmd!
-	autocmd User TermdebugStartPost wincmd p | wincmd H
-augroup END

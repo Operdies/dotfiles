@@ -46,6 +46,7 @@ nnoremap <silent> <esc> :nohlsearch<cr>:pclose<cr><esc>
 
 nnoremap gb :ls<cr>:b<space>
 nnoremap <space>fb :ls<cr>:b<space>
+nnoremap <space>ft :tabs<cr>:tabnext<space>
 
 nnoremap <space>so :w<cr>:so %<cr>
 
@@ -93,6 +94,7 @@ nnoremap <space>bD <cmd>call CleanBufferList()<cr>
 
 nnoremap <F1> <cmd>call TermDebugSendCommand("run")<cr>
 nnoremap <F2> <cmd>call TermDebugSendCommand("quit")<cr>
+nnoremap <F3> <cmd>call TermDebugSendCommand("start")<cr>
 nnoremap <F5> <cmd>call TermDebugSendCommand("continue")<cr>
 nnoremap <F9> <cmd>Until<cr>
 nnoremap <F10> <cmd>Over<cr>

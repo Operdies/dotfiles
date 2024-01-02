@@ -47,9 +47,6 @@ ensure_binaries() {
 		nitrogen nitrogen
 		nmcli networkmanager
 		notify-send libnotify
-		npm npm
-		nvim neovim
-		nvr neovim-remote
 		picom picom
 		powertop powertop
 		rg ripgrep
@@ -58,6 +55,7 @@ ensure_binaries() {
 		sudo sudo
 		tiramisu tiramisu-git
 		tldr tldr
+		tlp tlp
 		tmux tmux
 		xautolock xautolock
 		xclip xclip

@@ -245,3 +245,11 @@ function! CleanBufferList()
 		execute 'bdelete' .. todelete
 	endif
 endfunction
+
+function! StartDebugger(file)
+	tabnew | bprev | execute 'Termdebug ' .. a:file | set winfixheight | wincmd H | wincmd p | wincmd K | execute 'resize ' .. floor(&lines * 0.7)
+	Break
+	Run
+endfunction
+command! -complete=file -nargs=1 Debug call StartDebugger('<args>')
+

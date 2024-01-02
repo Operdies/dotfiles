@@ -41,11 +41,7 @@ set balloonevalterm
 let c_comment_strings=1
 let g:asyncrun_open=6
 let $PAGER=''
-let g:termdebug_config = #{
-			\ sign: '>>',
-			\ wide: 1,
-			\ winbar: 0,
-			\ }
+let g:termdebug_config = #{ winbar: 0, }
 
 filetype plugin indent on
 syntax on
