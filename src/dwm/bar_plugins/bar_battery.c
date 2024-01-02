@@ -1,4 +1,4 @@
-enum { CHARGING, DISCHARGING };
+enum { CHARGING = 1, DISCHARGING };
 typedef struct {
   int charge_full;
   int charge_now;
@@ -42,6 +42,7 @@ typedef struct {
 	int show_time;
 	int force_update;
 	int no_battery;
+	int state; // charging or discharging
 } battery_settings;
 
 static void
@@ -60,6 +61,12 @@ bar_battery_status(BarElementFuncArgs *data) {
 	if (!read_bat(&bat)) {
 		settings->no_battery = 1;
 		return;
+	}
+
+	if (settings->state != bat.state) {
+		cursor = 0;
+		memset(chargebuf, 0, sizeof chargebuf);
+		settings->state = bat.state;
 	}
 
 	chargebuf[cursor] = bat.current_now;
