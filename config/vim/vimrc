@@ -260,16 +260,16 @@ imap <C-f> <Right>
 set viminfo='100,<100,s100,:100,n~/.vim/viminfo
 
 if !exists('*Preserve')
-    function! Preserve(command)
-        try
-            " Preparation: save last search, and cursor position.
-            let l:win_view = winsaveview()
-            execute 'keepjumps ' . a:command
-        finally
-            " try restore / reg and cursor position
-            call winrestview(l:win_view)
-        endtry
-    endfunction
+	function! Preserve(command)
+		try
+			" Preparation: save last search, and cursor position.
+			let l:win_view = winsaveview()
+			execute 'keepjumps ' . a:command
+		finally
+			" try restore / reg and cursor position
+			call winrestview(l:win_view)
+		endtry
+	endfunction
 endif
 
 nnoremap <space>cw <cmd>call Preserve('%s/\s\+$//')<cr>
@@ -358,8 +358,35 @@ Plug 'skywind3000/asyncrun.vim'
 Plug 'tpope/vim-sensible'
 call plug#end()
 
+function! AsyncRunMegaMaker()
+	let makefile=''
+
+	if filereadable(getcwd() .. '/Makefile')
+		let makefile = getcwd()
+	else
+		let filedir = expand('%:h')
+		if filedir == '.'
+			let filedir = getcwd()
+		endif
+		if filedir[0] == '/'
+			while filedir != '/'
+				if filereadable(filedir .. '/Makefile')
+					let makefile = filedir
+					break
+				endif
+				let filedir = fnamemodify(filedir, ':h')
+			endwhile
+		endif
+	endif
+	if makefile == ''
+		echohl ErrorMsg | echo "No makefile found." | echohl None
+		return
+	endif
+	execute 'AsyncRun! -cwd=' .. makefile .. ' make'
+endfunction
+
 let g:asyncrun_open=10
-nmap <C-q> :AsyncRun! make<cr>
+nmap <C-q> :call AsyncRunMegaMaker()<cr>
 
 function! TmuxWinCmd(direction)
 	if winnr(a:direction) != winnr()
