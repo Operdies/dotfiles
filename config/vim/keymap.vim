@@ -39,6 +39,7 @@ nnoremap P P`[v`]=
 " search
 nnoremap <space>o :e %:p:h<cr>
 nnoremap <space>cd <cmd>call RealCd()<cr>
+nnoremap <space>gcd <cmd>call CdGitRoot()<cr>
 nnoremap <space>fw /\<
 nnoremap <space>fg :silent DoGrep<cr>
 nnoremap <space>fG :silent DoFuzzyGrep<cr>
@@ -84,7 +85,7 @@ nnoremap <C-q> :call AsyncRunMegaMaker()<cr>
 
 " debugging
 nnoremap <F1> <cmd>call TermDebugSendCommand("run")<cr>
-nnoremap <F2> <cmd>call TermDebugSendCommand("quit")<cr>
+nnoremap <F2> <cmd>call TermDebugSendCommand("quit")<cr>:tabclose<cr>
 nnoremap <F3> <cmd>call TermDebugSendCommand("start")<cr>
 nnoremap <F5> <cmd>call TermDebugSendCommand("continue")<cr>
 nnoremap <F9> <cmd>Until<cr>

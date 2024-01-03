@@ -43,7 +43,3 @@ let g:asyncrun_open=6
 let $PAGER=''
 let g:termdebug_config = #{ winbar: 0, }
 
-filetype plugin indent on
-syntax on
-
-colorscheme catppuccin_mocha

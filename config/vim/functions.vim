@@ -5,6 +5,11 @@ function! RealCd()
 	execute 'cd ' .. realdir
 endfunction
 
+function! CdGitRoot()
+	call RealCd()
+	execute 'cd ' .. system('git rev-parse --show-toplevel')
+endfunction
+
 function! Grephere(title, flags)
 	call inputsave()
 	let what = input(a:title)
@@ -63,12 +68,12 @@ endfunction
 
 function! CompleteProjects(ArgLead, CmdLine, CursorPos)
 	let files = systemlist("ls -d ~/repos/*/ | xargs -I {} basename {}")
-	return filter(files, 'stridx(v:val, a:ArgLead) != -1')
+	return filter(files, 'stridx(v:val, a:ArgLead) == 0')
 endfunction
 
 function! OpenProject(project)
 	execute "cd ~/repos/" .. a:project
-	execute "e ."
+	execute "tabe ."
 endfunction
 
 function! OldFiles(ArgLead, CmdLine, CursorPos)
@@ -246,12 +251,59 @@ function! CleanBufferList()
 	endif
 endfunction
 
+let g:DebuggerLayout = #{
+			\ height: 10,
+			\ width: 60,
+			\ layout: 1,
+			\ }
 function s:StartDebugger(file)
+	" open the current file in a new tab and configure the window layout for debugging
 	let here = getpos('.')
+	let options = g:DebuggerLayout
 	tabedit %
 	call setpos('.', here)
-	execute 'Termdebug ' .. a:file | set winfixheight nobuflisted | wincmd H | wincmd w | set winfixheight nobuflisted | wincmd w | wincmd K | execute 'resize ' .. floor(&lines * 0.7)
+	let wn = win_getid(winnr())
+	execute 'Termdebug ' .. a:file
+	if options['layout'] == 1
+		" ┌───────────────┬─────┐
+		" │               │     │
+		" │    source     │     │
+		" │               │ gdb │
+		" ├───────────────┤     │
+		" │    program    │     │
+		" └───────────────┴─────┘
+		" select the Program window and anchor it to the bottom with fixed height
+		wincmd w
+		wincmd J
+		execute 'resize ' .. options['height']
+		set winfixheight nobuflisted
+		" select the Gdb window and anchor it to the right with fixed width
+		wincmd w
+		wincmd L
+		execute 'vertical resize ' .. options['width']
+		set winfixwidth nobuflisted
+	else
+		" ┌───────────────────┐
+		" │                   │
+		" │      source       │
+		" │                   │
+		" ├─────────┬─────────┤
+		" │   gdb   │ program │
+		" └─────────┴─────────┘
+		" Move the Gdb and Program window side by side
+		wincmd H
+		" Move the Source window to the top
+		call win_gotoid(wn)
+		wincmd K
+		" Fix the height of the Gdb and Program windows
+		wincmd w
+		execute 'resize ' .. options['height']
+		set winfixheight nobuflisted
+		wincmd w
+		set winfixheight nobuflisted
+	endif
 	call setbufvar('gdb communication', '&buflisted', 0)
+	call win_gotoid(wn)
 endfunction
 
 function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
@@ -261,18 +313,17 @@ function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
 		let n += 1
 	endif
 
-	let options = [ 'backtrace', 'print', 'display', 'undisplay', 'x/nfu', 'thread', 'set', 'info', 'whatis' ]
+	let options = [ 'backtrace', 'print', 'display', 'undisplay', 'x/nfu', 'thread', 'set', 'info', 'whatis', 'quit' ]
 	if n == 2
-		return filter(options, 'stridx(v:val, a:ArgLead) != -1')
+		return filter(options, 'stridx(v:val, a:ArgLead) == 0')
 	endif
 
 	let cont = #{
-				\ set: ['var'],
 				\ info: ['args', 'breakpoints', 'display', 'locals', 'sharedlibrary', 'signals', 'threads', 'directories', 'listsize'],
 				\ }
 	if n == 3 && cont->has_key(words[1])
 		let o = copy(cont[words[1]])
-		return filter(o, 'stridx(v:val, a:ArgLead) != -1')
+		return filter(o, 'stridx(v:val, a:ArgLead) == 0')
 	endif
 	return []
 endfunction
