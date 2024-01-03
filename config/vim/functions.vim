@@ -246,10 +246,36 @@ function! CleanBufferList()
 	endif
 endfunction
 
-function! StartDebugger(file)
-	tabnew | bprev | execute 'Termdebug ' .. a:file | set winfixheight | wincmd H | wincmd p | wincmd K | execute 'resize ' .. floor(&lines * 0.7)
-	Break
-	Run
+function s:StartDebugger(file)
+	let here = getpos('.')
+	tabedit %
+	call setpos('.', here)
+	execute 'Termdebug ' .. a:file | set winfixheight nobuflisted | wincmd H | wincmd w | set winfixheight nobuflisted | wincmd w | wincmd K | execute 'resize ' .. floor(&lines * 0.7)
+	call setbufvar('gdb communication', '&buflisted', 0)
 endfunction
-command! -complete=file -nargs=1 Debug call StartDebugger('<args>')
 
+function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
+	let words = a:CmdLine->split()
+	let n = len(words)
+	if a:CmdLine[len(a:CmdLine)-1] == ' '
+		let n += 1
+	endif
+
+	let options = [ 'backtrace', 'print', 'display', 'undisplay', 'x/nfu', 'thread', 'set', 'info', 'whatis' ]
+	if n == 2
+		return filter(options, 'stridx(v:val, a:ArgLead) != -1')
+	endif
+
+	let cont = #{
+				\ set: ['var'],
+				\ info: ['args', 'breakpoints', 'display', 'locals', 'sharedlibrary', 'signals', 'threads', 'directories', 'listsize'],
+				\ }
+	if n == 3 && cont->has_key(words[1])
+		let o = copy(cont[words[1]])
+		return filter(o, 'stridx(v:val, a:ArgLead) != -1')
+	endif
+	return []
+endfunction
+
+command! -complete=file -nargs=1 Debug call s:StartDebugger('<args>')
+command! -complete=customlist,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
