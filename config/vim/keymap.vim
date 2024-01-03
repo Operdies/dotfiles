@@ -31,6 +31,7 @@ nnoremap <space>y "+
 nnoremap gp `[v`]
 vnoremap < <gv
 vnoremap > >gv
+nnoremap =ip :let __pos=getpos('.')<cr>=ip:call setpos('.', __pos)<cr>
 
 " indent text after pasting
 nnoremap p p`[v`]=

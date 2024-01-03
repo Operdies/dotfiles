@@ -254,7 +254,7 @@ endfunction
 let g:DebuggerLayout = #{
 			\ height: 10,
 			\ width: 60,
-			\ layout: 1,
+			\ layout: 'tall',
 			\ }
 function s:StartDebugger(file)
 	" open the current file in a new tab and configure the window layout for debugging
@@ -262,27 +262,46 @@ function s:StartDebugger(file)
 	let options = g:DebuggerLayout
 	tabedit %
 	call setpos('.', here)
-	let wn = win_getid(winnr())
+	let src_w = win_getid(winnr())
 	execute 'Termdebug ' .. a:file
-	if options['layout'] == 1
-		" ┌───────────────┬─────┐
-		" │               │     │
-		" │    source     │     │
-		" │               │ gdb │
-		" ├───────────────┤     │
-		" │    program    │     │
-		" └───────────────┴─────┘
+	let gdb_w = win_getid(winnr())
+	wincmd w
+	let prg_w = win_getid(winnr())
+	if options['layout'] == 'tiled'
+		" ┌─────────────┬─────┐
+		" │             │     │
+		" │   source    │     │
+		" │             │ gdb │
+		" ├─────────────┤     │
+		" │   program   │     │
+		" └─────────────┴─────┘
 		" select the Program window and anchor it to the bottom with fixed height
-		wincmd w
+		call win_gotoid(prg_w)
 		wincmd J
 		execute 'resize ' .. options['height']
 		set winfixheight nobuflisted
-		" select the Gdb window and anchor it to the right with fixed width
-		wincmd w
+		call win_gotoid(gdb_w)
 		wincmd L
 		execute 'vertical resize ' .. options['width']
 		set winfixwidth nobuflisted
-	else
+	elseif options['layout'] == 'tall'
+		" select the Gdb window and anchor it to the right with fixed width
+		" ┌────┬────────┬─────┐
+		" │    │        │     │
+		" │    │        │     │
+		" │prog│ source │ gdb │
+		" │ram │        │     │
+		" │    │        │     │
+		" └────┴────────┴─────┘
+		call win_gotoid(prg_w)
+		wincmd H
+		set winfixwidth nobuflisted
+		execute 'vertical resize ' .. options['width']
+		call win_gotoid(gdb_w)
+		wincmd L
+		set winfixwidth nobuflisted
+		execute 'vertical resize ' .. options['width']
+	else " wide
 		" ┌───────────────────┐
 		" │                   │
 		" │      source       │
@@ -291,19 +310,20 @@ function s:StartDebugger(file)
 		" │   gdb   │ program │
 		" └─────────┴─────────┘
 		" Move the Gdb and Program window side by side
+		call win_gotoid(gdb_w)
 		wincmd H
 		" Move the Source window to the top
-		call win_gotoid(wn)
+		call win_gotoid(src_w)
 		wincmd K
 		" Fix the height of the Gdb and Program windows
-		wincmd w
+		call win_gotoid(gdb_w)
 		execute 'resize ' .. options['height']
 		set winfixheight nobuflisted
-		wincmd w
+		call win_gotoid(prg_w)
 		set winfixheight nobuflisted
 	endif
 	call setbufvar('gdb communication', '&buflisted', 0)
-	call win_gotoid(wn)
+	call win_gotoid(src_w)
 endfunction
 
 function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
