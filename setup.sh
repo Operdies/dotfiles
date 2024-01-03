@@ -6,7 +6,7 @@ has() {
 
 ensure_yay() {
 	has yay || {
-		echo "Instlling yay."
+		echo "Installing yay."
 		sudo pacman -Syu --needed base-devel git
 		git clone https://aur.archlinux.org/yay.git /tmp/yay
 		pushd /tmp/yay
@@ -19,7 +19,7 @@ ensure_yay() {
 ensure_binaries() {
 	binaries=(
 		# Install fonts and libraries in addition to X
-		X "xorg-server ttf-meslo-nerd-font-powerlevel10k libx11 libxinerama libxft freetype2 arc-gtk-theme"
+		X "xorg-server ttf-meslo-nerd-font-powerlevel10k libx11 libxinerama libxft freetype2 arc-gtk-theme noto-fonts noto-fonts-emoji"
 		cargo rustup
 		convert imagemagick
 		ctags ctags
