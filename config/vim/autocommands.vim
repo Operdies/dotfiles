@@ -34,6 +34,6 @@ augroup END
 
 augroup asyncrun
 	autocmd!
-	autocmd User AsyncRunStop execute "cwindow"
+	autocmd User AsyncRunStop let __window=win_getid(winnr()) | execute "cwindow" | call win_gotoid(__window)
 augroup END
 
