@@ -204,6 +204,11 @@ static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static void focusstack_multimon(const Arg *arg);
+static Monitor *prevmon(Monitor *m);
+static Monitor *nextmon(Monitor *m);
+static Client *prevclient(Client *clients, Client *sel);
+static Client *nextclient(Client *clients, Client *sel);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
@@ -800,12 +805,6 @@ drawbar(Monitor *m)
 	}
 
 	x = 0;
-	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
-	}
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
@@ -975,6 +974,85 @@ focusstack(const Arg *arg)
 		focus(c);
 		restack(selmon);
 	}
+}
+
+void
+focusstack_multimon(const Arg *arg)
+{
+	Client *c = NULL, *i;
+
+	if (selmon->sel && selmon->sel->isfullscreen && lockfullscreen)
+		return;
+	if (arg->i > 0) {
+		if (selmon->sel)
+			for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
+		for (Monitor *m = nextmon(selmon); !c && m != selmon; m = nextmon(m))
+			for (c = m->clients; c && !ISVISIBLE(c); c = c->next);
+		if (!c && selmon->sel)
+			for (c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
+	} else {
+		Client *i2 = NULL;
+		if (selmon->sel) {
+			for (i = selmon->clients; i != selmon->sel; i = i->next)
+				if (ISVISIBLE(i))
+					c = i;
+			i2 = i;
+		}
+		for (Monitor *m = prevmon(selmon); !c && m != selmon; m = prevmon(m))
+			c = prevclient(m->clients, c);
+		if (!c)
+			for (i = i2; i; i = i->next)
+				if (ISVISIBLE(i))
+					c = i;
+	}
+	if (c) {
+		focus(c);
+		restack(selmon);
+	}
+}
+
+Monitor *
+prevmon(Monitor *m)
+{
+	Monitor *s = selmon;
+	selmon = m;
+	Monitor *result = dirtomon(-1);
+	selmon = s;
+	return result;
+}
+
+Monitor *
+nextmon(Monitor *m)
+{
+	Monitor *s = selmon;
+	selmon = m;
+	Monitor *result = dirtomon(1);
+	selmon = s;
+	return result;
+}
+
+Client *
+prevclient(Client *clients, Client *sel)
+{
+	Client *c = NULL, *i;
+	for (i = clients; i != sel; i = i->next)
+		if (ISVISIBLE(i))
+			c = i;
+	if (!c)
+		for (; i; i = i->next)
+			if (ISVISIBLE(i))
+				c = i;
+	return c;
+}
+
+Client *
+nextclient(Client *clients, Client *sel)
+{
+	Client *c = NULL;
+	for (c = sel->next; c && !ISVISIBLE(c); c = c->next);
+	if (!c)
+		for (c = clients; c && !ISVISIBLE(c); c = c->next);
+	return c;
 }
 
 Atom

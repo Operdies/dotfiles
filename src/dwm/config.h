@@ -127,11 +127,22 @@ setgap(const Arg *arg)
 }
 
 static void
-bar_session_info_init(BarElementFuncArgs *data)
+bar_session_info(BarElementFuncArgs *data)
 {
-	char *display = getenv("DISPLAY");
-	char *vtnr = getenv("XDG_VTNR");
-	sprintf(data->e->buffer, "VT%s X%s", vtnr, display);
+	static char *display = NULL;
+	static char *vtnr = NULL;
+	if (!display)
+		display = getenv("DISPLAY");
+	if (!display)
+		display = "None";
+	if (!vtnr) 
+		vtnr = getenv("XDG_VTNR");
+	if (!vtnr)
+		vtnr = "None";
+	if (data->m && mons && mons->next) // there is more than one monitor
+		sprintf(data->e->buffer, "M%d VT%s X%s", data->m->num, vtnr, display);
+	else
+		sprintf(data->e->buffer, "VT%s X%s", vtnr, display);
 }
 
 /* commands */
@@ -193,59 +204,58 @@ BarElement BarElements[] =
 		.update = bar_notifications,
 	},
 	{
-		.init = bar_session_info_init,
-		.interval = -1,
 		.scheme = SchemeSession,
+		.update = bar_session_info,
 	},
 };
 
 
 static const Key keys[] =
 {
-	/* modifier                     key        function        argument */
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             XK_w,      spawn,          {.v = dmenu_nmcli } },
-	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_j,      pushdown,       {0} },
-	{ MODKEY|ShiftMask,             XK_k,      pushup,         {0} },
-	{ MODKEY|ShiftMask,             XK_i,      setgap,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_o,      setgap,         {.i = +1 } },
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_o,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY,                       XK_equal,  setmfact,       {.f = +1.5} },
-	{ MODKEY,                       XK_g,      zoom,           {0} },
-	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY,                       XK_q,      killclient,     {0} },
-	{ MODKEY,                       XK_t,      setnmaster,     {.i = 1 } },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	{ MODKEY,                       XK_w,      setnmaster,     {.i = 2 } },
-	{ MODKEY,                       XK_w,      setlayout,      {.v = &layouts[3]} },
-	{ MODKEY,                       XK_space,  setlayout,      {0} },
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      toggleview,     {.ui = ~0 } },
-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	TAGKEYS(                        XK_1,                      0),
-	TAGKEYS(                        XK_2,                      1),
-	TAGKEYS(                        XK_3,                      2),
-	TAGKEYS(                        XK_4,                      3),
-	TAGKEYS(                        XK_5,                      4),
-	TAGKEYS(                        XK_6,                      5),
-	TAGKEYS(                        XK_7,                      6),
-	TAGKEYS(                        XK_8,                      7),
-	TAGKEYS(                        XK_9,                      8),
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	/* modifier                     key        function                 argument */
+	{ MODKEY|ShiftMask,             XK_Return, spawn,                   {.v = termcmd } },
+	{ MODKEY,                       XK_p,      spawn,                   {.v = dmenucmd } },
+	{ MODKEY,                       XK_d,      spawn,                   {.v = dmenucmd } },
+	{ MODKEY|ShiftMask,             XK_w,      spawn,                   {.v = dmenu_nmcli } },
+	{ MODKEY|ShiftMask,             XK_b,      togglebar,               {0} },
+	{ MODKEY,                       XK_j,      focusstack_multimon,     {.i = +1 } },
+	{ MODKEY,                       XK_k,      focusstack_multimon,     {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_j,      pushdown,                {0} },
+	{ MODKEY|ShiftMask,             XK_k,      pushup,                  {0} },
+	{ MODKEY|ShiftMask,             XK_i,      setgap,                  {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_o,      setgap,                  {.i = +1 } },
+	{ MODKEY,                       XK_i,      incnmaster,              {.i = +1 } },
+	{ MODKEY,                       XK_o,      incnmaster,              {.i = -1 } },
+	{ MODKEY,                       XK_h,      setmfact,                {.f = -0.05} },
+	{ MODKEY,                       XK_l,      setmfact,                {.f = +0.05} },
+	{ MODKEY,                       XK_equal,  setmfact,                {.f = +1.5} },
+	{ MODKEY,                       XK_g,      zoom,                    {0} },
+	{ MODKEY,                       XK_Tab,    view,                    {0} },
+	{ MODKEY,                       XK_q,      killclient,              {0} },
+	{ MODKEY,                       XK_t,      setnmaster,              {.i = 1 } },
+	{ MODKEY,                       XK_t,      setlayout,               {.v = &layouts[0]} },
+	{ MODKEY,                       XK_f,      setlayout,               {.v = &layouts[1]} },
+	{ MODKEY,                       XK_m,      setlayout,               {.v = &layouts[2]} },
+	{ MODKEY,                       XK_w,      setnmaster,              {.i = 2 } },
+	{ MODKEY,                       XK_w,      setlayout,               {.v = &layouts[3]} },
+	{ MODKEY,                       XK_space,  setlayout,               {0} },
+	{ MODKEY|ShiftMask,             XK_space,  togglefloating,          {0} },
+	{ MODKEY,                       XK_0,      view,                    {.ui = ~0 } },
+	{ MODKEY|ShiftMask,             XK_0,      toggleview,              {.ui = ~0 } },
+	{ MODKEY,                       XK_comma,  focusmon,                {.i = -1 } },
+	{ MODKEY,                       XK_period, focusmon,                {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_comma,  tagmon,                  {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_period, tagmon,                  {.i = +1 } },
+	TAGKEYS(                        XK_1,                               0),
+	TAGKEYS(                        XK_2,                               1),
+	TAGKEYS(                        XK_3,                               2),
+	TAGKEYS(                        XK_4,                               3),
+	TAGKEYS(                        XK_5,                               4),
+	TAGKEYS(                        XK_6,                               5),
+	TAGKEYS(                        XK_7,                               6),
+	TAGKEYS(                        XK_8,                               7),
+	TAGKEYS(                        XK_9,                               8),
+	{ MODKEY|ShiftMask,             XK_q,      quit,                    {0} },
 };
 
 /* button definitions */
