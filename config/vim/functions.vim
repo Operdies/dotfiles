@@ -157,6 +157,7 @@ function! CommentLines(context = {}, type = '') abort
 				\ vim: '" ',
 				\ c: '// ',
 				\ cpp: '// ',
+				\ conf: '# ',
 				\ sh: '# ',
 				\ zsh: '# ',
 				\ }

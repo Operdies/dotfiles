@@ -40,5 +40,9 @@ set balloonevalterm
 
 let c_comment_strings=1
 let $PAGER=''
-let g:termdebug_config = #{ winbar: 0, }
+let g:termdebug_config = #{ winbar: 0 }
 
+" C indentation options
+" avoid adding leading indentation when a C function declaration starts with
+" the return type and name are on separate lines
+set cino+=t0
