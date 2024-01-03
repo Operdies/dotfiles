@@ -32,8 +32,19 @@ augroup netrw
 	autocmd FileType netrw nnoremap <buffer> q :bdel<cr>
 augroup END
 
+function! s:AsyncRunAlert()
+	call popup_create("asyncrun finished", #{
+				\ line: "cursor-1",
+				\ col: "cursor",
+				\ padding: [],
+				\ border: [],
+				\ pos: "botleft",
+				\ time: 1500,
+				\ })
+endfunction
+
 augroup asyncrun
 	autocmd!
-	autocmd User AsyncRunStop let __window=win_getid(winnr()) | execute "cwindow" | call win_gotoid(__window)
+	autocmd User AsyncRunStop let __window=win_getid(winnr()) | execute "cwindow" | call win_gotoid(__window) | call s:AsyncRunAlert()
 augroup END
 

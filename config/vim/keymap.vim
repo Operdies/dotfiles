@@ -82,7 +82,7 @@ nnoremap <C-w><C-k> :call TmuxWinCmd('k')<cr>
 nnoremap <C-w><C-l> :call TmuxWinCmd('l')<cr>
 
 " compile
-nnoremap <C-q> :call AsyncRunMegaMaker()<cr>
+nnoremap <silent> <C-q> :call AsyncRunMegaMaker()<cr>
 
 " debugging
 nnoremap <F1> <cmd>call TermDebugSendCommand("run")<cr>
