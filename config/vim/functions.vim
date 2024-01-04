@@ -87,54 +87,39 @@ command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit :e <args>
 command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
 command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
-let g:CurrentPreviewSymbol=''
-function! PreviewSymbol(arg, dir)
-	let cword = expand('<cword>')
-	try
-		let preview_window=popup_findpreview()
-		if preview_window == 0 || g:CurrentPreviewSymbol != cword
-			execute "silent wincmd }"
-			let g:CurrentPreviewSymbol = cword
-		else
-			let preview_buf = winbufnr(preview_window)
-			if a:dir == '0'
-				try
-					execute "ptnext"
-				catch
-					execute "silent! ptfirst"
-				endtry
-			else
-				try
-					execute "ptprev"
-				catch
-					execute "silent! ptlast"
-				endtry
-			endif
-			if winbufnr(preview_window) != preview_buf && getbufvar(preview_buf, "&readonly")
-				execute "bdelete " . preview_buf
-			endif
+function! s:PreviewOpen()
+	for nr in range(1, winnr('$'))
+		if getwinvar(nr, "&pvw") == 1
+			return 1
 		endif
-		return
-	catch
-		echohl ErrorMsg | echo "Tag not found: " .. expand("<cword>") | echohl None
-	endtry
+	endfor
+	return 0
 endfunction
 
-if !exists('*Preserve')
-	function! Preserve(command)
-		try
-			" Preparation: save last search, and cursor position.
-			let l:win_view = winsaveview()
-			execute 'keepjumps ' . a:command
-		finally
-			" try restore / reg and cursor position
-			call winrestview(l:win_view)
-		endtry
-	endfunction
-endif
+let g:PreviewSymbolSettings = #{ nth: 1, cword: ""}
+function! PreviewSymbol(dir)
+	let s = g:PreviewSymbolSettings
+	let cword = expand('<cword>')
+	let tags = taglist($'^{cword}$', expand('%'))
+
+	if len(tags) == 0
+		echohl ErrorMsg | echo "Tag not found: " .. expand("<cword>") | echohl None
+		return
+	endif
+
+	if s['cword'] == cword && s:PreviewOpen()
+		let s['nth'] = (s['nth'] + len(tags) + a:dir) % len(tags)
+	else
+		let s['nth'] = 0
+		let s['cword'] = cword
+	endif
+
+	let nth = s['nth'] + 1
+	execute $"{nth}ptag {cword}"
+endfunction
 
 " open tag in preview window
-command! -nargs=+ PreviewSymbol call PreviewSymbol(<f-args>)
+command! -nargs=+ PreviewSymbol call PreviewSymbol(<args>)
 
 function! CommentLines(context = {}, type = '') abort
 	if a:type == ''
@@ -348,5 +333,24 @@ function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
 	return ""
 endfunction
 
+def Toast(what: any)
+	var what_str = type(what) == type("") ? what : string(what)
+	if exists('g:toast_winid')
+		call popup_close(g:toast_winid)
+	endif
+	g:toast_winid = popup_create(what_str, {
+		line: 3,
+		col: &columns - 3,
+		padding: [0, 1, 0, 1],
+		border: [],
+		pos: "topright",
+		callback: (id, result) => {
+			unlet g:toast_winid
+		},
+	})
+enddef
+
 command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugger('<args>')
 command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
+
+defcompile

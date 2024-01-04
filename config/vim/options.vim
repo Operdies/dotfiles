@@ -28,7 +28,6 @@ set mouse=a
 set ttymouse=xterm2
 set termguicolors
 set showtabline=2
-set previewpopup=height:10,width:100,border:on
 set viminfo='100,<100,s100,:100,n~/.vim/viminfo
 set ballooneval 
 set balloonevalterm

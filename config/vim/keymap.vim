@@ -31,7 +31,7 @@ nnoremap <space>y "+
 nnoremap gp `[v`]
 vnoremap < <gv
 vnoremap > >gv
-nnoremap =ip :let __pos=getpos('.')<cr>=ip:call setpos('.', __pos)<cr>
+nnoremap =ip m`=ip``
 
 " indent text after pasting
 nnoremap p p`[v`]=
@@ -60,11 +60,10 @@ inoremap <C-b> <Left>
 inoremap <C-f> <Right>
 
 " preview tags
-nnoremap <space>cw <cmd>call Preserve('%s/\s\+$//')<cr>
-nnoremap <C-k> <cmd>call Preserve('PreviewSymbol n 1')<cr>
-inoremap <C-k> <C-c><cmd>call Preserve('PreviewSymbol i 1')<cr>
-nnoremap <C-j> <cmd>call Preserve('PreviewSymbol n 0')<cr>
-inoremap <C-j> <C-c><cmd>call Preserve('PreviewSymbol i 0')<cr>
+nnoremap <C-k> :PreviewSymbol 1<cr>
+inoremap <C-k> <C-c>:PreviewSymbol 1<cr>
+nnoremap <C-j> :PreviewSymbol 0<cr>
+inoremap <C-j> <C-c>:PreviewSymbol 0<cr>
 
 " commenting
 nnoremap <expr> gc CommentLines()

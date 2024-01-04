@@ -33,14 +33,8 @@ augroup netrw
 augroup END
 
 function! s:AsyncRunAlert()
-	call popup_create("asyncrun finished", #{
-				\ line: "cursor-1",
-				\ col: "cursor",
-				\ padding: [],
-				\ border: [],
-				\ pos: "botleft",
-				\ time: 1500,
-				\ })
+	let what = "asyncrun finished"
+	call Toast(what)
 endfunction
 
 augroup asyncrun

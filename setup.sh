@@ -55,7 +55,6 @@ ensure_binaries() {
 		sudo sudo
 		tiramisu tiramisu-git
 		tldr tldr
-		tlp tlp
 		tmux tmux
 		xautolock xautolock
 		xclip xclip
