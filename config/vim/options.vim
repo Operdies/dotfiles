@@ -10,7 +10,8 @@ set showcmd
 set wildmenu
 set hlsearch
 " first tab: list files. Second tab: cycle matches
-set wildmode=list,full
+set wildmode=longest:full,full
+set wildoptions=fuzzy,pum,tagfile
 set number
 set ttimeout
 set ttimeoutlen=100

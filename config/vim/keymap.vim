@@ -50,6 +50,7 @@ nnoremap <space>ff :GitEdit
 nnoremap <space>cr :!tcc -run %<cr>
 nnoremap <space>fp :OpenProject 
 nnoremap <space>fr :RecentFiles 
+nnoremap <space>fs :tj<space><C-d>
 nnoremap ]q :cnext<cr>
 nnoremap [q :cprev<cr>
 
@@ -98,7 +99,7 @@ nnoremap <space>dc <cmd>Clear<cr>
 nnoremap <space>dd <cmd>Until<cr>
 nnoremap <space>dq :GdbDo<space>
 nnoremap <space>dr <cmd>call TermDebugSendCommand("run")<cr>
-nnoremap <space>ds <cmd>Stop<cr>
+nnoremap <space>ds :Debug<space>
 
 " vim stuff
 nnoremap <space>so :w<cr>:so %<cr>

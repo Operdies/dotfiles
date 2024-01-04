@@ -62,13 +62,15 @@ function! UpdateBufferline(abuf, del, write)
 endfunction
 
 function! CompleteGitFiles(ArgLead, CmdLine, CursorPos)
-	let files = systemlist("git ls-files")
-	return filter(files, 'stridx(v:val, a:ArgLead) != -1')
+	return system("git ls-files")
+endfunction
+
+function! CompleteExecutables(ArgLead, CmdLine, CursorPos)
+	return system("find . -executable -type f -not -path '*/.*'")
 endfunction
 
 function! CompleteProjects(ArgLead, CmdLine, CursorPos)
-	let files = systemlist("ls -d ~/repos/*/ | xargs -I {} basename {}")
-	return filter(files, 'stridx(v:val, a:ArgLead) == 0')
+	return system("ls -d ~/repos/*/ | xargs -I {} basename {}")
 endfunction
 
 function! OpenProject(project)
@@ -77,15 +79,13 @@ function! OpenProject(project)
 endfunction
 
 function! OldFiles(ArgLead, CmdLine, CursorPos)
-	let files = copy(v:oldfiles)
-	let nontemp = filter(files, 'v:val !~ "[~]$"')
-	let matching = filter(nontemp, 'stridx(v:val, a:ArgLead) != -1')
-	return matching
+	" files ending with a trailing tilde are (likely) help / man pages
+	return filter(v:oldfiles, 'v:val !~ "[~]$"')->join("\n")
 endfunction
 
-command! -complete=customlist,CompleteGitFiles -nargs=1 GitEdit :e <args>
-command! -complete=customlist,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
-command! -complete=customlist,OldFiles -nargs=1 RecentFiles :e <args>
+command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit :e <args>
+command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
+command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
 let g:CurrentPreviewSymbol=''
 function! PreviewSymbol(arg, dir)
@@ -328,26 +328,25 @@ function s:StartDebugger(file)
 endfunction
 
 function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
-	let words = a:CmdLine->split()
+	let partial_line = a:CmdLine[0:a:CursorPos]
+	let words = partial_line->split()
 	let n = len(words)
-	if a:CmdLine[len(a:CmdLine)-1] == ' '
+	if a:CmdLine[a:CursorPos-1] == ' '
 		let n += 1
 	endif
 
-	let options = [ 'backtrace', 'print', 'display', 'undisplay', 'x/nfu', 'thread', 'set', 'info', 'whatis', 'quit' ]
 	if n == 2
-		return filter(options, 'stridx(v:val, a:ArgLead) == 0')
+		return [ 'backtrace', 'print', 'display', 'undisplay', 'x/nfu', 'thread', 'set', 'info', 'whatis', 'quit' ]->join("\n")
 	endif
 
 	let cont = #{
 				\ info: ['args', 'breakpoints', 'display', 'locals', 'sharedlibrary', 'signals', 'threads', 'directories', 'listsize'],
 				\ }
 	if n == 3 && cont->has_key(words[1])
-		let o = copy(cont[words[1]])
-		return filter(o, 'stridx(v:val, a:ArgLead) == 0')
+		return cont[words[1]]->join("\n")
 	endif
-	return []
+	return ""
 endfunction
 
-command! -complete=file -nargs=1 Debug call s:StartDebugger('<args>')
-command! -complete=customlist,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
+command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugger('<args>')
+command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')

@@ -83,7 +83,7 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class          instance    title       tags mask     isfloating   monitor    icon*/
-	{ "firefox",      NULL,       NULL,       1 << 2,       0,           -1,        .icon="",   },
+	{ "firefox",      NULL,       NULL,       0,            0,           -1,        .icon="",   },
 	{ "Pavucontrol",  NULL,       NULL,       1 << 3,       0,           -1,        .icon="",   },
 	{ "discord",      NULL,       NULL,       1 << 8,       0,           -1,        .icon="ﭮ",   },
 	{ "Zathura",      NULL,       NULL,       1 << 3,       0,           -1,        .icon="󰈦",   },
