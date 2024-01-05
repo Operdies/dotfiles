@@ -87,16 +87,11 @@ command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit :e <args>
 command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
 command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
-function! s:PreviewOpen()
-	for nr in range(1, winnr('$'))
-		if getwinvar(nr, "&pvw") == 1
-			return 1
-		endif
-	endfor
-	return 0
-endfunction
+let g:PreviewSymbolSettings = #{ 
+			\ nth: 0, 
+			\ cword: ""
+			\ }
 
-let g:PreviewSymbolSettings = #{ nth: 1, cword: ""}
 function! PreviewSymbol(dir)
 	let s = g:PreviewSymbolSettings
 	let cword = expand('<cword>')
@@ -107,16 +102,72 @@ function! PreviewSymbol(dir)
 		return
 	endif
 
-	if s['cword'] == cword && s:PreviewOpen()
+	if s['cword'] == cword
 		let s['nth'] = (s['nth'] + len(tags) + a:dir) % len(tags)
 	else
 		let s['nth'] = 0
 		let s['cword'] = cword
 	endif
 
-	let nth = s['nth'] + 1
-	execute $"{nth}ptag {cword}"
+	let tag = tags[s['nth']]
+	echo $'{cword}: tag {s['nth']+1}/{len(tags)}'
+	silent keepjumps keeppatterns keepmarks call PopupPreviewSymbol(tag)
 endfunction
+
+let g:tagpreviewwin=0
+function! PopupPreviewSymbol(tag)
+	let view = winsaveview()
+	let here = getpos('.')
+	let buf = bufnr()
+	try
+		let tag = a:tag
+		let tagbuf = bufadd(tag.filename)
+		execute 'b! ' .. tagbuf
+		let cmd = escape(tag.cmd[1:-2], '.*?/\[]~')
+		call cursor(1,1)
+		let lineno = search(cmd, 'cn')
+
+		if lineno == 0
+			echohl ErrorMsg | echo "found tag, but tag.cmd yielded no results: " .. tag.cmd .. ' in ' .. tag.filename | echohl None
+			return
+		endif
+	catch
+		return
+	finally
+		execute 'b! ' .. buf
+		call setpos('.', here)
+		call winrestview(view)
+	endtry
+
+	let context=10
+	let firstline = max([lineno - 3, 1])
+
+	if exists('g:tagpreviewwin')
+		call popup_close(g:tagpreviewwin)
+	endif
+
+	let g:tagpreviewwin = popup_create(tagbuf, #{
+				\ border: [],
+				\ col: &columns - 3,
+				\ cursorline: 1,
+				\ firstline: firstline,
+				\ line: 3,
+				\ maxheight: context,
+				\ maxwidth: 80,
+				\ minheight: 6,
+				\ minwidth: 40,
+				\ padding: [0, 1, 0, 1],
+				\ pos: "topright",
+				\ scrollbar: 0,
+				\ title: tag.name,
+				\ })
+	" 'cursorline' highlights the selected line, but it also sets the selected
+	" line to the first line of the popup
+	call win_execute(g:tagpreviewwin, lineno)
+	" call win_execute(popupwin, 'normal zz')
+endfunction
+
+nmap <silent> <C-q> :silent w<cr>:silent so<cr>:silent call PreviewSymbol(1)<cr>
 
 " open tag in preview window
 command! -nargs=+ PreviewSymbol call PreviewSymbol(<args>)
@@ -333,7 +384,7 @@ function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
 	return ""
 endfunction
 
-def Toast(what: any)
+def! Toast(what: any)
 	var what_str = type(what) == type("") ? what : string(what)
 	if exists('g:toast_winid')
 		call popup_close(g:toast_winid)

@@ -60,10 +60,10 @@ inoremap <C-b> <Left>
 inoremap <C-f> <Right>
 
 " preview tags
-nnoremap <C-k> :PreviewSymbol 1<cr>
-inoremap <C-k> <C-c>:PreviewSymbol 1<cr>
-nnoremap <C-j> :PreviewSymbol 0<cr>
-inoremap <C-j> <C-c>:PreviewSymbol 0<cr>
+nnoremap <silent> <C-k> :PreviewSymbol -1<cr>
+inoremap <silent> <C-k> <C-o>:PreviewSymbol -1<cr>
+nnoremap <silent> <C-j> :PreviewSymbol 1<cr>
+inoremap <silent> <C-j> <C-o>:PreviewSymbol 1<cr>
 
 " commenting
 nnoremap <expr> gc CommentLines()
