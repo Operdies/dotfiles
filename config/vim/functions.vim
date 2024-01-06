@@ -111,7 +111,7 @@ function! PreviewSymbol(dir)
 
 	let tag = tags[s['nth']]
 	echo $'{cword}: tag {s['nth']+1}/{len(tags)}'
-	silent keepjumps keeppatterns keepmarks call PopupPreviewSymbol(tag)
+	keeppatterns keepmarks call PopupPreviewSymbol(tag)
 endfunction
 
 let g:tagpreviewwin=0
@@ -122,7 +122,7 @@ function! PopupPreviewSymbol(tag)
 	try
 		let tag = a:tag
 		let tagbuf = bufadd(tag.filename)
-		execute 'b! ' .. tagbuf
+		execute 'keepjumps silent b! ' .. tagbuf
 		let cmd = escape(tag.cmd[1:-2], '.*?/\[]~')
 		call cursor(1,1)
 		let lineno = search(cmd, 'cn')
@@ -132,9 +132,10 @@ function! PopupPreviewSymbol(tag)
 			return
 		endif
 	catch
+		echo v:exception
 		return
 	finally
-		execute 'b! ' .. buf
+		execute 'keepjumps silent b! ' .. buf
 		call setpos('.', here)
 		call winrestview(view)
 	endtry
@@ -405,3 +406,4 @@ command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugge
 command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
 
 defcompile
+call popup_clear()
