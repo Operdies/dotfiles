@@ -73,9 +73,4 @@ vimtags() {
   ctags -R --languages=vim .
 }
 
-vim() {
-  # shift/ctrl'ed F keys don't work without this
-  TERM='xterm-256color' command vim $*
-}
-
 # vim: set et sw=2 sts=2 tw=78 ft=sh:
