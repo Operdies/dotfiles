@@ -34,7 +34,7 @@ augroup END
 
 function! s:AsyncRunAlert()
 	let what = "asyncrun finished"
-	call Toast(what)
+	call Toast(what, 5000)
 endfunction
 
 augroup asyncrun

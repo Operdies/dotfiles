@@ -153,6 +153,7 @@ function! PopupPreviewSymbol(tag)
 				\ cursorline: 1,
 				\ firstline: firstline,
 				\ line: 3,
+				\ zindex: 1,
 				\ maxheight: context,
 				\ maxwidth: 80,
 				\ minheight: 6,
@@ -385,21 +386,39 @@ function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
 	return ""
 endfunction
 
-def! Toast(what: any)
-	var what_str = type(what) == type("") ? what : string(what)
-	if exists('g:toast_winid')
-		call popup_close(g:toast_winid)
+let g:active_toasts = []
+def! Toast(what: any, time: number)
+	var what_str = what
+	if type(what) != type("") && type(what) != type([])
+		what_str = string(what)
 	endif
-	g:toast_winid = popup_create(what_str, {
-		line: 3,
+
+	def MoveToasts()
+		var i = 1
+		for t in g:active_toasts
+			call popup_move(t, { line: i * 4 })
+			i += 1
+		endfor
+	enddef
+
+	var toast_id = popup_create(what_str, {
+		line: len(g:active_toasts) * 4,
 		col: &columns - 3,
 		padding: [0, 1, 0, 1],
 		border: [],
+		time: time,
+		zindex: 10,
 		pos: "topright",
 		callback: (id, result) => {
-			unlet g:toast_winid
+			g:toastcnt -= 1
+			var idx = g:active_toasts->index(id)
+			if idx != -1
+				g:active_toasts->remove(idx)
+				MoveToasts()
+			endif
 		},
 	})
+	g:active_toasts += [toast_id]
 enddef
 
 command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugger('<args>')
