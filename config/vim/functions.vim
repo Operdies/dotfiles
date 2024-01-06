@@ -387,42 +387,51 @@ function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
 endfunction
 
 let g:active_toasts = []
-def! Toast(what: any, time: number)
-	var what_str = what
-	if type(what) != type("") && type(what) != type([])
-		what_str = string(what)
+
+function! Toast(what, ...)
+	let what_str = a:what
+	let s:msgheight = 3
+	let time = get(a:, 1, 3000)
+	if type(a:what) != type("") && type(a:what) != type([])
+		let what_str = string(a:what)
 	endif
 
-	def MoveToasts()
-		var i = 1
-		for t in g:active_toasts
-			call popup_move(t, { line: i * 4 })
-			i += 1
+	function! RemoveToast(id)
+		let idx = g:active_toasts->index(a:id)
+		call remove(g:active_toasts, idx)
+		for i in range(idx, len(g:active_toasts)-1)
+			let t = g:active_toasts[i]
+			call popup_move(t, #{ line: (i+1) * s:msgheight })
 		endfor
-	enddef
+	endfunction
 
-	var toast_id = popup_create(what_str, {
-		line: len(g:active_toasts) * 4,
-		col: &columns - 3,
-		padding: [0, 1, 0, 1],
-		border: [],
-		time: time,
-		zindex: 10,
-		pos: "topright",
-		callback: (id, result) => {
-			g:toastcnt -= 1
-			var idx = g:active_toasts->index(id)
-			if idx != -1
-				g:active_toasts->remove(idx)
-				MoveToasts()
-			endif
-		},
-	})
-	g:active_toasts += [toast_id]
-enddef
+	let toast_id = popup_create(what_str, #{
+				\ line: (1 + len(g:active_toasts)) * s:msgheight,
+				\ col: &columns - 3,
+				\ padding: [0, 1, 0, 1],
+				\ border: [],
+				\ time: time,
+				\ zindex: 10,
+				\ pos: "topright",
+				\ callback: { id, result -> RemoveToast(id) },
+				\ })
+	let g:active_toasts += [toast_id]
+endfunction
 
 command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugger('<args>')
 command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
 
 defcompile
 call popup_clear()
+
+call Toast("First", 1000)
+call Toast("Second", 2000)
+call Toast("Third", 3000)
+call Toast("Fourth", 4000)
+call Toast("First", 5000)
+call Toast("First", 1000)
+call Toast("First", 5000)
+call Toast("First", 5000)
+call Toast("First", 7000)
+call Toast("First", 6000)
+call Toast("First", 6000)
