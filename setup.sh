@@ -4,6 +4,10 @@ has() {
 	which "$1" 2>/dev/null >/dev/null
 }
 
+has_pkg() {
+	pacman -Qs "^$1$" > /dev/null
+}
+
 ensure_yay() {
 	has yay || {
 		echo "Installing yay."
@@ -16,67 +20,60 @@ ensure_yay() {
 		rm -rf /tmp/yay
 	}
 }
+
 ensure_binaries() {
-	binaries=(
-		# Install fonts and libraries in addition to X
-		X "xorg-server ttf-meslo-nerd-font-powerlevel10k libx11 libxinerama libxft freetype2 arc-gtk-theme noto-fonts noto-fonts-emoji"
-		cargo rustup
-		convert imagemagick
-		ctags ctags
-		curl curl
-		dmenu dmenu
-		fd fd
-		feh feh
-		firefox firefox
-		fzf fzf
-		gcc gcc
-		gdb gdb
-		git git
-		go go
-		gsimplecal gsimplecal
-		gvim gvim # don't need the gui, but gvim includes X11 clipboard
-		htop htop
-		i3lock i3lock
-		iw iw
-		iwctl iwd
-		lazygit lazygit
-		less less
-		libinput-gestures "libinput libinput-gestures xf86-input-libinput"
-		man 'man-db man-pages'
-		networkmanager_dmenu networkmanager-dmenu-git
-		nitrogen nitrogen
-		nmcli networkmanager
-		notify-send libnotify
-		picom picom
-		powertop powertop
-		rg ripgrep
-		rofi rofi
-		startx xorg-xinit
-		sudo sudo
-		tiramisu tiramisu-git
-		tldr tldr
-		tmux tmux
-		xautolock xautolock
-		xclip xclip
-		xdg-mime xdg-utils
-		xdotool xdotool
-		xinput xorg-xinput
-		xwininfo xorg-xwininfo
-		yq go-yq
-		zathura "zathura zathura-pdf-mupdf"
-		zsh zsh
+	packages=(
+		arc-gtk-theme 
+		ctags
+		curl wget
+		dmenu networkmanager-dmenu-git
+		fd
+		feh
+		firefox
+		freetype2 
+		fzf
+		gcc gdb
+		git
+		go
+		gsimplecal
+		gvim
+		htop
+		imagemagick
+		iw iwd
+		lazygit
+		less
+		libinput xf86-input-libinput libinput-gestures
+		libnotify
+		man-db man-pages
+		networkmanager
+		nitrogen
+		noto-fonts noto-fonts-emoji
+		picom
+		powertop
+		ripgrep
+		rofi
+		rustup
+		sudo
+		tldr
+		tmux
+		xautolock i3lock
+		xfce-polkit dex
+		xorg-server xorg-xinit libx11 libxft libxinerama freetype2 
+		xorg-xinput xdotool xwininfo xdg-utils xclip tiramisu-git
+		zathura zathura-pdf-mupdf
+		zsh ttf-meslo-nerd-font-powerlevel10k 
 	)
 
 	missing=()
-	for ((i = 0; i < ${#binaries[@]}; i += 2)); do
-		bin=${binaries[i]}
-		source=${binaries[i + 1]}
 
-		if has $bin; then
-			echo "binary $bin is installed from package $source"
+	for ((i = 0; i < ${#packages[@]}; i += 2)); do
+		pkg=${packages[i]}
+
+		if has_pkg $pkg; then
+			echo "package $pkg is installed"
 		else
-			echo "binary $bin is missing, but can be installed from $source"
-			missing+=($source)
+			echo "package $pkg is missing"
+			missing+=($pkg)
 		fi
 	done
 
