@@ -4,8 +4,31 @@ has() {
 	which "$1" 2>/dev/null >/dev/null
 }
 
+INSTALLED=($(pacman -Qq))
+
 has_pkg() {
-	pacman -Qs "^$1$" > /dev/null
+	local needle="$1"
+	local start=0
+	local end=${#INSTALLED[@]}
+	local count=$end
+
+	local prevguess=0
+	while [[ "$guess" != "$prevguess" ]]; do
+		prevguess=$guess
+		local guess="$(((end - start) / 2 + start))"
+		local item=${INSTALLED[guess]}
+
+		if [ "$item" == "$needle" ]
+		then
+			return 0
+		elif [ "$item" \< "$needle" ]
+		then
+			start=$guess
+		else
+			end=$guess
+		fi
+	done
+	return 1
 }
 
 ensure_yay() {
@@ -25,7 +48,7 @@ ensure_binaries() {
 	packages=(
 		arc-gtk-theme 
 		ctags
-		curl wget
+		curl
 		dmenu networkmanager-dmenu-git
 		fd
 		feh
@@ -41,10 +64,9 @@ ensure_binaries() {
 		imagemagick
 		iw iwd
 		lazygit
-		less
 		libinput xf86-input-libinput libinput-gestures
 		libnotify
-		man-db man-pages
+		man-db man-pages less
 		networkmanager
 		nitrogen
 		noto-fonts noto-fonts-emoji
@@ -59,19 +81,17 @@ ensure_binaries() {
 		xautolock i3lock
 		xfce-polkit dex
 		xorg-server xorg-xinit libx11 libxft libxinerama freetype2 
-		xorg-xinput xdotool xwininfo xdg-utils xclip tiramisu-git
+		xorg-xinput xdotool xorg-xwininfo xdg-utils xclip tiramisu-git
 		zathura zathura-pdf-mupdf
 		zsh ttf-meslo-nerd-font-powerlevel10k 
 	)
 
 	missing=()
 
-	for ((i = 0; i < ${#packages[@]}; i += 2)); do
+	for ((i = 0; i < ${#packages[@]}; i++)); do
 		pkg=${packages[i]}
 
-		if has_pkg $pkg; then
-			echo "package $pkg is installed"
-		else
+		if ! has_pkg $pkg; then
 			echo "package $pkg is missing"
 			missing+=($pkg)
 		fi
@@ -152,7 +172,9 @@ ensure_make() {
 		dir="$(readlink -f "$item")"
 		pushd "$dir"
 		make
-		sudo make install || echo "no make install"
+		if [[ "$INSTALL" == 1 ]]; then
+			make install
+		fi
 		popd
 	done
 }
@@ -165,9 +187,18 @@ set_default_apps() {
 	xdg-mime default feh.desktop image/jpeg
 }
 
-ensure_links
-ensure_yay
-ensure_binaries
-ensure_clones
-ensure_make
-set_default_apps
+case "$1" in
+	install)
+		INSTALL=1
+		ensure_make
+		;;
+	*)
+		ensure_links
+		ensure_yay
+		ensure_binaries
+		ensure_clones
+		ensure_make
+		set_default_apps
+		;;
+esac
+
