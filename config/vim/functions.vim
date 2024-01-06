@@ -161,15 +161,13 @@ function! PopupPreviewSymbol(tag)
 				\ padding: [0, 1, 0, 1],
 				\ pos: "topright",
 				\ scrollbar: 0,
-				\ title: tag.name,
+				\ title: $'{tag.filename}:{lineno}'
 				\ })
 	" 'cursorline' highlights the selected line, but it also sets the selected
 	" line to the first line of the popup
 	call win_execute(g:tagpreviewwin, lineno)
 	" call win_execute(popupwin, 'normal zz')
 endfunction
-
-nmap <silent> <C-q> :silent w<cr>:silent so<cr>:silent call PreviewSymbol(1)<cr>
 
 " open tag in preview window
 command! -nargs=+ PreviewSymbol call PreviewSymbol(<args>)
@@ -423,15 +421,3 @@ command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand
 
 defcompile
 call popup_clear()
-
-call Toast("First", 1000)
-call Toast("Second", 2000)
-call Toast("Third", 3000)
-call Toast("Fourth", 4000)
-call Toast("First", 5000)
-call Toast("First", 1000)
-call Toast("First", 5000)
-call Toast("First", 5000)
-call Toast("First", 7000)
-call Toast("First", 6000)
-call Toast("First", 6000)
