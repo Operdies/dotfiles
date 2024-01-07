@@ -32,6 +32,11 @@ augroup netrw
 	autocmd FileType netrw nnoremap <buffer> q :bdel<cr>
 augroup END
 
+augroup vimtagfile
+	autocmd!
+	autocmd FileType vim let &l:tags = &g:tags .. ',' .. '/usr/share/vim/vim91/doc/tags'
+augroup END
+
 function! s:AsyncRunAlert()
 	let what = "asyncrun finished"
 	call Toast(what, 5000)

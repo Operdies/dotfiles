@@ -98,8 +98,13 @@ function! PreviewSymbol(dir)
 	let tags = taglist($'^{cword}$', expand('%'))
 
 	if len(tags) == 0
-		echohl ErrorMsg | echo "Tag not found: " .. expand("<cword>") | echohl None
-		return
+		if &ft == 'vim'
+			let tags = taglist($'^{cword}()$', expand('%'))
+		endif
+		if len(tags) == 0
+			echohl ErrorMsg | echo "Tag not found: " .. expand("<cword>") | echohl None
+			return
+		endif
 	endif
 
 	if s['cword'] == cword
@@ -128,7 +133,12 @@ function! PreviewBalloonExpr()
 
 	let tags = taglist($'^{symbol}$', expand('%'))
 	if len(tags) == 0
-		return ""
+		if &ft == 'vim'
+			let tags = taglist($'^{symbol}()$', expand('%'))
+		endif
+		if len(tags) == 0
+			return ""
+		endif
 	endif
 
 	function! OnBalloonClosed()
@@ -191,7 +201,7 @@ function! PopupPreviewSymbol(tag)
 		call winrestview(view)
 	endtry
 
-	let context=10
+	let context=40
 	let firstline = max([lineno - 3, 1])
 
 	if exists('g:tagpreviewwin')
@@ -214,6 +224,12 @@ function! PopupPreviewSymbol(tag)
 				\ scrollbar: 0,
 				\ title: $'{tag.filename}:{lineno}'
 				\ })
+
+	augroup CloseOnWinLeave
+		autocmd!
+		autocmd BufLeave * ++once call popup_close(g:tagpreviewwin)
+	augroup END
+	
 	" 'cursorline' highlights the selected line, but it also sets the selected
 	" line to the first line of the popup
 	call win_execute(g:tagpreviewwin, lineno)
