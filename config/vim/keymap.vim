@@ -37,6 +37,10 @@ nnoremap =ip m`=ip``
 nnoremap p p`[v`]=
 nnoremap P P`[v`]=
 
+" snipe
+noremap s <cmd>Snipe<cr>
+noremap S <cmd>BSnipe<cr>
+
 " search
 nnoremap <space>o :e %:p:h<cr>
 nnoremap <space>cd <cmd>call RealCd()<cr>

@@ -491,6 +491,39 @@ function! Toast(what, ...)
 	let g:active_toasts += [toast_id]
 endfunction
 
+function! s:Snipe(forwards)
+	let ESCAPE = 27
+	echo
+	echon "Snipe: "
+	let ch1 = getchar()
+	if ch1 == ESCAPE
+		return
+	endif
+	let s1 = nr2char(ch1)
+	echon s1
+	let ch2 = getchar()
+	if ch2 == ESCAPE
+		return
+	endif
+	let s2 = nr2char(ch2)
+	echon s2
+	let chars = (s1 .. s2)->escape('\')
+	let flags = a:forwards ? 'zWs' : 'bzWs'
+	" let n = search('\V' .. chars, flags)
+	let m = v:count ? v:count : 1
+	for i in range(1, m)
+		if search('\V' .. chars, flags) == 0
+			return
+		endif
+	endfor
+	" if n == 0
+	" 	echohl ErrorMsg | echo "No match: " .. chars | echohl None
+	" endif
+endfunction
+
+command! Snipe call s:Snipe(1)
+command! BSnipe call s:Snipe(0)
+
 command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugger('<args>')
 command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
 
