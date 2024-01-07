@@ -50,11 +50,13 @@ nnoremap <space>fg :silent DoGrep<cr>
 nnoremap <space>fG :silent DoFuzzyGrep<cr>
 nnoremap <space>qf :cw<cr>
 nnoremap <silent> <esc> :nohlsearch<cr>:CPopupSymbol<cr><esc>
-nnoremap <space>ff :GitEdit 
 nnoremap <space>cr :!tcc -run %<cr>
-nnoremap <space>fp :OpenProject 
+
+nnoremap <expr> <space>ff ":GitEdit " .. input(':e ', '', 'custom,CompleteGitFiles') .. "<cr>"
+nnoremap <space>fp :call OpenWizard()<cr>
 nnoremap <space>fr :RecentFiles 
 nnoremap <space>fs :tj<space><C-d>
+
 nnoremap ]q :cnext<cr>
 nnoremap [q :cprev<cr>
 

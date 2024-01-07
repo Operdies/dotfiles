@@ -77,12 +77,50 @@ function! OpenProject(project)
 	execute "tabe ."
 endfunction
 
+function! OpenWizard()
+	let path = input("Project: ", '', 'custom,CompleteProjects')
+	if path == ''
+		return
+	endif
+	let fullpath = expand('~/repos/' .. path)
+	if !isdirectory(fullpath)
+		echohl ErrorMsg
+		echo "Project '" .. path .. "' not valid."
+		echohl None
+		return
+	endif
+
+	execute 'cd ' .. fullpath
+
+	let file = input("File: ", '', 'custom,CompleteGitFiles')
+	if file == ''
+		return
+	endif
+	if !filereadable(file)
+		echohl ErrorMsg
+		echo "File '" .. file .. "' not readable."
+		echohl None
+		return
+	endif
+	execute ':e ' .. file
+endfunction
+
 function! OldFiles(ArgLead, CmdLine, CursorPos)
 	" files ending with a trailing tilde are (likely) help / man pages
 	return filter(v:oldfiles, 'v:val !~ "[~]$"')->join("\n")
 endfunction
 
-command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit :e <args>
+function! s:GitEdit(f)
+	if filereadable(a:f)
+		execute ':e ' .. a:f
+	else
+		echohl ErrorMsg
+		echo "File '" .. a:f .. "' could not be opened."
+		echohl None
+	endif
+endfunction
+
+command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit call s:GitEdit(<q-args>)
 command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
 command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
