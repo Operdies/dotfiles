@@ -31,6 +31,12 @@ set showtabline=2
 set viminfo='100,<100,s100,:100,n~/.vim/viminfo
 set ballooneval 
 set balloonevalterm
+set balloonexpr=PreviewBalloonExpr()
+
+augroup ballonexpr_grp
+	autocmd!
+	au User TermdebugStopPost set ballooneval balloonevalterm balloonexpr=PreviewBalloonExpr()
+augroup END
 
 " set foldmethod=syntax
 " set foldlevel=99

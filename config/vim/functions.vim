@@ -114,6 +114,57 @@ function! PreviewSymbol(dir)
 	keeppatterns keepmarks call PopupPreviewSymbol(tag)
 endfunction
 
+let g:preview_balloon_settings=#{ winid: 0, text: "" }
+function! PreviewBalloonExpr()
+	let s = g:preview_balloon_settings
+	let symbol = v:beval_text
+
+	if s['winid'] > 0 && popup_getpos(s['winid']) != v:null
+		if s['text'] == symbol
+			return ""
+		endif
+		call popup_close(s['winid'])
+	endif
+
+	let tags = taglist($'^{symbol}$', expand('%'))
+	if len(tags) == 0
+		return ""
+	endif
+
+	function! OnBalloonClosed()
+		let g:preview_balloon_settings['winid'] = 0
+	endfunction
+
+	let tag = tags[0]
+	let cmd = escape(tag.cmd[1:-2], '.*?/\[]~')
+	let cmd = cmd->substitute('\\/', '/', 'g')
+	let lines = systemlist($"grep -m 1 '{cmd}' '{tag.filename}'")
+	if len(lines) == 0 || lines[0] == ""
+		return ""
+	endif
+
+	let s:winid = popup_beval(lines, #{
+				\ border: [],
+				\ padding: [0, 1, 0, 1],
+				\ scrollbar: 0,
+				\ callback: { id, result -> OnBalloonClosed() },
+				\ })
+	let s['winid'] = s:winid
+	let s['text'] = symbol
+
+	let ext = fnamemodify(tag.filename, ':e')
+	if ext != ""
+		let extmap = #{
+					\ h: 'c',
+					\ }
+		if extmap->has_key(ext)
+			let ext = extmap[ext]
+		endif
+		call setbufvar(winbufnr(s:winid), '&ft', ext)
+	endif
+	return ""
+endfunction
+
 let g:tagpreviewwin=0
 function! PopupPreviewSymbol(tag)
 	let view = winsaveview()
