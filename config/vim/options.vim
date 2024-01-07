@@ -28,7 +28,11 @@ set mouse=a
 set ttymouse=xterm2
 set termguicolors
 set showtabline=2
-set viminfo='100,<100,s100,:100,n~/.vim/viminfo
+if has('win32')
+	set viminfo='100,<100,s100,:100,n~/vimfiles/viminfo
+else
+	set viminfo='100,<100,s100,:100,n~/.vim/viminfo
+endif
 set ballooneval 
 set balloonevalterm
 set balloonexpr=PreviewBalloonExpr()

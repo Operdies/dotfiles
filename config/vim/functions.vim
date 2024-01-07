@@ -1,8 +1,6 @@
 function! RealCd()
-	let fname = expand('%:p')
-	let realpath = system("readlink -f " .. fname)
-	let realdir = fnamemodify(realpath, ":h")
-	execute 'cd ' .. realdir
+	let fname = expand('%:p:h')
+	execute 'cd ' .. fname
 endfunction
 
 function! CdGitRoot()
@@ -70,9 +68,10 @@ function! CompleteExecutables(ArgLead, CmdLine, CursorPos)
 endfunction
 
 function! CompleteProjects(ArgLead, CmdLine, CursorPos)
-	return system("ls -d ~/repos/*/ | xargs -I {} basename {}")
+	let s:repodir = expand('~/repos/')
+	return readdir(s:repodir, { x -> isdirectory(s:repodir .. x) })->join('\n')
 endfunction
-
+ 
 function! OpenProject(project)
 	execute "cd ~/repos/" .. a:project
 	execute "tabe ."
