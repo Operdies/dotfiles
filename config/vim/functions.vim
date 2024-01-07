@@ -1,5 +1,5 @@
 function! RealCd()
-	let fname = expand('%:p:h')
+	let fname = expand('%:p')->resolve()->fnamemodify(':h')
 	execute 'cd ' .. fname
 endfunction
 
@@ -69,7 +69,7 @@ endfunction
 
 function! CompleteProjects(ArgLead, CmdLine, CursorPos)
 	let s:repodir = expand('~/repos/')
-	return readdir(s:repodir, { x -> isdirectory(s:repodir .. x) })->join('\n')
+	return readdir(s:repodir, { x -> isdirectory(s:repodir .. x) })->join("\n")
 endfunction
  
 function! OpenProject(project)
