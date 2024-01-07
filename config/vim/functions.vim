@@ -29,37 +29,37 @@ endfunction
 command! DoGrep silent call Grephere('grep: ', '')
 command! DoFuzzyGrep silent call Grephere('fuzzy: ', 'f')
 
-function! UpdateBufferline(abuf, del, write)
-	let bufnames = filter(copy(getbufinfo()), 'v:val.listed')
-	execute 'set tabline='
-	let focused=bufnr()
-	let newtabline = ""
-	let sel = '%#TabLineSel#'
-	let nosel = '%#TabLine#'
-	let fill = '%#TabLineFill#'
+def! UpdateBufferline(del: bool, write: bool)
+	var abuf = str2nr(expand("<abuf>"))
+	var bufnames = filter(getbufinfo(), 'v:val.listed')
+	var focused = bufnr()
+	var newtabline = ""
+	var sel = '%#TabLineSel#'
+	var nosel = '%#TabLine#'
+	var fill = '%#TabLineFill#'
 	for b in bufnames
-		" skip buffer if it was deleted
-		if a:del && a:abuf == b.bufnr
+		# skip buffer if it was deleted
+		if del && abuf == b.bufnr
 			continue
 		endif
-		let prefix = ''
-		let postfix = (b.changed ? '+' : ' ')
-		if a:write && a:abuf == b.bufnr
-			let postfix = ' '
+		var prefix = ''
+		var postfix = (b.changed ? '+' : ' ')
+		if write && abuf == b.bufnr
+			postfix = ' '
 		endif
 
-		let name = prefix .. fnamemodify(b.name, ":t") .. ' [' .. b.bufnr .. ']' .. postfix
+		var name = prefix .. fnamemodify(b.name, ":t") .. ' [' .. b.bufnr .. ']' .. postfix
 
 		if b.bufnr == focused
-			let name = sel .. name .. nosel .. ' '
+			name = sel .. name .. nosel .. ' '
 		else
-			let name = nosel .. name .. ' '
+			name = nosel .. name .. ' '
 		endif
-		let newtabline .= name
+		newtabline ..= name
 	endfor
-	let newtabline .= nosel
+	newtabline ..= nosel
 	execute 'set tabline=' .. fnameescape(newtabline)
-endfunction
+enddef
 
 function! CompleteGitFiles(ArgLead, CmdLine, CursorPos)
 	return system("git ls-files")

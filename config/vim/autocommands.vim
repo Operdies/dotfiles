@@ -6,13 +6,13 @@ autocmd BufReadPost *
 			\ | endif
 
 
+set updatetime=1000
 augroup bufferlinegrp
 	autocmd!
-	autocmd BufEnter,BufNew,InsertLeave,CursorHold * call UpdateBufferline(expand("<abuf>"), 0, 0)
-	autocmd BufDelete * call UpdateBufferline(expand("<abuf>"), 1, 0)
-	autocmd BufWrite * call UpdateBufferline(expand("<abuf>"), 0, 1)
+	autocmd BufEnter,BufNew,CursorHold * call UpdateBufferline(v:false, v:false)
+	autocmd BufDelete * call UpdateBufferline(v:true, v:false)
+	autocmd BufWrite * call UpdateBufferline(v:false, v:true)
 augroup END
-
 
 augroup qf
 	autocmd!
