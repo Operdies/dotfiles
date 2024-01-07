@@ -87,38 +87,6 @@ command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit :e <args>
 command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
 command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
-let g:PreviewSymbolSettings = #{ 
-			\ nth: 0, 
-			\ cword: ""
-			\ }
-
-function! PreviewSymbol(dir)
-	let s = g:PreviewSymbolSettings
-	let cword = expand('<cword>')
-	let tags = taglist($'^{cword}$', expand('%'))
-
-	if len(tags) == 0
-		if &ft == 'vim'
-			let tags = taglist($'^{cword}()$', expand('%'))
-		endif
-		if len(tags) == 0
-			echohl ErrorMsg | echo "Tag not found: " .. expand("<cword>") | echohl None
-			return
-		endif
-	endif
-
-	if s['cword'] == cword
-		let s['nth'] = (s['nth'] + len(tags) + a:dir) % len(tags)
-	else
-		let s['nth'] = 0
-		let s['cword'] = cword
-	endif
-
-	let tag = tags[s['nth']]
-	echo $'{cword}: tag {s['nth']+1}/{len(tags)}'
-	keeppatterns keepmarks call PopupPreviewSymbol(tag)
-endfunction
-
 let g:preview_balloon_settings=#{ winid: 0, text: "" }
 function! PreviewBalloonExpr()
 	let s = g:preview_balloon_settings
@@ -175,6 +143,51 @@ function! PreviewBalloonExpr()
 	return ""
 endfunction
 
+let g:PreviewSymbolSettings = { "nth": 0, "cword": "", "context": 10 }
+function! s:PreviewSymbol(...)
+	let s = g:PreviewSymbolSettings
+	let args = get(a:, 1, #{})
+	let cword = expand(get(args, "word", s['cword']))
+	let cnt = get(args, "count", 1)
+	let close = get(args, "close", 0)
+
+	if close 
+		if g:tagpreviewwin != 0
+			call popup_close(g:tagpreviewwin)
+			let g:tagpreviewwin=0
+		endif
+		return
+	endif
+
+	let tags = taglist($'^{cword}$', expand('%'))
+
+	if len(tags) == 0
+		if &ft == 'vim'
+			let tags = taglist($'^{cword}()$', expand('%'))
+		endif
+		if len(tags) == 0
+			echohl ErrorMsg | echo "Tag not found: " .. cword | echohl None
+			return
+		endif
+	endif
+
+	if s['cword'] == cword
+		let s['nth'] = (s['nth'] + len(tags) + cnt) % len(tags)
+	else
+		let s['nth'] = 0
+		let s['cword'] = cword
+	endif
+
+	let tag = tags[s['nth']]
+	echo $'{cword}: tag {s['nth']+1}/{len(tags)}'
+	keeppatterns keepmarks call PopupPreviewSymbol(tag)
+endfunction
+
+command! -complete=tag -nargs=1 PopupSymbol  call s:PreviewSymbol( { "word": <q-args> } )
+command! -complete=tag -nargs=1 NPopupSymbol call s:PreviewSymbol( { "word": <q-args> } )
+command! -complete=tag -nargs=1 PPopupSymbol call s:PreviewSymbol( { "word": <q-args>, "count": -1 } )
+command!               -nargs=0 CPopupSymbol call s:PreviewSymbol( { "close" : 1 } )
+
 let g:tagpreviewwin=0
 function! PopupPreviewSymbol(tag)
 	let view = winsaveview()
@@ -201,10 +214,10 @@ function! PopupPreviewSymbol(tag)
 		call winrestview(view)
 	endtry
 
-	let context=40
+	let context= get(g:PreviewSymbolSettings, "context", 10)
 	let firstline = max([lineno - 3, 1])
 
-	if exists('g:tagpreviewwin')
+	if g:tagpreviewwin != 0
 		call popup_close(g:tagpreviewwin)
 	endif
 
@@ -225,11 +238,6 @@ function! PopupPreviewSymbol(tag)
 				\ title: $'{tag.filename}:{lineno}'
 				\ })
 
-	augroup CloseOnWinLeave
-		autocmd!
-		autocmd BufLeave * ++once call popup_close(g:tagpreviewwin)
-	augroup END
-	
 	" 'cursorline' highlights the selected line, but it also sets the selected
 	" line to the first line of the popup
 	call win_execute(g:tagpreviewwin, lineno)

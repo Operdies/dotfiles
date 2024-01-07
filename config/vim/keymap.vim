@@ -45,7 +45,7 @@ nnoremap <space>fw /\<
 nnoremap <space>fg :silent DoGrep<cr>
 nnoremap <space>fG :silent DoFuzzyGrep<cr>
 nnoremap <space>qf :cw<cr>
-nnoremap <silent> <esc> :nohlsearch<cr>:pclose<cr><esc>
+nnoremap <silent> <esc> :nohlsearch<cr>:CPopupSymbol<cr><esc>
 nnoremap <space>ff :GitEdit 
 nnoremap <space>cr :!tcc -run %<cr>
 nnoremap <space>fp :OpenProject 
@@ -60,10 +60,12 @@ inoremap <C-b> <Left>
 inoremap <C-f> <Right>
 
 " preview tags
-nnoremap <silent> <C-k> :PreviewSymbol -1<cr>
-inoremap <silent> <C-k> <C-o>:PreviewSymbol -1<cr>
-nnoremap <silent> <C-j> :PreviewSymbol 1<cr>
-inoremap <silent> <C-j> <C-o>:PreviewSymbol 1<cr>
+nnoremap <silent> <C-k> <cmd>PPopupSymbol <cword><cr>
+inoremap <silent> <C-k> <cmd>PPopupSymbol <cword><cr>
+nnoremap <silent> <C-j> <cmd>NPopupSymbol <cword><cr>
+inoremap <silent> <C-j> <cmd>NPopupSymbol <cword><cr>
+nnoremap <silent> <C-h> <cmd>CPopupSymbol<cr>
+inoremap <silent> <C-h> <cmd>CPopupSymbol<cr>
 
 " commenting
 nnoremap <expr> gc CommentLines()
