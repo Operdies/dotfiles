@@ -47,3 +47,8 @@ augroup asyncrun
 	autocmd User AsyncRunStop let __window=win_getid(winnr()) | execute "cwindow" | call win_gotoid(__window) | call s:AsyncRunAlert()
 augroup END
 
+augroup additional_filetypes
+	autocmd!
+	autocmd BufEnter *.csproj set filetype=xml
+	autocmd BufEnter *.props set filetype=xml
+augroup END

@@ -28,16 +28,18 @@ if has('gui')
 	tnoremap <M-\> <cmd>FloatermToggle<cr>
 	tnoremap <M-]> <cmd>FloatermNext<cr>
 	tnoremap <M-[> <cmd>FloatermPrev<cr>
-	tnoremap <M-=> <cmd>FloatermNew<cr>
+	nnoremap <M-=> <cmd>FloatermNew --cmd=<buffer-root><cr>
+	tnoremap <M-=> <cmd>FloatermNew --cmd=<buffer-root><cr>
 	tnoremap <M-q> <cmd>FloatermKill<cr>
 else
 	nnoremap <esc>\ <cmd>FloatermToggle<cr>
 	tnoremap <esc>\ <cmd>FloatermToggle<cr>
 	tnoremap <esc>] <cmd>FloatermNext<cr>
 	tnoremap <esc>[ <cmd>FloatermPrev<cr>
-	tnoremap <esc>= <cmd>FloatermNew<cr>
+	nnoremap <esc>= <cmd>FloatermNew --cmd=<buffer-root><cr>
+	tnoremap <esc>= <cmd>FloatermNew --cmd=<buffer-root><cr>
 	tnoremap <esc>q <cmd>FloatermKill<cr>
 endif
 
-nnoremap <space>gg <cmd>FloatermNew --name=lazygit --autoclose=2 lazygit<cr>
+nnoremap <space>gg <cmd>FloatermNew --cwd=<buffer> --name=lazygit --autoclose=2 lazygit<cr>
 
