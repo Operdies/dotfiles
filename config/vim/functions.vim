@@ -68,8 +68,15 @@ function! CompleteExecutables(ArgLead, CmdLine, CursorPos)
 endfunction
 
 function! CompleteProjects(ArgLead, CmdLine, CursorPos)
-	let s:repodir = expand('~/repos/')
-	return readdir(s:repodir, { x -> isdirectory(s:repodir .. x) })->join("\n")
+	let dirs = ["~/repos/", "/git/"]
+	let projects = []
+	for cand in dirs
+		let s:dir = expand(cand)
+		if isdirectory(s:dir)
+			let projects += readdir(s:dir, { x -> isdirectory(s:dir .. x) })
+		endif
+	endfor
+	return projects->join("\n")
 endfunction
  
 function! OpenProject(project)

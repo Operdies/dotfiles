@@ -4,6 +4,7 @@ packadd! termdebug
 call plug#begin()
 Plug 'skywind3000/asyncrun.vim'
 Plug 'tpope/vim-sensible'
+Plug 'voldikss/vim-floaterm'
 call plug#end()
 
 filetype plugin indent on
