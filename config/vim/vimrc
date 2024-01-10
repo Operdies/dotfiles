@@ -1,4 +1,17 @@
-﻿let s:vimdir=has('win32') ? '~/vimfiles' : '~/.vim'
+﻿if has('gui')
+	set guioptions=!d
+	set guifont=MesloLGS\ NF
+
+	if has('win32')
+		augroup gvim_startup
+			autocmd!
+			autocmd GUIEnter * winpos 0 0
+			autocmd GUIEnter * set lines=100 columns=180
+		augroup END
+	endif
+endif
+
+let s:vimdir=has('win32') ? '~/vimfiles' : '~/.vim'
 let s:plug_vim=expand(s:vimdir .. "/autoload/plug.vim")
 
 let s:did_bootstrap=0
@@ -22,3 +35,4 @@ source ~/repos/dotfiles/config/vim/autocommands.vim
 if s:did_bootstrap
 	PlugInstall
 endif
+
