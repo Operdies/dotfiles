@@ -10,7 +10,6 @@ nnoremap <C-s> :w<cr>
 nnoremap H :bprev!<cr>
 nnoremap L :bnext!<cr>
 nnoremap <space>bd :bdelete<cr>
-nnoremap <space>gg :silent !lazygit<cr><C-l>
 nnoremap K :Man <cword><cr>
 nnoremap [<tab> :tabprev<cr>
 nnoremap ]<tab> :tabnext<cr>
