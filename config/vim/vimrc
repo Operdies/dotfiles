@@ -3,11 +3,9 @@ let s:plug_vim=expand(s:vimdir .. "/autoload/plug.vim")
 
 let s:did_bootstrap=0
 if !filereadable(s:plug_vim)
-	echon "Bootstrapping VimPlug.. "
 	call system("curl -fLo " .. s:plug_vim .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim")
 	let s:did_bootstrap=1
 	execute "source " .. s:plug_vim
-	echon "Done!"
 endif
 
 let s:catppuccin_theme=expand(s:vimdir .. "/colors/catppuccin_mocha.vim")
