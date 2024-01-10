@@ -28,11 +28,15 @@ set mouse=a
 set ttymouse=xterm2
 set termguicolors
 set showtabline=2
+
 if has('win32')
-	set viminfo='100,<100,s100,:100,n~/vimfiles/viminfo
+	set viminfo='100,<100,s100,:100,n~/vimfiles/viminfo/undo
+	set undodir=~/vimfiles
 else
-	set viminfo='100,<100,s100,:100,n~/.vim/viminfo
+	set viminfo='100,<100,s100,:100,n~/.vim/viminfo/undo
+	set undodir=~/.vim
 endif
+
 set ballooneval 
 set balloonevalterm
 set balloonexpr=PreviewBalloonExpr()
