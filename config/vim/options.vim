@@ -30,11 +30,11 @@ set termguicolors
 set showtabline=2
 
 if has('win32')
-	set viminfo='100,<100,s100,:100,n~/vimfiles/viminfo/undo
-	set undodir=~/vimfiles
+	set viminfo='100,<100,s100,:100,n~/vimfiles/viminfo
+	set undodir=~/vimfiles/undo/
 else
-	set viminfo='100,<100,s100,:100,n~/.vim/viminfo/undo
-	set undodir=~/.vim
+	set viminfo='100,<100,s100,:100,n~/.vim/viminfo
+	set undodir=~/.vim/undo/
 endif
 
 set ballooneval 
