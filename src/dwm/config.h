@@ -171,7 +171,7 @@ BarElement BarElements[] =
 	},
 	{
 		.click = { [LeftClick] = bar_battery_toggle_timer },
-		.data = &(battery_settings) { .show_time = 1 },
+		.data = &(battery_settings) { .show_details = 0 },
 		.interval = default_tickrate,
 		.scheme = SchemeBattery,
 		.update = bar_battery_status,
