@@ -115,7 +115,7 @@ bar_battery_status(BarElementFuncArgs *data) {
 		settings->force_update = 0;
 		const char *icon = bat.state == CHARGING ? icon_charging : icon_charge_levels[percentage / 10];
 		if (settings->show_details && bat.state != FULL) {
-			sprintf(data->e->buffer, "%dh%02dm | %d%% | %s", hours, minutes, percentage, icon);
+			sprintf(data->e->buffer, "%d%% | %dh%02dm | %s", percentage, hours, minutes, icon);
 		} else {
 			sprintf(data->e->buffer, "%s", icon);
 		}
