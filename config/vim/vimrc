@@ -26,11 +26,12 @@ if !filereadable(s:catppuccin_theme)
 	call system("curl -fLo " .. s:catppuccin_theme .. " --create-dirs https://raw.githubusercontent.com/catppuccin/vim/main/colors/catppuccin_mocha.vim")
 endif
 
-source ~/repos/dotfiles/config/vim/plugins.vim
-source ~/repos/dotfiles/config/vim/options.vim
-source ~/repos/dotfiles/config/vim/keymap.vim
-source ~/repos/dotfiles/config/vim/functions.vim
-source ~/repos/dotfiles/config/vim/autocommands.vim
+let s:here="<sfile>:p:h"->expand()->resolve()
+execute 'source ' .. s:here .. '/plugins.vim'
+execute 'source ' .. s:here .. '/options.vim'
+execute 'source ' .. s:here .. '/keymap.vim'
+execute 'source ' .. s:here .. '/functions.vim'
+execute 'source ' .. s:here .. '/autocommands.vim'
 
 if s:did_bootstrap
 	PlugInstall
