@@ -139,6 +139,7 @@ struct Monitor {
 	Client *clients;
 	Client *sel;
 	Client *stack;
+	Monitor *parent;
 	Monitor *next;
 	Window barwin;
 	const Layout *lt[2];
@@ -251,6 +252,7 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static int solitary(Client *c);
 static void spawn(const Arg *arg);
+static void splitmon();
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
@@ -1988,6 +1990,67 @@ spawn(const Arg *arg)
 
 		execvp(((char **)arg->v)[0], (char **)arg->v);
 		die("dwm: execvp '%s' failed:", ((char **)arg->v)[0]);
+	}
+}
+
+void
+transferclients(Client *c, Monitor *m)
+{
+	Client *next;
+	while (c) {
+		next = c->next;
+		sendmon(c, m);
+		c = next;
+	}
+}
+
+void
+unsplitmon(Monitor *m)
+{
+	m->parent->mw = m->parent->ww = m->parent->mw + m->mw;
+	transferclients(m->clients, m->parent);
+	if (selmon == m) {
+		selmon = m->parent;
+	}
+	cleanupmon(m);
+	focus(NULL);
+	arrange(NULL);
+}
+
+void
+splitmon()
+{
+	if (selmon->parent)
+		unsplitmon(selmon);
+	else if (selmon->next && selmon->next->parent)
+		unsplitmon(selmon->next);
+	else {
+		Monitor *vmon;
+
+		vmon = createmon();
+		vmon->next = selmon->next;
+		selmon->next = vmon;
+		vmon->parent = selmon;
+		vmon->num = selmon->num;
+
+		for (Monitor *m = vmon; m; m = m->next)
+			m->num += 1;
+
+		selmon->mw /= 2;
+		selmon->ww /= 2;
+
+		vmon->mx = vmon->wx = selmon->mw + selmon->mx;
+		vmon->my = vmon->wy = selmon->my;
+		vmon->mw = vmon->ww = selmon->mw;
+		vmon->mh = vmon->wh = selmon->mh;
+
+		updatebars();
+		updatebarpos(vmon);
+
+		transferclients(selmon->clients, vmon);
+
+		focus(NULL);
+		arrange(NULL);
 	}
 }
 
