@@ -231,6 +231,7 @@ static const Key keys[] =
 	{ MODKEY,                       XK_h,      setmfact,                {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,                {.f = +0.05} },
 	{ MODKEY,                       XK_equal,  setmfact,                {.f = +1.5} },
+	{ MODKEY|ControlMask|ShiftMask, XK_v,      togglebar,               {-1} },
 	{ MODKEY|ControlMask|ShiftMask, XK_v,      splitmon,                {0} },
 	{ MODKEY,                       XK_g,      zoom,                    {0} },
 	{ MODKEY,                       XK_Tab,    view,                    {0} },

@@ -2013,6 +2013,10 @@ unsplitmon(Monitor *m)
 		selmon = m->parent;
 	}
 	cleanupmon(m);
+
+	updatebarpos(selmon);
+	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
+
 	focus(NULL);
 	arrange(NULL);
 }

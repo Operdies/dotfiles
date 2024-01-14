@@ -4,8 +4,19 @@ sh "$HOME/.config/dwm/startup.sh" dwm
 # Screensaver
 xset -dpms; xset s off
 
-# Resolution
-xrandr --output DP-0 --primary --mode 5120x1440 --rate 240
+amd() {
+  xrandr --output DisplayPort-1-0 --primary --mode 5120x1440 --rate 240 --output DP-0 --off
+}
+nvidia() {
+  xrandr --output DP-0 --primary --mode 5120x1440 --rate 240 --output DisplayPort-1-0 --off
+}
+
+both() {
+  xrandr --output DP-0 --primary --mode 5120x1440 --rate 240 --output DisplayPort-1-0 --left-of DP-0 --primary --mode 5120x1440 --rate 240
+}
+
+nvidia
+
 
 # Wallpaper
 nitrogen --restore &
