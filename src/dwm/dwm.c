@@ -258,6 +258,7 @@ static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void tilewide(Monitor *m);
 static void togglebar(const Arg *arg);
+static void togglebarelems(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -833,27 +834,29 @@ drawbar(Monitor *m)
 		}
 	}
 
-	int now = time(NULL);
-	x = m->ww;
 
-	for (int i = LENGTH(BarElements) - 1; i >= 0; i--) {
-		BarElement *elem = BarElements + i;
-		if (elem->update && elem->interval >= 0) {
-			if (now - elem->last_call >= elem->interval) {
-				elem->last_call = now;
-				elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
+	if (barelembars & 1 << m->num) {
+		int now = time(NULL);
+		x = m->ww;
+		for (int i = LENGTH(BarElements) - 1; i >= 0; i--) {
+			BarElement *elem = BarElements + i;
+			if (elem->update && elem->interval >= 0) {
+				if (now - elem->last_call >= elem->interval) {
+					elem->last_call = now;
+					elem->update(&(BarElementFuncArgs) { .m = m, .e = elem });
+				}
 			}
-		}
-		if (elem->hidden)
-			continue;
-		if (elem->buffer[0]) {
-			w = TEXTW(elem->buffer);
-			x -= w;
-			if (elem->scheme)
-				drw_setscheme(drw, scheme[elem->scheme]);
-			else
-				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, elem->buffer, 0);
+			if (elem->hidden)
+				continue;
+			if (elem->buffer[0]) {
+				w = TEXTW(elem->buffer);
+				x -= w;
+				if (elem->scheme)
+					drw_setscheme(drw, scheme[elem->scheme]);
+				else
+					drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+				drw_text(drw, x, 0, w, bh, lrpad / 2, elem->buffer, 0);
+			}
 		}
 	}
 
@@ -2005,6 +2008,15 @@ transferclients(Client *c, Monitor *m)
 }
 
 void
+renumbermons()
+{
+	Monitor *m;
+	int i;
+	for (m = mons, i = 0; m; m = m->next, i++)
+		m->num = i;
+}
+
+void
 unsplitmon(Monitor *m)
 {
 	m->parent->mw = m->parent->ww = m->parent->mw + m->mw;
@@ -2012,7 +2024,9 @@ unsplitmon(Monitor *m)
 	if (selmon == m) {
 		selmon = m->parent;
 	}
+
 	cleanupmon(m);
+	renumbermons();
 
 	updatebarpos(selmon);
 	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
@@ -2037,9 +2051,6 @@ splitmon()
 		vmon->parent = selmon;
 		vmon->num = selmon->num;
 
-		for (Monitor *m = vmon; m; m = m->next)
-			m->num += 1;
-
 		selmon->mw /= 2;
 		selmon->ww /= 2;
 
@@ -2048,6 +2059,7 @@ splitmon()
 		vmon->mw = vmon->ww = selmon->mw;
 		vmon->mh = vmon->wh = selmon->mh;
 
+		renumbermons();
 		updatebars();
 		updatebarpos(vmon);
 
@@ -2164,6 +2176,13 @@ tilewide(Monitor *m)
 			if (ty + HEIGHT(c) < m->wh)
 				ty += HEIGHT(c) + gapy;
 		}
+}
+
+void
+togglebarelems(const Arg *arg)
+{
+	barelembars ^= 1 << selmon->num;
+	drawbars();
 }
 
 void

@@ -5,6 +5,7 @@ static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static int gap_y                    = 0;
 static int gap_x                    = 0;
+static int barelembars              = ~0;
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int default_tickrate   = 1;
@@ -205,10 +206,6 @@ BarElement BarElements[] =
 		.interval = default_tickrate,
 		.update = bar_notifications,
 	},
-	{
-		.scheme = SchemeSession,
-		.update = bar_session_info,
-	},
 };
 
 
@@ -220,6 +217,7 @@ static const Key keys[] =
 	{ MODKEY,                       XK_d,      spawn,                   {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_w,      spawn,                   {.v = dmenu_nmcli } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,               {0} },
+	{ MODKEY|ControlMask|ShiftMask, XK_b,      togglebarelems,          {0} },
 	{ MODKEY,                       XK_j,      focusstack_multimon,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack_multimon,     {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_j,      pushdown,                {0} },
@@ -231,7 +229,7 @@ static const Key keys[] =
 	{ MODKEY,                       XK_h,      setmfact,                {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,                {.f = +0.05} },
 	{ MODKEY,                       XK_equal,  setmfact,                {.f = +1.5} },
-	{ MODKEY|ControlMask|ShiftMask, XK_v,      togglebar,               {-1} },
+	{ MODKEY|ControlMask|ShiftMask, XK_v,      togglebar,               {0} },
 	{ MODKEY|ControlMask|ShiftMask, XK_v,      splitmon,                {0} },
 	{ MODKEY,                       XK_g,      zoom,                    {0} },
 	{ MODKEY,                       XK_Tab,    view,                    {0} },
