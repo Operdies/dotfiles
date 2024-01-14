@@ -2,7 +2,9 @@
 start_at=$(date +%s,%N)
 
 setxkbmap us -variant altgr-intl
-setxkbmap -option caps:escape
+setxkbmap -option caps:super
+xcape -e 'Super_L=Escape'
+
 LIBINPUT="$HOME/.config/sxhkd/scripts/libinput.sh"
 [ -f "$LIBINPUT" ] && (
 	sh "$LIBINPUT" set 'natural scrolling' 1
