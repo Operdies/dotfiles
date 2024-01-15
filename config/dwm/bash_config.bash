@@ -1,9 +1,10 @@
 #!/bin/env bash
 start_at=$(date +%s,%N)
 
-setxkbmap us -variant altgr-intl
-setxkbmap -option caps:super
-xcape -e 'Super_L=Escape'
+# map ctrl tab to escape
+xcape -t 280
+# map caps to ctrl
+setxkbmap us -variant altgr-intl -option ctrl:nocaps
 
 LIBINPUT="$HOME/.config/sxhkd/scripts/libinput.sh"
 [ -f "$LIBINPUT" ] && (

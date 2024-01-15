@@ -50,11 +50,10 @@ if has picom; then
 	picom -b --config ~/.config/picom.conf &
 fi
 
-# Set caps = escape
-# This should run before sxhkd starts so caps can be mapped to ESCAPE_KEYSYM
-setxkbmap us -variant altgr-intl
-setxkbmap -option caps:escape
-# rhkd-whichkey doesn't immediately load, so we reload the config in the background
+# map ctrl tab to escape
+xcape -t 280
+# map caps to ctrl
+setxkbmap us -variant altgr-intl -option ctrl:nocaps
 
 config_dir="sxhkd"
 if [ "$1" == dwm ]; then
