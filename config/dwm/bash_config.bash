@@ -1,10 +1,8 @@
 #!/bin/env bash
 start_at=$(date +%s,%N)
 
-# map ctrl tab to escape
-xcape -t 280
-# map caps to ctrl
-setxkbmap us -variant altgr-intl -option ctrl:nocaps
+# keyboard layout + caps mapping
+~/.config/dwm/configurekeyboard.sh
 
 LIBINPUT="$HOME/.config/sxhkd/scripts/libinput.sh"
 [ -f "$LIBINPUT" ] && (

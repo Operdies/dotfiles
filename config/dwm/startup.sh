@@ -50,14 +50,12 @@ if has picom; then
 	picom -b --config ~/.config/picom.conf &
 fi
 
-# map ctrl tab to escape
-xcape -t 280
-# map caps to ctrl
-setxkbmap us -variant altgr-intl -option ctrl:nocaps
+# keyboard layout + caps mapping
+~/.config/dwm/configurekeyboard.sh
 
 config_dir="sxhkd"
 if [ "$1" == dwm ]; then
-  config_dir="dwm"
+	config_dir="dwm"
 fi
 
 rhkd -c "$HOME/.config/$config_dir/sxhkdrc" &
