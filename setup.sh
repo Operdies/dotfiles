@@ -67,6 +67,7 @@ ensure_binaries() {
 		libinput xf86-input-libinput libinput-gestures
 		libnotify
 		man-db man-pages less
+		neovim
 		networkmanager
 		nitrogen
 		noto-fonts noto-fonts-emoji
