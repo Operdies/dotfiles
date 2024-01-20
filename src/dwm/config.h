@@ -86,8 +86,8 @@ static const Rule rules[] = {
 	/* class             instance    title       tags mask     isfloating   monitor    icon*/
 	{ "firefox",         NULL,       NULL,       0,            0,           -1,        .icon="",   },
 	{ "Pavucontrol",     NULL,       NULL,       0,            1,           -1,        .icon="",   },
-	{ "discord",         NULL,       NULL,       1 << 8,       0,           -1,        .icon="ﭮ",   },
-	{ "Zathura",         NULL,       NULL,       1 << 3,       0,           -1,        .icon="󰈦",   },
+	{ "discord",         NULL,       NULL,       0,            0,           -1,        .icon="ﭮ",   },
+	{ "Zathura",         NULL,       NULL,       0,            0,           -1,        .icon="󰈦",   },
 	{ "nvim",            "nvim",     "nvim",     0,            0,           -1,        .icon="",   },
 	{ "vim",             "vim",      "vim",      0,            0,           -1,        .icon="",   },
 	{ "tmux",            NULL,       "tmux",     0,            0,           -1,        .icon="",   },
