@@ -1,36 +1,3 @@
-function! RealCd()
-	let fname = expand('%:p')->resolve()->fnamemodify(':h')
-	execute 'cd ' .. fname
-endfunction
-
-function! CdGitRoot()
-	call RealCd()
-	execute 'cd ' .. system('git rev-parse --show-toplevel')
-endfunction
-
-function! Grephere(title, flags)
-	call inputsave()
-	let what = input(a:title)
-	call inputrestore()
-	if len(what)
-		try
-			execute 'vimgrep /' . what . '/' .. a:flags .. ' `git ls-files`'
-			if len(getqflist()) > 0
-				execute 'copen'
-				execute 'wincmd p'
-			endif
-		catch
-		endtry
-	endif
-endfunction
-
-command! DoGrep silent call Grephere('grep: ', '')
-command! DoFuzzyGrep silent call Grephere('fuzzy: ', 'f')
-
-function! CompleteGitFiles(ArgLead, CmdLine, CursorPos)
-	return system("git ls-files")
-endfunction
-
 function! CompleteExecutables(ArgLead, CmdLine, CursorPos)
 	return system("find . -executable -type f -not -path '*/.*'")
 endfunction
@@ -99,63 +66,6 @@ command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit call s:GitEdit(<q-ar
 command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
 command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
-function! CommentLines(context = {}, type = '') abort
-	if a:type == ''
-		let context = #{
-					\ dot_command: v:false,
-					\ extend_block: '',
-					\ virtualedit: [&l:virtualedit, &g:virtualedit],
-					\ }
-		let &operatorfunc = function('CommentLines', [context])
-		set virtualedit=block
-		return 'g@'
-	endif
-
-	let save = #{
-				\ virtualedit: [&l:virtualedit, &g:virtualedit],
-				\ }
-
-	let commentstring="// "
-	let commentstrings = #{
-				\ vim: '" ',
-				\ c: '// ',
-				\ cpp: '// ',
-				\ conf: '# ',
-				\ sh: '# ',
-				\ zsh: '# ',
-				\ }
-	if commentstrings->has_key(&filetype)
-		let commentstring = commentstrings[&filetype]
-	endif
-
-	try
-		let [_, startline, _, _] = getpos("'[")
-		let [_, endline, _, _] = getpos("']")
-		let commentidx = 999
-
-		let first_line = getline('.')
-		let is_comment = first_line->match('^\s*' .. commentstring) >= 0
-		if is_comment
-			execute startline .. ',' .. endline .. 's:' .. commentstring .. '::'
-		else
-			for lineno in range(startline, endline)
-				let line = getline(lineno)
-				if line->match('^\s*$') >= 0
-					continue
-				endif
-				let matchidx = line->match('[^ 	]')
-				if matchidx >= 0 && matchidx < commentidx
-					let commentidx = matchidx
-				endif
-			endfor
-			execute startline .. ',' .. endline .. 's:^\(\s\{' .. commentidx .. '\}\):\1' .. commentstring .. ':'
-		endif
-	finally
-		let [&l:virtualedit, &g:virtualedit] = get(a:context.dot_command ? save : a:context, 'virtualedit')
-		let a:context.dot_command = v:true
-	endtry
-endfunction
-
 function! AsyncRunMegaMaker()
 	let makefile=''
 
@@ -194,24 +104,6 @@ function! TmuxWinCmd(direction)
 					\ l: 'R'
 					\ }[a:direction]
 		call system('tmux select-pane -' .. tmux_dir)
-	endif
-endfunction
-
-function! CleanBufferList()
-	try
-		let project_root = system('git rev-parse --show-toplevel')
-	catch
-		let project_root = getcwd()
-	endtry
-	let bufnames = filter(copy(getbufinfo()), 'v:val.listed')
-	let todelete = ''
-	for buf in bufnames
-		if buf.changed == 0 && len(buf.windows) == 0 && buf.name->match('^' .. project_root) != 0 
-			let todelete ..= ' ' .. buf.bufnr
-		endif
-	endfor
-	if todelete != ''
-		execute 'bdelete' .. todelete
 	endif
 endfunction
 
@@ -310,39 +202,6 @@ function! s:CompleteGdb(ArgLead, CmdLine, CursorPos)
 	endif
 	return ""
 endfunction
-
-function! s:Snipe(forwards)
-	let ESCAPE = 27
-	echo
-	echon "Snipe: "
-	let ch1 = getchar()
-	if ch1 == ESCAPE
-		return
-	endif
-	let s1 = nr2char(ch1)
-	echon s1
-	let ch2 = getchar()
-	if ch2 == ESCAPE
-		return
-	endif
-	let s2 = nr2char(ch2)
-	echon s2
-	let chars = (s1 .. s2)->escape('\')
-	let flags = a:forwards ? 'zWs' : 'bzWs'
-	" let n = search('\V' .. chars, flags)
-	let m = v:count ? v:count : 1
-	for i in range(1, m)
-		if search('\V' .. chars, flags) == 0
-			return
-		endif
-	endfor
-	" if n == 0
-	" 	echohl ErrorMsg | echo "No match: " .. chars | echohl None
-	" endif
-endfunction
-
-command! Snipe call s:Snipe(1)
-command! BSnipe call s:Snipe(0)
 
 command! -complete=custom,CompleteExecutables -nargs=1 Debug call s:StartDebugger('<args>')
 command! -complete=custom,s:CompleteGdb -nargs=+ GdbDo call TermDebugSendCommand('<args>')
