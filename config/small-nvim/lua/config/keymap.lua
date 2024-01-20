@@ -1,14 +1,26 @@
-" close all folds
-nnoremap zC :setlocal foldlevel=0<cr>
+local map = vim.keymap.set
+local opts = { silent = true, noremap = true }
+local function nmap(keys, action)
+  map("n", keys, action, opts)
+end
 
-" open all folds
-nnoremap zO :setlocal foldlevel=99<cr>
+-- Insert blank line before/after cursor and restore position
+nmap("[<space>", "m'O<esc>`'")
+nmap("]<space>", "m'o<esc>`'")
+-- restore position after reindenting
+nmap("=ip", "m`=ip``")
+-- reindent on paste
+nmap("p", "p`[v`]=")
+nmap("<S-p>", "P`[v`]=")
+nmap("<C-s>", ":w<cr>")
+nmap("<esc>", "<esc>:nohlsearch<cr>")
+nmap("<leader>o", ":e %:p:h<cr>")
+nmap("<S-h>", ":bprev<cr>")
+nmap("<S-l>", ":bnext<cr>")
+nmap("<leader>bd", ":bdelete")
 
+vim.cmd[[
 " buffers
-nnoremap <C-s> :w<cr>
-nnoremap H :bprev!<cr>
-nnoremap L :bnext!<cr>
-nnoremap <space>bd :bdelete<cr>
 nnoremap [<tab> :tabprev<cr>
 nnoremap ]<tab> :tabnext<cr>
 nnoremap gb :ls<cr>:b<space>
@@ -16,8 +28,6 @@ nnoremap <space>fb :ls<cr>:b<space>
 nnoremap <space>ft :tabs<cr>:tabnext<space>
 tnoremap <esc>[ <cmd>bprev<cr>
 tnoremap <esc>] <cmd>bnext<cr>
-" nnoremap <C-j> :m .+1<cr>==
-" nnoremap <C-k> :m .-2<cr>==
 
 " editing
 vnoremap <C-j> :m '>+1<cr>gv=gv
@@ -25,28 +35,11 @@ vnoremap <C-k> :m '<-2<cr>gv=gv
 nnoremap [<space> m'O<esc>`'
 nnoremap ]<space> m'o<esc>`'
 nnoremap <space>y "+
-nnoremap gp `[v`]
-vnoremap < <gv
-vnoremap > >gv
-nnoremap =ip m`=ip``
-
-" indent text after pasting
-nnoremap p p`[v`]=
-nnoremap P P`[v`]=
-
-" snipe
-noremap s <cmd>Snipe<cr>
-noremap S <cmd>BSnipe<cr>
 
 " search
-nnoremap <space>o :e %:p:h<cr>
 nnoremap <space>cd <cmd>call RealCd()<cr>
 nnoremap <space>gcd <cmd>call CdGitRoot()<cr>
-nnoremap <space>fw /\<
-nnoremap <space>fg :silent DoGrep<cr>
-nnoremap <space>fG :silent DoFuzzyGrep<cr>
 nnoremap <space>qf :cw<cr>
-nnoremap <silent> <esc> :nohlsearch<cr>:CPopupSymbol<cr><esc>
 nnoremap <space>cr :!tcc -run %<cr>
 
 nnoremap <expr> <space>ff ":GitEdit " .. input(':e ', '', 'custom,CompleteGitFiles') .. "<cr>"
@@ -113,3 +106,5 @@ nnoremap <space>p <cmd>.!xclip -o<cr>
 " create an undo point before pasting
 inoremap <C-r> <C-G>u<C-r>
 
+
+]]
