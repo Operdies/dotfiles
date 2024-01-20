@@ -47,43 +47,33 @@ ensure_yay() {
 ensure_binaries() {
 	packages=(
 		arc-gtk-theme 
-		ctags
 		curl
-		dmenu networkmanager-dmenu-git
-		fd
-		feh
+		discord
+		dmenu networkmanager-dmenu-git rofi
+		fd fzf ripgrep
+		feh zathura zathura-pdf-mupdf
 		firefox
-		freetype2 
-		fzf
-		gcc gdb
-		git
-		go
+		gcc gdb go rustup npm git ctags
 		gsimplecal
-		gvim
-		htop
+		htop powertop
 		imagemagick
-		iw iwd
 		lazygit
-		libinput xf86-input-libinput libinput-gestures
-		libnotify
+		libinput xf86-input-libinput libinput-gestures # touchpad gestures
+		libnotify tiramisu-git # simple notification daemon that writes to stdout
 		man-db man-pages less
-		neovim
-		networkmanager
+		neovim gvim # vim-minimal does not have clipboard integration
+		networkmanager iw iwd # wifi + wifi cli tools
 		nitrogen
-		noto-fonts noto-fonts-emoji
+		noto-fonts noto-fonts-emoji # needed for Discord to display emojis
 		picom
-		powertop
-		ripgrep
-		rofi
 		rustup
 		sudo
 		tldr
 		tmux
 		xautolock i3lock
+		xcape # neat utility to use modifiers as keys when tapped (e.g. control as escape when tapped)
 		xfce-polkit dex
-		xorg-server xorg-xinit libx11 libxft libxinerama freetype2 
-		xorg-xinput xdotool xorg-xwininfo xdg-utils xclip tiramisu-git
-		zathura zathura-pdf-mupdf
+		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils xclip libx11 libxft libxinerama freetype2 
 		zsh ttf-meslo-nerd-font-powerlevel10k 
 	)
 
