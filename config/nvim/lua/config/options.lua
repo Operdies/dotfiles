@@ -31,3 +31,4 @@ vim.g.autoformat = false
 
 -- Set shiftwidth to 4 for csharp files
 vim.cmd([[autocmd FileType cs setlocal shiftwidth=4]])
+vim.cmd([[autocmd BufEnter *.csproj,*.props setlocal shiftwidth=4 filetype=xml]])

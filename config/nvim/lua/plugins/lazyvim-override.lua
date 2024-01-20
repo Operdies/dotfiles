@@ -1,24 +1,10 @@
 return {
-	{
-		"goolord/alpha-nvim",
-		enabled = false,
-	},
-	{
-		"folke/persistence.nvim",
-		enabled = false,
-	},
-	{
-		"neo-tree.nvim",
-		enabled = false,
-	},
-	{
-		"echasnovski/mini.pairs",
-		enabled = false,
-	},
-	{
-		"echasnovski/mini.surround",
-		enabled = false,
-	},
+	{ "goolord/alpha-nvim", enabled = false },
+	{ "folke/noice.nvim", enabled = false },
+	{ "folke/persistence.nvim", enabled = false },
+	{ "neo-tree.nvim", enabled = false },
+	{ "echasnovski/mini.pairs", enabled = false },
+	{ "echasnovski/mini.surround", enabled = false },
 	{
 		"akinsho/bufferline.nvim",
 		keys = {
