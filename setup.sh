@@ -46,7 +46,7 @@ ensure_yay() {
 
 ensure_binaries() {
 	packages=(
-		arc-gtk-theme 
+		arc-gtk-theme nitrogen
 		curl
 		discord
 		dmenu networkmanager-dmenu-git rofi
@@ -55,26 +55,22 @@ ensure_binaries() {
 		firefox
 		gcc gdb go rustup npm git ctags
 		gsimplecal
-		htop powertop
+		htop powertop lazygit
 		imagemagick
-		lazygit
 		libinput xf86-input-libinput libinput-gestures # touchpad gestures
 		libnotify tiramisu-git # simple notification daemon that writes to stdout
 		man-db man-pages less
-		neovim gvim # vim-minimal does not have clipboard integration
 		networkmanager iw iwd # wifi + wifi cli tools
-		nitrogen
 		noto-fonts noto-fonts-emoji # needed for Discord to display emojis
 		picom
-		rustup
 		sudo
 		tldr
-		tmux
+		tmux neovim gvim # vim-minimal does not have clipboard integration
 		xautolock i3lock
 		xcape # neat utility to use modifiers as keys when tapped (e.g. control as escape when tapped)
 		xfce-polkit dex
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils xclip libx11 libxft libxinerama freetype2 
-		zsh ttf-meslo-nerd-font-powerlevel10k 
+		zsh ttf-meslo-nerd-font-powerlevel10k # need a chonky font for a chonky shell
 	)
 
 	missing=()
