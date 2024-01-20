@@ -1,7 +1,7 @@
 os:
-  edit: 'vim {{filename}}'
-  editAtLine: 'vim +{{line}} -- {{filename}}'
-  editAtLineAndWait: 'vim +{{line}} -- {{filename}}'
+  edit: '~/.config/lazygit/nvim-wrapper.sh {{filename}}'                           
+  editAtLine: '~/.config/lazygit/nvim-wrapper.sh +{{line}} -- {{filename}}'        
+  editAtLineAndWait: '~/.config/lazygit/nvim-wrapper.sh +{{line}} -- {{filename}}' 
   editInTerminal: true
 gui:
   skipDiscardChangeWarning: true
