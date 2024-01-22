@@ -14,10 +14,9 @@ nmap("p", "p`[v`]=")
 nmap("<S-p>", "P`[v`]=")
 nmap("<C-s>", ":w<cr>")
 nmap("<esc>", "<esc>:nohlsearch<cr>")
-nmap("<leader>o", ":e %:p:h<cr>")
 nmap("<S-h>", ":bprev<cr>")
 nmap("<S-l>", ":bnext<cr>")
-nmap("<leader>bd", ":bdelete")
+nmap("<leader>bd", ":bdelete<cr>")
 
 vim.cmd[[
 " buffers
@@ -44,8 +43,6 @@ nnoremap <space>cr :!tcc -run %<cr>
 
 nnoremap <expr> <space>ff ":GitEdit " .. input(':e ', '', 'custom,CompleteGitFiles') .. "<cr>"
 nnoremap <space>fp :call OpenWizard()<cr>
-nnoremap <space>fr :RecentFiles 
-nnoremap <space>fs :tj<space><C-d>
 
 nnoremap ]q :cnext<cr>
 nnoremap [q :cprev<cr>
