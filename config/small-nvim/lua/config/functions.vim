@@ -1,3 +1,17 @@
+function! RealCd()
+	let fname = expand('%:p')->resolve()->fnamemodify(':h')
+	execute 'cd ' .. fname
+endfunction
+
+function! CdGitRoot()
+	call RealCd()
+	execute 'cd ' .. system('git rev-parse --show-toplevel')
+endfunction
+
+function! CompleteGitFiles(ArgLead, CmdLine, CursorPos)
+	return system("git ls-files")
+endfunction
+
 function! CompleteExecutables(ArgLead, CmdLine, CursorPos)
 	return system("find . -executable -type f -not -path '*/.*'")
 endfunction
@@ -14,10 +28,6 @@ function! CompleteProjects(ArgLead, CmdLine, CursorPos)
 	return projects->join("\n")
 endfunction
  
-function! OpenProject(project)
-	execute "cd ~/repos/" .. a:project
-	execute "tabe ."
-endfunction
 
 function! OpenWizard()
 	let path = input("Project: ", '', 'custom,CompleteProjects')
@@ -47,11 +57,6 @@ function! OpenWizard()
 	execute ':e ' .. file
 endfunction
 
-function! OldFiles(ArgLead, CmdLine, CursorPos)
-	" files ending with a trailing tilde are (likely) help / man pages
-	return filter(v:oldfiles, 'v:val !~ "[~]$"')->join("\n")
-endfunction
-
 function! s:GitEdit(f)
 	if filereadable(a:f)
 		execute ':e ' .. a:f
@@ -64,7 +69,6 @@ endfunction
 
 command! -complete=custom,CompleteGitFiles -nargs=1 GitEdit call s:GitEdit(<q-args>)
 command! -complete=custom,CompleteProjects -nargs=1 OpenProject :call OpenProject("<args>")
-command! -complete=custom,OldFiles -nargs=1 RecentFiles :e <args>
 
 function! AsyncRunMegaMaker()
 	let makefile=''
