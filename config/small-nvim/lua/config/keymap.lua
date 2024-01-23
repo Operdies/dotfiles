@@ -80,20 +80,20 @@ nnoremap <C-w><C-l> :call TmuxWinCmd('l')<cr>
 nnoremap <silent> <C-q> :call AsyncRunMegaMaker()<cr>
 
 " debugging
-nnoremap <F1> <cmd>call TermDebugSendCommand("run")<cr>
-nnoremap <F2> <cmd>call TermDebugSendCommand("quit")<cr>:tabclose<cr>
-nnoremap <F3> <cmd>call TermDebugSendCommand("start")<cr>
-nnoremap <F5> <cmd>call TermDebugSendCommand("continue")<cr>
-nnoremap <F9> <cmd>Until<cr>
-nnoremap <F10> <cmd>Over<cr>
-nnoremap <F11> <cmd>Step<cr>
-nnoremap <F12> <cmd>Finish<cr>
-nnoremap <space>db <cmd>Break<cr>
-nnoremap <space>dc <cmd>Clear<cr>
-nnoremap <space>dd <cmd>Until<cr>
-nnoremap <space>dq :GdbDo<space>
-nnoremap <space>dr <cmd>call TermDebugSendCommand("run")<cr>
-nnoremap <space>ds :Debug<space>
+" nnoremap <F1> <cmd>call TermDebugSendCommand("run")<cr>
+" nnoremap <F2> <cmd>call TermDebugSendCommand("quit")<cr>:tabclose<cr>
+" nnoremap <F3> <cmd>call TermDebugSendCommand("start")<cr>
+" nnoremap <F5> <cmd>call TermDebugSendCommand("continue")<cr>
+" nnoremap <F9> <cmd>Until<cr>
+" nnoremap <F10> <cmd>Over<cr>
+" nnoremap <F11> <cmd>Step<cr>
+" nnoremap <F12> <cmd>Finish<cr>
+" nnoremap <space>db <cmd>Break<cr>
+" nnoremap <space>dc <cmd>Clear<cr>
+" nnoremap <space>dd <cmd>Until<cr>
+" nnoremap <space>dq :GdbDo<space>
+" nnoremap <space>dr <cmd>call TermDebugSendCommand("run")<cr>
+" nnoremap <space>ds :Debug<space>
 
 " vim stuff
 nnoremap <space>so :w<cr>:so %<cr>
