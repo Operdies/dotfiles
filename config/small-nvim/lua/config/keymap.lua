@@ -1,7 +1,6 @@
-local map = vim.keymap.set
-local opts = { silent = true, noremap = true }
 local function nmap(keys, action)
-  map("n", keys, action, opts)
+  local opts = { silent = true, noremap = true }
+  vim.keymap.set("n", keys, action, opts)
 end
 
 -- Insert blank line before/after cursor and restore position
