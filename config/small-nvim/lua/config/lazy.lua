@@ -53,4 +53,4 @@ require("lazy").setup({
 require('config')
 
 
-dap.configurations.c = {} -- fix this lol
+-- dap.configurations.c = {} -- fix this lol
