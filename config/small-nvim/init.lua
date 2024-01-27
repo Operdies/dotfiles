@@ -332,7 +332,7 @@ require('lazy').setup({
       },
       build = ':TSUpdate',
     },
-    -- { import = 'custom.plugins' },
+    { import = 'plugins' },
   },
   dev = {
     path = "~/repos",
@@ -388,8 +388,8 @@ vim.o.smartcase = true
 vim.wo.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
+vim.o.updatetime = 1000
+vim.o.timeoutlen = 500
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -745,42 +745,8 @@ cmp.setup {
   },
 }
 
-local function nmap(keys, action)
-  local opts = { silent = true, noremap = true }
-  vim.keymap.set("n", keys, action, opts)
-end
--- Insert blank line before/after cursor and restore position
-nmap("[<space>", "m'O<esc>`'")
-nmap("]<space>", "m'o<esc>`'")
--- restore position after reindenting
-nmap("=ip", "m`=ip``")
--- reindent on paste
-nmap("p", "p`[v`]=")
-nmap("<S-p>", "P`[v`]=")
-nmap("<C-s>", ":w<cr>")
-nmap("<esc>", "<esc>:nohlsearch<cr>")
-nmap("<S-h>", ":bprev<cr>")
-nmap("<S-l>", ":bnext<cr>")
-nmap("<leader>bd", ":bdelete<cr>")
-nmap("g?", function()
-  local success, err = pcall(function() vim.cmd("Man " .. vim.fn.expand("<cword>")) end)
-  if not success then
-    -- vim.api.nvim_err_writeln
-    print(err)
-  end
-end)
-
-vim.keymap.set({ "v", "n" }, "<leader>cf", vim.lsp.buf.format)
-
-vim.keymap.set("v", "<M-j>", ":m '>+1<cr>gv=gv")
-vim.keymap.set("v", "<M-k>", ":m '<-2<cr>gv=gv")
-vim.keymap.set("n", "<M-j>", ":m .+1<cr>==")
-vim.keymap.set("n", "<M-k>", ":m .-2<cr>==")
-vim.o.shiftwidth = 2
-vim.o.tabstop = 2
-vim.o.expandtabs = false
-vim.o.number = true
-vim.o.swapfile = false
+require('config.options')
+require('config.keymap')
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
