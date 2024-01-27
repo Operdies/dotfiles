@@ -24,7 +24,7 @@ return {
           dap.listeners.after.event_initialized["dapui_config"] = function()
             dapui.open({})
             hover_id = vim.api.nvim_create_autocmd('CursorHold', {
-              callback = dapui.eval,
+              callback = function() dapui.eval() end,
               group = eval_group,
             })
           end

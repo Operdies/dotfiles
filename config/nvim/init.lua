@@ -240,6 +240,7 @@ require('lazy').setup({
       -- Enable `lukas-reineke/indent-blankline.nvim`
       -- See `:help ibl`
       main = 'ibl',
+      enabled = false,
       opts = {},
     },
 
