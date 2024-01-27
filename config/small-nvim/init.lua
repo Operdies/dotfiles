@@ -45,6 +45,15 @@ require('lazy').setup({
     },
 
     {
+      'echasnovski/mini.starter',
+      version = '*',
+      opts = {
+        footer = "",
+        header = "",
+      },
+    },
+
+    {
       "stevearc/oil.nvim",
       cmd = { "Oil " },
       config = true,
@@ -454,6 +463,16 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
     vim.opt_local.filetype = "xml"
     vim.opt_local.shiftwidth = 4
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufReadPost', {
+  group = vim.api.nvim_create_augroup("RestoreLastKnownCursorLine", { clear = true }),
+  callback = function()
+    local line = vim.fn.line("'\"")
+    if line > 0 and line <= vim.fn.line("$") then
+      vim.fn.execute [[normal! g'"]]
+    end
   end,
 })
 
