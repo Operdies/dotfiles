@@ -1,4 +1,3 @@
-vim.o.autochdir = true
 vim.o.compatible = false
 vim.o.shiftwidth = 2
 vim.o.tabstop = 2
@@ -15,6 +14,7 @@ vim.o.incsearch = true
 vim.o.backup = false
 vim.o.undofile = true
 vim.o.writebackup = false
+vim.o.swapfile = false
 vim.o.textwidth = 0 -- disable automatic text reflowing on long lines
 vim.g.termdebug_config = { winbar = 0 }
 vim.opt.cino:append { "t0" }
