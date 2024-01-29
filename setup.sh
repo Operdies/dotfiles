@@ -66,6 +66,7 @@ ensure_binaries() {
 		sudo
 		tldr
 		tmux neovim gvim # vim-minimal does not have clipboard integration
+		unzip
 		xautolock i3lock
 		xcape # neat utility to use modifiers as keys when tapped (e.g. control as escape when tapped)
 		xfce-polkit dex
