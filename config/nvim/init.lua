@@ -71,6 +71,11 @@ require('lazy').setup({
       "stevearc/overseer.nvim",
       keys = {
         {
+          "<leader>rw",
+          "<cmd>OverseerQuickAction watch<cr>",
+          desc = "Rerun on save (Overseer)",
+        },
+        {
           "<leader>rt",
           "<cmd>OverseerRun<cr>",
           desc = "Run task (Overseer)",
@@ -230,6 +235,7 @@ require('lazy').setup({
           keymap = {
             next = "<M-j>",
             prev = "<M-k>",
+            accept = "<M-e>",
           }
         },
       },
@@ -314,6 +320,7 @@ require('lazy').setup({
       },
       opts = {
         options = {
+          close_command = "bp|bd #",
           diagnostics = "nvim_lsp",
           always_show_bufferline = true,
           offsets = {
@@ -743,7 +750,6 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
-
 cmp.setup {
   snippet = {
     expand = function(args)
