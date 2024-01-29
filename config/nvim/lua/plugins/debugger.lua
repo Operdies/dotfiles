@@ -23,10 +23,10 @@ return {
           local hover_id = 0
           dap.listeners.after.event_initialized["dapui_config"] = function()
             dapui.open({})
-            hover_id = vim.api.nvim_create_autocmd('CursorHold', {
-              callback = function() dapui.eval() end,
-              group = eval_group,
-            })
+            -- hover_id = vim.api.nvim_create_autocmd('CursorHold', {
+            --   callback = function() dapui.eval() end,
+            --   group = eval_group,
+            -- })
           end
           dap.listeners.before.event_terminated["dapui_config"] = function()
             if hover_id ~= 0 then
