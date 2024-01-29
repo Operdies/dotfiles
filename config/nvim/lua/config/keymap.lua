@@ -25,7 +25,8 @@ nmap("<C-s>", ":w<cr>")
 nmap("<esc>", "<esc>:nohlsearch<cr>")
 nmap("<S-h>", ":bprev<cr>")
 nmap("<S-l>", ":bnext<cr>")
-nmap("<leader>bd", ":bdelete<cr>")
+-- delete the active buffer without deleting its window
+nmap("<leader>bd", ":bp|bd #<cr>")
 nmap("g?", function()
   local success, err = pcall(function() vim.cmd("Man " .. vim.fn.expand("<cword>")) end)
   if not success then
