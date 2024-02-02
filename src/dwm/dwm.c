@@ -1462,7 +1462,7 @@ void
 pushdown(const Arg *arg) {
 	Client *sel = selmon->sel, *c;
 
-	if(!sel || sel->isfloating || sel == nexttiled(selmon->clients))
+	if(!sel || sel->isfloating)
 		return;
 	if((c = nexttiled(sel->next))) {
 		detach(sel);
@@ -1479,11 +1479,15 @@ pushup(const Arg *arg) {
 
 	if(!sel || sel->isfloating)
 		return;
-	if((c = prevtiled(sel)) && c != nexttiled(selmon->clients)) {
-		detach(sel);
-		sel->next = c;
-		for(c = selmon->clients; c->next != sel->next; c = c->next);
-		c->next = sel;
+	if((c = prevtiled(sel))) {
+		if (c == nexttiled(selmon->clients)) {
+			zoom(arg);
+		} else {
+			detach(sel);
+			sel->next = c;
+			for(c = selmon->clients; c->next != sel->next; c = c->next);
+			c->next = sel;
+		}
 	}
 	focus(sel);
 	arrange(selmon);
