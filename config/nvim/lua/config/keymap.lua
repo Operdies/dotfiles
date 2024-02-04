@@ -41,6 +41,9 @@ vmap("<M-k>", ":m '<-2<cr>gv=gv")
 nmap("<M-j>", ":m .+1<cr>==")
 nmap("<M-k>", ":m .-2<cr>==")
 
+nmap("<C-]>", "g<C-]>")
+nmap("<C-j>", ":execute 'ptag ' .. expand('<cword>')<cr>")
+
 -- create undo point before pasting
 imap("<C-r>", "<C-G>u<C-r>")
 
@@ -48,4 +51,4 @@ imap("<C-r>", "<C-G>u<C-r>")
 vmap("<", "<gv")
 vmap(">", ">gv")
 
-imap("", "<del>")
+imap("<C-d>", "<del>")
