@@ -57,6 +57,7 @@ ensure_binaries() {
 		gsimplecal
 		htop powertop lazygit
 		imagemagick
+		libbsd # neat C headers
 		libinput xf86-input-libinput libinput-gestures # touchpad gestures
 		libnotify tiramisu-git # simple notification daemon that writes to stdout
 		man-db man-pages less
@@ -64,11 +65,11 @@ ensure_binaries() {
 		noto-fonts noto-fonts-emoji # needed for Discord to display emojis
 		picom
 		sudo
+		thunar thunar-volman
 		tldr
 		tmux neovim gvim # vim-minimal does not have clipboard integration
 		unzip
 		xautolock i3lock
-		xcape # neat utility to use modifiers as keys when tapped (e.g. control as escape when tapped)
 		xfce-polkit dex
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils xclip libx11 libxft libxinerama freetype2 
 		zsh ttf-meslo-nerd-font-powerlevel10k # need a chonky font for a chonky shell
