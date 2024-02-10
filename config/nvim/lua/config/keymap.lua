@@ -35,7 +35,6 @@ nmap("g?", function()
   end
 end)
 
-vim.keymap.set({ "v", "n" }, "<leader>cf", vim.lsp.buf.format, opts)
 vmap("<M-j>", ":m '>+1<cr>gv=gv")
 vmap("<M-k>", ":m '<-2<cr>gv=gv")
 nmap("<M-j>", ":m .+1<cr>==")
