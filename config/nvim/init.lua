@@ -711,7 +711,7 @@ local servers = {
     single_file_support = false,
     root_dir = lspconfig.util.root_pattern('compile_commands.json'),
     capabilities = {
-      offsetEncoding = { 'utf-8' } -- without this, clangd gives annoying offset warnings all over the place
+      offsetEncoding = { 'utf-16' } -- without this, clangd gives annoying offset warnings all over the place
     },
   },
   gopls = {},
