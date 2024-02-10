@@ -704,7 +704,7 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
+  clangd = {},
   gopls = {},
   -- pyright = {},
   rust_analyzer = {},
@@ -796,6 +796,12 @@ cmp.setup {
 
 require('config.options')
 require('config.keymap')
+
+local lspconfig = require('lspconfig')
+lspconfig.clangd.setup({
+  single_file_support = false,
+  root_dir = lspconfig.util.root_pattern('compile_commands.json')
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
