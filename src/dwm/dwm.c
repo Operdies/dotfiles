@@ -240,7 +240,7 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static int solitary(Client *c);
 static void spawn(const Arg *arg);
-static void splitmon();
+static void splitmon(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
@@ -2005,7 +2005,7 @@ transferclients(Client *c, Monitor *m)
 }
 
 void
-renumbermons()
+renumbermons(void)
 {
 	Monitor *m;
 	int i;
@@ -2033,7 +2033,7 @@ unsplitmon(Monitor *m)
 }
 
 void
-splitmon()
+splitmon(const Arg *arg)
 {
 	if (selmon->parent)
 		unsplitmon(selmon);
