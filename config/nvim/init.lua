@@ -703,20 +703,26 @@ require('mason-lspconfig').setup()
 --
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
+local lspconfig = require('lspconfig')
 local servers = {
-  clangd = {},
+  clangd = {
+    single_file_support = false,
+    root_dir = lspconfig.util.root_pattern('compile_commands.json'),
+  },
   gopls = {},
-  -- pyright = {},
+  pyright = {},
   rust_analyzer = {},
   -- tsserver = {},
   html = { filetypes = { 'html' } },
 
   lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-      -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-      -- diagnostics = { disable = { 'missing-fields' } },
+    settings = {
+      Lua = {
+        workspace = { checkThirdParty = false },
+        telemetry = { enable = false },
+        -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+        diagnostics = { disable = { 'missing-fields' } },
+      },
     },
   },
 }
@@ -735,16 +741,14 @@ mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
-mason_lspconfig.setup_handlers {
+mason_lspconfig.setup_handlers ({
   function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
+    local server = servers[server_name] or {}
+    server.capabilities = server.capabilities or capabilities
+    server.on_attach = server.on_attach or on_attach
+    lspconfig[server_name].setup(server)
   end,
-}
+})
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
@@ -796,12 +800,6 @@ cmp.setup {
 
 require('config.options')
 require('config.keymap')
-
-local lspconfig = require('lspconfig')
-lspconfig.clangd.setup({
-  single_file_support = false,
-  root_dir = lspconfig.util.root_pattern('compile_commands.json')
-})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
