@@ -64,8 +64,9 @@ ensure_binaries() {
 		networkmanager iw iwd # wifi + wifi cli tools
 		noto-fonts noto-fonts-emoji # needed for Discord to display emojis
 		picom
+		qmk udisks2 # flash keyboard + mount liatris controller
 		sudo
-		thunar thunar-volman
+		thunar thunar-volman gvfs # gvfs is needed for volume management / fuse integration in thunar
 		tldr
 		tmux neovim gvim # vim-minimal does not have clipboard integration
 		unzip
