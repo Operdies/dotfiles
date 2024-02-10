@@ -641,23 +641,25 @@ local on_attach = function(_, bufnr)
   --
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
-  local nmap = function(keys, func, desc)
+  local nmap = function(keys, func, desc, modes)
     if desc then
       desc = 'LSP: ' .. desc
     end
 
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+    vim.keymap.set(modes or 'n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  nmap('<leader>cr', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  nmap('<leader>cf', vim.lsp.buf.format, 'Format Buffer', 'n')
+  nmap('<leader>cf', vim.lsp.buf.format, 'Format Range', 'v')
 
   nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
   nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  nmap('<leader>cs', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+  nmap('<leader>cS', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -708,6 +710,9 @@ local servers = {
   clangd = {
     single_file_support = false,
     root_dir = lspconfig.util.root_pattern('compile_commands.json'),
+    -- capabilities = {
+    --   offsetEncoding = { 'utf-16' }
+    -- },
   },
   gopls = {},
   pyright = {},
@@ -744,7 +749,7 @@ mason_lspconfig.setup {
 mason_lspconfig.setup_handlers ({
   function(server_name)
     local server = servers[server_name] or {}
-    server.capabilities = server.capabilities or capabilities
+    server.capabilities = vim.tbl_deep_extend('force', capabilities, server.capabilities or {})
     server.on_attach = server.on_attach or on_attach
     lspconfig[server_name].setup(server)
   end,
@@ -763,6 +768,7 @@ cmp.setup {
     end,
   },
   completion = {
+    -- autocompletion while typing is distracting >:(
     autocomplete = false,
     completeopt = 'menu,menuone,noinsert',
   },
