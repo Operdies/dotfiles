@@ -861,6 +861,7 @@ drawbars(void)
 		drawbar(m);
 }
 
+static int nowarp = 0;
 void
 enternotify(XEvent *e)
 {
@@ -877,7 +878,9 @@ enternotify(XEvent *e)
 		selmon = m;
 	} else if (!c || c == selmon->sel)
 		return;
+	nowarp = 1;
 	focus(c);
+	nowarp = 0;
 }
 
 void
@@ -2535,6 +2538,8 @@ void
 warp(const Client *c)
 {
 	int x, y;
+
+	if (nowarp) return;
 
 	if (!c) {
 		XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww / 2, selmon->wy + selmon->wh / 2);
