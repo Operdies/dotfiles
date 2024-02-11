@@ -390,7 +390,7 @@ require('lazy').setup({
         "gzip",
         "matchit",
         "matchparen",
-        "netrwPlugin",
+        -- "netrwPlugin", -- netrw is needed for gx to open file under cursor with system handler
         "tarPlugin",
         "tohtml",
         "tutor",
