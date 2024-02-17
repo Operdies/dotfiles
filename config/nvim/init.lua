@@ -272,6 +272,17 @@ require('lazy').setup({
       "akinsho/toggleterm.nvim",
       cmd = "ToggleTerm",
       config = function(_, opts)
+        if 'Windows_NT' == vim.loop.os_uname().sysname then
+          vim.cmd [[
+            let &shell = 'powershell'
+            let &shellcmdflag = '-NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';'
+            let &shellredir = '2>&1 | %%{ "$_" } | Out-File %s; exit $LastExitCode'
+            let &shellpipe  = '2>&1 | %%{ "$_" } | Tee-Object %s; exit $LastExitCode'
+            set shellquote= shellxquote=
+            ]]
+        end
+
+        opts.shell = vim.o.shell
         local toggleterm = require("toggleterm")
         toggleterm.setup(opts)
       end,
@@ -362,7 +373,7 @@ require('lazy').setup({
         },
       },
     },
-
+    { 'echasnovski/mini.pairs', opts = {} },
     {
       -- Highlight, edit, and navigate code
       'nvim-treesitter/nvim-treesitter',
@@ -746,7 +757,7 @@ mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
 
-mason_lspconfig.setup_handlers ({
+mason_lspconfig.setup_handlers({
   function(server_name)
     local server = servers[server_name] or {}
     server.capabilities = vim.tbl_deep_extend('force', capabilities, server.capabilities or {})
