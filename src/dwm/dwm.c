@@ -980,6 +980,11 @@ focusstack_multimon(const Arg *arg)
 {
 	Client *c = NULL, *i;
 
+	if (selmon->lt[selmon->sellt]->arrange == &monocle) {
+		focusstack(arg);
+		return;
+	}
+
 	if (selmon->sel && selmon->sel->isfullscreen && lockfullscreen)
 		return;
 	if (arg->i > 0) {
