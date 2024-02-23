@@ -41,6 +41,7 @@ require('lazy').setup({
 
         -- Additional lua configuration, makes nvim stuff amazing!
         'folke/neodev.nvim',
+        'Hoffs/omnisharp-extended-lsp.nvim',
       },
     },
 
@@ -117,6 +118,7 @@ require('lazy').setup({
         -- Adds LSP completion capabilities
         'hrsh7th/cmp-nvim-lsp',
         'hrsh7th/cmp-path',
+        "hrsh7th/cmp-nvim-lsp-signature-help",
 
         -- Adds a number of user-friendly snippets
         'rafamadriz/friendly-snippets',
@@ -206,7 +208,11 @@ require('lazy').setup({
       "catppuccin/nvim",
       name = "catppuccin",
       priority = 1000,
-      config = function()
+      opts = {
+        no_italic = true,
+      },
+      config = function(_, opts)
+        require("catppuccin").setup(opts)
         vim.cmd.colorscheme 'catppuccin-mocha'
       end,
     },
@@ -727,6 +733,19 @@ local servers = {
   },
   gopls = {},
   pyright = {},
+  omnisharp = {
+    filetypes = { "cs", "csx" },
+    handlers = {
+      ["textDocument/definition"] = require("omnisharp_extended").handler,
+    },
+    on_attach = function(client, bufnr)
+      -- Use omnisharp_extended for decompilation
+
+      -- stylua: ignore
+      vim.keymap.set("n", "gd", "<cmd>lua require('omnisharp_extended').telescope_lsp_definitions()<cr>",
+        { buffer = bufnr, desc = "Goto Definition" })
+    end,
+  },
   rust_analyzer = {},
   -- tsserver = {},
   html = { filetypes = { 'html' } },
@@ -761,7 +780,18 @@ mason_lspconfig.setup_handlers({
   function(server_name)
     local server = servers[server_name] or {}
     server.capabilities = vim.tbl_deep_extend('force', capabilities, server.capabilities or {})
-    server.on_attach = server.on_attach or on_attach
+
+    local server_on_attach = server.on_attach
+
+    local on_attach_wrapper = function(i, bufnr)
+      on_attach(i, bufnr)
+      if server_on_attach then
+        server_on_attach(i, bufnr)
+      end
+    end
+
+    server.on_attach = on_attach_wrapper
+
     lspconfig[server_name].setup(server)
   end,
 })
@@ -820,6 +850,7 @@ cmp.setup {
   },
   sources = {
     { name = 'nvim_lsp' },
+    { name = 'nvim_lsp_signature_help' },
     { name = 'luasnip' },
     { name = 'path' },
     { name = "tags",
