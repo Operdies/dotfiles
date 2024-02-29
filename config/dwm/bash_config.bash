@@ -10,7 +10,10 @@ LIBINPUT="$HOME/.config/sxhkd/scripts/libinput.sh"
 	sh "$LIBINPUT" set 'disable while typing' 1
 	sh "$LIBINPUT" set 'tapping enabled' 1
 )
+
 libinput-gestures &
+autorandr --change
+nitrogen --restore
 
 DEFAULT_PREFIX='super + space ; '
 
