@@ -61,7 +61,7 @@
 #define CHARBUFSIZE 256
 
 /* enums */
-enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
+enum { CurNormal, CurTopLeft, CurTopRight, CurBottomLeft, CurBottomRight, CurMove, CurLast }; /* cursor */
 enum { SchemeNorm, SchemeSel }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck, NetWMFullscreen, NetActiveWindow, NetWMWindowType, NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
@@ -275,6 +275,7 @@ static void zoom(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
+static int nowarp = 0;       /* bit of a hack to temporarily disable mouse warping when it would be intrusive (e.g. while resizing) */
 static char stext[CHARBUFSIZE];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
@@ -862,7 +863,6 @@ drawbars(void)
 		drawbar(m);
 }
 
-static int nowarp = 0;
 void
 enternotify(XEvent *e)
 {
@@ -1562,15 +1562,13 @@ resizemouse(const Arg *arg)
 	XEvent ev;
 	Time lasttime = 0;
 	bool topdrag, leftdrag;
+	int curresize;
 
 	if (!(c = selmon->sel))
 		return;
 	if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
 		return;
 	restack(selmon);
-	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-		None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess)
-		return;
 
 	x0 = c->x;
 	y0 = c->y;
@@ -1588,7 +1586,16 @@ resizemouse(const Arg *arg)
 		topdrag = leftdrag = false;
 	}
 
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, leftdrag ? 0 : c->w + c->bw - 1, topdrag ? 0 : c->h + c->bw - 1);
+	curresize = topdrag ?
+		leftdrag ? CurTopLeft : CurTopRight :
+		leftdrag ? CurBottomLeft : CurBottomRight;
+
+	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+		None, cursor[curresize]->cursor, CurrentTime) != GrabSuccess)
+		return;
+
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, ocx - c->x - c->bw, ocy - c->y - c->bw);
+	nowarp = 1; /* disable warp while resizing */
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch(ev.type) {
@@ -1618,17 +1625,22 @@ resizemouse(const Arg *arg)
 				int dx = ev.xmotion.x_root - ocx;
 				int dy = ev.xmotion.y_root - ocy;
 				resize(c, 
-					 leftdrag ? x0 + dx : x0,      // x
+					 leftdrag ? x0 + dx : x0,       // x
 					 topdrag  ? y0 + dy : y0,       // y
-					 leftdrag ? w0 - dx : w0 + dx, // w
+					 leftdrag ? w0 - dx : w0 + dx,  // w
 					 topdrag  ? h0 - dy : h0 + dy,  // h
 					1);
 			}
 			break;
 		}
 	} while (ev.type != ButtonRelease);
-	// XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, leftdrag ? 0 : c->w + c->bw - 1, topdrag ? 0 : c->h + c->bw - 1);
+
+	{ // ensure mouse is on the corner that initiated the resize
+		ocx = leftdrag ? c->x : c->x + c->w;
+		ocy = topdrag ? c->y : c->y + c->h;
+		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, ocx - c->x - c->bw, ocy - c->y - c->bw);
+	}
+	nowarp = 0;
 
 	XUngrabPointer(dpy, CurrentTime);
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
@@ -1938,7 +1950,10 @@ setup(void)
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
 	/* init cursors */
 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
-	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
+	cursor[CurTopLeft] = drw_cur_create(drw, XC_top_left_corner);
+	cursor[CurTopRight] = drw_cur_create(drw, XC_top_right_corner);
+	cursor[CurBottomLeft] = drw_cur_create(drw, XC_bottom_left_corner);
+	cursor[CurBottomRight] = drw_cur_create(drw, XC_bottom_right_corner);
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 	/* init appearance */
 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
