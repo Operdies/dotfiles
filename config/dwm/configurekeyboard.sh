@@ -13,3 +13,6 @@ capsescape() {
 
 
 capsescape
+
+# Key repeat after 200ms, 30 times per second 
+xset r rate 250 30
