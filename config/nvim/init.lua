@@ -247,6 +247,80 @@ require('lazy').setup({
         },
       },
     },
+
+    {
+      "CopilotC-Nvim/CopilotChat.nvim",
+      branch = "canary",
+      dependencies = {
+        { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
+        { "nvim-lua/plenary.nvim" },  -- for curl, log wrapper
+        { "ibhagwan/fzf-lua" },       -- for picker
+      },
+      opts = {
+        name = 'Copilot',
+        window = {
+          layout = 'horizontal',
+        },
+        prompts = {
+          FixDiagnostic = {
+            mapping = '<leader>ar',
+            description = 'AI Fix Diagnostic',
+          },
+          Explain = {
+            prompt = '/COPILOT_EXPLAIN /USER_EXPLAIN',
+            mapping = '<leader>ae',
+            description = 'AI Explain',
+          },
+          Documentation = {
+            prompt = '/COPILOT_DEVELOPER /USER_DOCS',
+            mapping = '<leader>ad',
+            description = 'AI Documentation',
+          },
+          Fix = {
+            prompt = '/COPILOT_DEVELOPER /USER_FIX',
+            mapping = '<leader>af',
+            description = 'AI Fix',
+          },
+          Optimize = {
+            prompt = '/COPILOT_DEVELOPER Optimize the selected code to improve performance and readability.',
+            mapping = '<leader>ao',
+            description = 'AI Optimize',
+          },
+          Simplify = {
+            prompt = '/COPILOT_DEVELOPER Simplify the selected code and improve readability',
+            mapping = '<leader>as',
+            description = 'AI Simplify',
+          },
+        },
+      },
+      config = function(_, opts)
+        local chat = require('CopilotChat')
+        local actions = require('CopilotChat.actions')
+        local integration = require('CopilotChat.integrations.fzflua')
+
+        local function pick(pick_actions)
+          return function()
+            integration.pick(pick_actions(), {}, {
+              fzf_tmux_opts = {
+                ['-d'] = '45%',
+              },
+            })
+          end
+        end
+
+        chat.setup(opts)
+        vim.keymap.set({ 'n', 'v' }, '<leader>aa', chat.toggle, { desc = 'AI Toggle' })
+        vim.keymap.set({ 'n', 'v' }, '<leader>ax', chat.reset, { desc = 'AI Reset' })
+        vim.keymap.set({ 'n', 'v' }, '<leader>ah', pick(actions.help_actions), { desc = 'AI Help Actions' })
+        vim.keymap.set(
+          { 'n', 'v' },
+          '<leader>ap',
+          pick(actions.prompt_actions),
+          { desc = 'AI Prompt Actions' }
+        )
+      end
+    },
+
     {
       -- Add indentation guides even on blank lines
       'lukas-reineke/indent-blankline.nvim',
