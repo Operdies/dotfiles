@@ -251,6 +251,7 @@ require('lazy').setup({
     {
       "CopilotC-Nvim/CopilotChat.nvim",
       branch = "canary",
+      event = "VeryLazy",
       dependencies = {
         { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
         { "nvim-lua/plenary.nvim" },  -- for curl, log wrapper
@@ -293,6 +294,10 @@ require('lazy').setup({
           },
         },
       },
+      keys = {
+        { "<leader>aa", function() require('CopilotChat').toggle() end, "Toggle Chat" },
+        { "<leader>ax", function() require('CopilotChat').reset() end,  "Reset Chat" },
+      },
       config = function(_, opts)
         local chat = require('CopilotChat')
         local actions = require('CopilotChat.actions')
@@ -309,9 +314,6 @@ require('lazy').setup({
         end
 
         chat.setup(opts)
-        vim.keymap.set({ 'n', 'v' }, '<leader>aa', chat.toggle, { desc = 'AI Toggle' })
-        vim.keymap.set({ 'n', 'v' }, '<leader>ax', chat.reset, { desc = 'AI Reset' })
-        vim.keymap.set({ 'n', 'v' }, '<leader>ah', pick(actions.help_actions), { desc = 'AI Help Actions' })
         vim.keymap.set(
           { 'n', 'v' },
           '<leader>ap',
@@ -661,10 +663,9 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'asm', 'bash', 'c', 'c_sharp', 'cpp', 'diff', 'gitcommit', 'go', 'javascript', 'lua', 'markdown', 'python', 'rust', 'svelte', 'tsx', 'typescript', 'vimdoc', 'vim', 'xml', 'yaml' },
 
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-    auto_install = false,
+    auto_install = true,
     -- Install languages synchronously (only applied to `ensure_installed`)
     sync_install = false,
     -- List of parsers to ignore installing
