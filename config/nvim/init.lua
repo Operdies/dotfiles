@@ -663,7 +663,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'asm', 'bash', 'c', 'c_sharp', 'cpp', 'diff', 'gitcommit', 'go', 'javascript', 'lua', 'markdown', 'python', 'rust', 'svelte', 'tsx', 'typescript', 'vimdoc', 'vim', 'xml', 'yaml' },
+    ensure_installed = { 'bash', 'c', 'c_sharp', 'cpp', 'diff', 'gitcommit', 'go', 'javascript', 'lua', 'markdown', 'python', 'rust', 'svelte', 'tsx', 'typescript', 'vimdoc', 'vim', 'xml', 'yaml' },
 
     auto_install = true,
     -- Install languages synchronously (only applied to `ensure_installed`)
