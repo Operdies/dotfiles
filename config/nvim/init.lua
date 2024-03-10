@@ -813,6 +813,7 @@ local servers = {
   },
   gopls = {},
   pyright = {},
+  ocamllsp = {},
   omnisharp = {
     filetypes = { "cs", "csx" },
     handlers = {
