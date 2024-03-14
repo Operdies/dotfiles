@@ -654,7 +654,8 @@ local function telescope_live_grep_open_files()
 end
 vim.keymap.set('n', '<leader>f/', telescope_live_grep_open_files, { desc = '[S]earch [/] in Open Files' })
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Select [B]uffer' })
-vim.keymap.set('n', '<leader>ff', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
+-- vim.keymap.set('n', '<leader>ff', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
+vim.keymap.set('n', '<leader>ff', "<cmd>Telescope fd<cr>",  { desc = 'Search with fd' })
 vim.keymap.set('n', '<leader>fF', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = 'Search Help' })
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
@@ -813,7 +814,6 @@ local servers = {
   },
   gopls = {},
   pyright = {},
-  ocamllsp = {},
   omnisharp = {
     filetypes = { "cs", "csx" },
     handlers = {
