@@ -91,6 +91,11 @@ require('lazy').setup({
           "<cmd>OverseerToggle<cr>",
           desc = "Toggle task list (Overseer)",
         },
+        {
+          "<leader>rr",
+          "<cmd>OverseerToggle right<cr>",
+          desc = "Open Overseer on the right",
+        },
       },
       opts = {
         task_list = {
