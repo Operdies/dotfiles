@@ -76,6 +76,10 @@ static const char *dmenu_nmcli[]  = { "networkmanager_dmenu", "-l", "10", DMENU_
 #include "bar_plugins/bar_tail.c"
 #include "bar_plugins/bar_network.c"
 
+#ifdef LAPTOP
+#include "bar_plugins/bar_keyboard.c"
+#endif // LAPTOP
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -153,6 +157,15 @@ bar_session_info(BarElementFuncArgs *data)
 /* commands */
 BarElement BarElements[] =
 {
+#ifdef LAPTOP
+	{
+			.data = &(keyboard_settings) {0},
+			.interval = default_tickrate,
+			.scheme = SchemeCpu,
+			.update = bar_keyboard,
+			.click = { [LeftClick] = bar_keyboard_click},
+	},
+#endif // LAPTOP
 	{
 		.data = &(network_settings) { .interface = "wlan0" },
 		.interval = default_tickrate,
