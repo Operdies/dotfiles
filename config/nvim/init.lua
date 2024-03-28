@@ -25,12 +25,16 @@ require('lazy').setup({
       'folke/trouble.nvim',
       opts = {},
       keys = {
-        { '<leader>tt', '<cmd>TroubleToggle<cr>',                 desc = 'Toggle Trouble' },
+        { '<leader>tt', '<cmd>TroubleToggle<cr>',                       desc = 'Toggle Trouble' },
         { '<leader>tw', '<cmd>TroubleToggle workspace_diagnostics<cr>', desc = 'Toggle Workspace' },
-        { '<leader>td', '<cmd>TroubleToggle document_diagnostics<cr>', desc = 'Toggle Workspace' },
+        { '<leader>td', '<cmd>TroubleToggle document_diagnostics<cr>',  desc = 'Toggle Workspace' },
       }
     },
-
+    {
+      "folke/todo-comments.nvim",
+      dependencies = { "nvim-lua/plenary.nvim" },
+      opts = {}
+    },
     -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
 
@@ -110,6 +114,8 @@ require('lazy').setup({
         task_list = {
           direction = "bottom",
           min_height = 15,
+          default_detail = 2,
+          dap = true,
         },
       },
     },
