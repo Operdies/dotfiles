@@ -61,6 +61,7 @@ ensure_binaries() {
 		libinput xf86-input-libinput libinput-gestures # touchpad gestures
 		libnotify tiramisu-git # simple notification daemon that writes to stdout
 		man-db man-pages less
+		mesa # picom requires iris_dri.so for the glx backed which is provided by mesa, but not mesa-amber
 		networkmanager iw iwd # wifi + wifi cli tools
 		noto-fonts noto-fonts-emoji # needed for Discord to display emojis
 		picom

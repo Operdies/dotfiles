@@ -31,12 +31,11 @@ if has redshift; then
 fi
 
 
-# Polkit
-# /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-# Dex
-# dex -a -s /etc/xdg/autostart/:~/.config/autostart/
 # dex -a -s ~/.config/autostart/
-dex ~/.config/autostart/xfce-polkit-gnome-authentication-agent-1.desktop
+# elevation requests
+dex /etc/xdg/autostart/xfce-polkit.desktop
+# blueman-applet
+dex /etc/xdg/autostart/blueman.desktop
 
 # the firewall-applet in /etc/xdg/autostart/firewall-applet.desktop
 # does not check if it is already running and will launch new instances.
