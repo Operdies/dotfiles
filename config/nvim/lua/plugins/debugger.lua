@@ -88,17 +88,13 @@ return {
 
     -- stylua: ignore
     keys = {
-      { "<leader>db", function() require("dap").toggle_breakpoint() end,             desc = "Toggle Breakpoint" },
+      { "<F9>",       function() require("dap").toggle_breakpoint() end,             desc = "Toggle Breakpoint" },
       { "<F5>",       function() require("dap").continue() end,                      desc = "Continue" },
       { "<leader>da", function() require("dap").continue({ before = get_args }) end, desc = "Run with Args" },
-      { "<F9>",       function() require("dap").run_to_cursor() end,                 desc = "Run to Cursor" },
       { "<leader>dg", function() require("dap").goto_() end,                         desc = "Go to line (no execute)" },
-      { "<leader>dj", function() require("dap").down() end,                          desc = "Down" },
-      { "<leader>dk", function() require("dap").up() end,                            desc = "Up" },
+      { "<F4>",       function() require("dap").up() end,                            desc = "Up" },
+      { "<F7>",       function() require("dap").down() end,                          desc = "Down" },
       { "<F1>",       function() require("dap").run_last() end,                      desc = "Run Last" },
-      { "<F7>",      function() require("dap").step_over() end,                     desc = "Step Over" },
-      { "<F8>",      function() require("dap").step_into() end,                     desc = "Step Into" },
-      { "<F9>",      function() require("dap").step_out() end,                      desc = "Step Out" },
       { "<F10>",      function() require("dap").step_over() end,                     desc = "Step Over" },
       { "<F11>",      function() require("dap").step_into() end,                     desc = "Step Into" },
       { "<F12>",      function() require("dap").step_out() end,                      desc = "Step Out" },
@@ -107,6 +103,7 @@ return {
       { "<leader>ds", function() require("dap").session() end,                       desc = "Session" },
       { "<F2>",       function() require("dap").terminate() end,                     desc = "Terminate" },
       { "<F17>",      function() require("dap").terminate() end,                     desc = "Terminate" },
+      { "<F8>", function() require("dap.ui.widgets").hover() end,              desc = "Widgets" },
       { "<leader>dw", function() require("dap.ui.widgets").hover() end,              desc = "Widgets" },
     },
 
