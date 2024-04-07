@@ -1,7 +1,11 @@
 #!/bin/bash
 
+id=""
 get_touchpad() {
-	xinput --list | grep " Touchpad " | grep -P --only-matching 'id=\d+' | cut -d= -f2
+	if [ -z "$id" ]; then
+		id=$(xinput --list | grep " Touchpad " | grep -P --only-matching 'id=\d+' | cut -d= -f2)
+	fi
+	echo "$id"
 }
 
 get_props() {
@@ -52,6 +56,7 @@ set)
 	fi
 	;;
 wizard)
+	id="$(xinput --list | grep -Eo '[a-zA-Z].*' | rofi 'Select device' | grep -P --only-matching 'id=\d+' | cut -d= -f2)"
 	prop="$(get_props | rofi 'Select a property')"
 	if [ -n "$prop" ]; then
 		propId="$(echo $prop | grep -P --only-matching "\(\d+\)" | tr -d '()')"
