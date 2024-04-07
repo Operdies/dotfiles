@@ -69,8 +69,9 @@ ensure_binaries() {
 		sudo
 		thunar thunar-volman gvfs # gvfs is needed for volume management / fuse integration in thunar
 		tldr
-		tmux neovim gvim # vim-minimal does not have clipboard integration
+		tmux neovim-nightly-bin gvim # vim-minimal does not have clipboard integration
 		unzip
+		valgrind
 		xautolock i3lock
 		xfce-polkit dex
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils xclip libx11 libxft libxinerama freetype2 
