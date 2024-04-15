@@ -223,12 +223,31 @@ BarElement BarElements[] =
 	},
 };
 
+static int quake_tag = 7;
+
+void
+quake(const Arg *arg)
+{
+	if (selmon) {	
+		int tag = 1 << quake_tag;
+		int tag_selected = (selmon->seltags & tag) > 0;
+		Client *c = NULL;
+		toggleview(&(Arg) { .ui = tag });
+		if (!tag_selected) {
+			for (c = selmon->stack; c && !ISVISIBLEONTAG(c, tag); c = c->next) 
+			;
+			if (c)
+				focus(c);
+		}
+	}
+}
 
 static const Key keys[] =
 {
 	/* modifier                     key        function                 argument */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,                   {.v = termcmd } },
 	{ MODKEY,                       XK_p,      spawn,                   {.v = dmenucmd } },
+	{ MODKEY,                       XK_t,      quake,                   {0} },
 	{ MODKEY,                       XK_d,      spawn,                   {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_w,      spawn,                   {.v = dmenu_nmcli } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,               {0} },
