@@ -21,20 +21,6 @@ require('lazy').setup({
     -- Git related plugins
     'tpope/vim-fugitive',
     'tpope/vim-rhubarb',
-    {
-      'folke/trouble.nvim',
-      opts = {},
-      keys = {
-        { '<leader>tt', '<cmd>TroubleToggle<cr>',                       desc = 'Toggle Trouble' },
-        { '<leader>tw', '<cmd>TroubleToggle workspace_diagnostics<cr>', desc = 'Toggle Workspace' },
-        { '<leader>td', '<cmd>TroubleToggle document_diagnostics<cr>',  desc = 'Toggle Workspace' },
-      }
-    },
-    {
-      "folke/todo-comments.nvim",
-      dependencies = { "nvim-lua/plenary.nvim" },
-      opts = {}
-    },
     -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
 
