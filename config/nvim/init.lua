@@ -723,10 +723,27 @@ require('mason-lspconfig').setup()
 local lspconfig = require('lspconfig')
 local servers = {
   clangd = {
+    keys = {
+      { "<leader>cR", "<cmd>ClangdSwitchSourceHeader<cr>", desc = "Switch Source/Header (C/C++)" },
+    },
     single_file_support = false,
     root_dir = lspconfig.util.root_pattern('compile_commands.json'),
     capabilities = {
-      offsetEncoding = { 'utf-16' } -- without this, clangd gives annoying offset warnings all over the place
+      offsetEncoding = { "utf-16" },
+    },
+    cmd = {
+      "clangd",
+      "--background-index",
+      "--clang-tidy",
+      "--header-insertion=iwyu",
+      "--completion-style=detailed",
+      "--function-arg-placeholders",
+      "--fallback-style=llvm",
+    },
+    init_options = {
+      usePlaceholders = true,
+      completeUnimported = true,
+      clangdFileStatus = true,
     },
   },
   gopls = {},
