@@ -817,6 +817,10 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
+
+vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+local cmp_defaults = require("cmp.config.default")()
+
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -824,14 +828,21 @@ cmp.setup {
     end,
   },
   completion = {
-    -- autocompletion while typing is distracting >:(
-    completeopt = 'menu,menuone,noinsert',
+    auto_bracktes = {},
+    completeopt   = 'menu,menuone,noinsert',
   },
+  experimental = {
+    ghost_text = {
+      hl_group = "CmpGhostText",
+    },
+  },
+  sorting = cmp_defaults.sorting,
   mapping = cmp.mapping.preset.insert {
     ['<C-n>'] = cmp.mapping.select_next_item(),
     ['<C-p>'] = cmp.mapping.select_prev_item(),
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ["<CR>"] = cmp.mapping.confirm({ select = true }),
     ['<C-e>'] = function()
       if cmp.get_selected_entry() == nil then
         cmp.complete()
@@ -863,14 +874,6 @@ cmp.setup {
     { name = 'nvim_lsp_signature_help' },
     { name = 'luasnip' },
     { name = 'path' },
-    { name = "tags",
-      option = {
-        complete_defer = 100,
-        max_items = 10,
-        exact_match = true,
-        current_buffer_only = true
-      }
-    },
   },
 }
 
