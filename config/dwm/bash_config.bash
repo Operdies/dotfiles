@@ -9,6 +9,7 @@ LIBINPUT="$HOME/.config/sxhkd/scripts/libinput.sh"
 	sh "$LIBINPUT" set 'natural scrolling' 1
 	sh "$LIBINPUT" set 'disable while typing' 1
 	sh "$LIBINPUT" set 'tapping enabled' 1
+	sh "$LIBINPUT" magic set 'tapping enabled' 1
 )
 
 libinput-gestures &
