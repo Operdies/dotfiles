@@ -10,39 +10,53 @@ return {
         dependencies = { "nvim-neotest/nvim-nio" },
         -- stylua: ignore
         keys = {
-          { "<leader>du", function() require("dapui").toggle({}) end, desc = "Dap UI" },
-          { "<leader>de", function() require("dapui").eval() end,     desc = "Eval",  mode = { "n", "v" } },
+          { "<leader>du", function() require("dapui").toggle({}) end,                  desc = "Dap UI" },
+          { "<leader>k",  function() require("dapui").eval(nil, { enter = true }) end, desc = "Eval",  mode = { "n", "v" } },
         },
         opts = {},
         config = function(_, opts)
           -- setup dap config by VsCode launch.json file
           -- require("dap.ext.vscode").load_launchjs()
           local dap = require("dap")
-          local dapui = require("dapui")
-          dapui.setup(opts)
-          local eval_group = vim.api.nvim_create_augroup('CursorHoldDebugEval', { clear = true })
-          local hover_id = 0
-          dap.listeners.after.event_initialized["dapui_config"] = function()
-            dapui.open({})
-            -- hover_id = vim.api.nvim_create_autocmd('CursorHold', {
-            --   callback = function() dapui.eval() end,
-            --   group = eval_group,
-            -- })
+          local ui = require("dapui")
+          ui.setup(opts)
+          dap.listeners.before.attach.dapui_config = function()
+            ui.open()
           end
-          dap.listeners.before.event_terminated["dapui_config"] = function()
-            if hover_id ~= 0 then
-              vim.api.nvim_del_autocmd(hover_id)
-              hover_id = 0
+          dap.listeners.before.launch.dapui_config = function()
+            ui.open()
+          end
+          dap.listeners.before.event_terminated.dapui_config = function()
+            ui.close()
+          end
+          dap.listeners.before.event_exited.dapui_config = function()
+            ui.close()
+          end
+          local function scan_executables()
+            local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', 'out', '-t', 'x' })
+            if ok and executables then
+              local cfgs = {}
+              for ex in pairs(executables) do
+                local nm = executables[ex]
+                local index = string.find(nm, "/[^/]*$")
+                local pretty = nm:sub(1 + (index or 0))
+
+                cfgs[#cfgs + 1] = {
+                  args = {},
+                  console = "integratedTerminal",
+                  cwd = "${workspaceFolder}",
+                  name = pretty,
+                  program = nm,
+                  request = "launch",
+                  stopOnEntry = false,
+                  type = "codelldb"
+                }
+              end
+              dap.configurations.c = cfgs
             end
-            dapui.close({})
           end
-          dap.listeners.before.event_exited["dapui_config"] = function()
-            if hover_id ~= 0 then
-              vim.api.nvim_del_autocmd(hover_id)
-              hover_id = 0
-            end
-            dapui.close({})
-          end
+          vim.keymap.set("n", "<leader>dr", scan_executables,
+            { desc = "Scan for executables (lldb)" })
         end,
       },
 
@@ -103,7 +117,7 @@ return {
       { "<leader>ds", function() require("dap").session() end,                       desc = "Session" },
       { "<F2>",       function() require("dap").terminate() end,                     desc = "Terminate" },
       { "<F17>",      function() require("dap").terminate() end,                     desc = "Terminate" },
-      { "<F8>", function() require("dap.ui.widgets").hover() end,              desc = "Widgets" },
+      { "<F8>",       function() require("dap.ui.widgets").hover() end,              desc = "Widgets" },
       { "<leader>dw", function() require("dap.ui.widgets").hover() end,              desc = "Widgets" },
     },
 
