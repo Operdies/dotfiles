@@ -53,6 +53,7 @@ ensure_binaries() {
 		fd fzf ripgrep
 		feh zathura zathura-pdf-mupdf
 		firefox
+		fish
 		gcc gdb go rustup npm git ctags
 		gsimplecal
 		htop powertop lazygit
@@ -69,7 +70,7 @@ ensure_binaries() {
 		sudo
 		thunar thunar-volman gvfs # gvfs is needed for volume management / fuse integration in thunar
 		tldr
-		tmux neovim-nightly-bin gvim # vim-minimal does not have clipboard integration
+		tmux gvim # vim-minimal does not have clipboard integration
 		unzip
 		valgrind
 		xautolock i3lock
