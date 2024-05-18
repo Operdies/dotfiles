@@ -18,6 +18,7 @@ end
 
 
 if status is-interactive
+    set --universal fish_color_error 'ff0000'
     set fish_greeting
     # Commands to run in interactive sessions can go here
     ensure_fisher
