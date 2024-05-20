@@ -221,10 +221,21 @@ require('lazy').setup({
       priority = 1000,
       opts = {
         no_italic = true,
+        background = {
+          light = "latte",
+          dark = "mocha",
+        },
+        highlight_overrides = {
+          mocha = function(_)
+            return {
+              WinSeparator = { fg = "#4E4E6E", },
+            }
+          end,
+        },
       },
       config = function(_, opts)
         require("catppuccin").setup(opts)
-        vim.cmd.colorscheme 'catppuccin-mocha'
+        vim.cmd.colorscheme 'catppuccin'
       end,
     },
 
@@ -327,9 +338,9 @@ require('lazy').setup({
       "akinsho/bufferline.nvim",
       event = "VeryLazy",
       keys = {
-        { "<leader>bo", "<cmd>%bd|e#<cr>", desc = "Delete other buffers" },
-        { "<S-h>",      "<cmd>BufferLineCyclePrev<cr>",   desc = "Prev buffer" },
-        { "<S-l>",      "<cmd>BufferLineCycleNext<cr>",   desc = "Next buffer" },
+        { "<leader>bo", "<cmd>%bd|e#<cr>",              desc = "Delete other buffers" },
+        { "<S-h>",      "<cmd>BufferLineCyclePrev<cr>", desc = "Prev buffer" },
+        { "<S-l>",      "<cmd>BufferLineCycleNext<cr>", desc = "Next buffer" },
       },
       opts = {
         options = {
