@@ -22,7 +22,8 @@ if status is-interactive
             curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
         end
 
-        set plugins "catppuccin/fish" \
+        set plugins "jorgebucaran/fisher" \
+        "catppuccin/fish" \
         "jorgebucaran/hydro" \
         "jethrokuan/z" \
         "2m/fish-history-merge"
@@ -32,10 +33,18 @@ if status is-interactive
                 fisher install $plugin
             end
         end
+        for plugin in $(fisher list)
+            if not contains $plugin $plugins
+                fisher remove $plugin
+            end
+        end
     end
 
-    set --universal fish_color_error 'ff0000'
     set fish_greeting
+    set hydro_multiline true
+    set hydro_color_pwd 6bb0f0
+    set hydro_color_error f02020
+    set fish_prompt_pwd_dir_length 10
 
     ensure_fisher
     fish_config theme choose "Catppuccin Mocha"
@@ -61,6 +70,11 @@ if status is-interactive
         end
     end
     bind \cq push-line
+
+    function take
+        mkdir -p $argv[1]
+        cd $argv[1]
+    end
 
     # startx on login on VT 1 if no display is set and the current session is on a tty
     if [ -t 0 -a -z "$DISPLAY" -a "$XDG_VTNR" -eq 1 -a ]
