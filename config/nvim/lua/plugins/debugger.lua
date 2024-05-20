@@ -36,10 +36,17 @@ return {
             local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', 'out', '-t', 'x' })
             if ok and executables then
               local cfgs = {}
+              local seen = {}
               for ex in pairs(executables) do
                 local nm = executables[ex]
                 local index = string.find(nm, "/[^/]*$")
                 local pretty = nm:sub(1 + (index or 0))
+                local existing = seen[pretty]
+                if existing ~= nil then
+                  pretty = nm
+                  cfgs[existing.index].name = executables[existing.sourceIndex]
+                end
+                seen[pretty] = { index = #cfgs+1, sourceIndex = ex }
 
                 cfgs[#cfgs + 1] = {
                   args = {},
