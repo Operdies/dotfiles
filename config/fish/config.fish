@@ -39,7 +39,28 @@ if status is-interactive
 
     ensure_fisher
     fish_config theme choose "Catppuccin Mocha"
-    bind \ea execute history-search-backward
+
+    function execute-and-restore
+        set -g __fish_pushed_line (commandline)
+        set -g __fish_cursor_pos (commandline -C)
+        commandline -f execute
+        function on-next-prompt --on-event fish_postexec
+            commandline $__fish_pushed_line
+            commandline -C $__fish_cursor_pos
+            functions --erase on-next-prompt
+        end
+    end
+    bind \ea execute-and-restore
+
+    function push-line
+        set -g __fish_pushed_line (commandline)
+        commandline ""
+        function on-next-prompt --on-event fish_postexec
+            commandline $__fish_pushed_line
+            functions --erase on-next-prompt
+        end
+    end
+    bind \cq push-line
 
     # startx on login on VT 1 if no display is set and the current session is on a tty
     if [ -t 0 -a -z "$DISPLAY" -a "$XDG_VTNR" -eq 1 -a ]
