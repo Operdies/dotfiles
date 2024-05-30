@@ -482,10 +482,12 @@ maybeclickbarelem(XEvent *e)
 	XButtonPressedEvent *ev = &e->xbutton;
 	Monitor *m = selmon;
 	int x = m->ww;
+	int sep_width = TEXTW(bar_plugin_separator);
 	for (int i = LENGTH(BarElements)-1; i >= 0; i--) {
 		BarElement *elem = BarElements + i;
 		if (elem->buffer[0] && !elem->hidden) {
 			x -= TEXTW(elem->buffer);
+			x -= sep_width / 2;
 			if (ev->x > x) {
 				if (ev->button < MouseButtonsLast && elem->click[ev->button]) {
 					elem->click[ev->button](&(BarElementFuncArgs) { .m = m, .e = elem, .ev = e });
@@ -493,6 +495,7 @@ maybeclickbarelem(XEvent *e)
 				}
 				return 1;
 			}
+			x -= sep_width / 2;
 		}
 	}
 	return 0;
@@ -849,6 +852,10 @@ drawbar(Monitor *m)
 				else
 					drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 				drw_text(drw, x, 0, w, bh, lrpad / 2, elem->buffer, 0);
+				w = TEXTW(bar_plugin_separator);
+				x -= w;
+				drw_setscheme(drw, scheme[SchemeSel]);
+				drw_text(drw, x, 0, w, bh, lrpad / 2, bar_plugin_separator, 0);
 			}
 		}
 	}
