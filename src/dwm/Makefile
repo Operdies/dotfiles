@@ -14,9 +14,6 @@ all: dwm
 
 ${OBJ}: config.h config.mk $(BAR_PLUGINS)
 
-config.h:
-	cp config.def.h $@
-
 dwm: ${OBJ} Makefile
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
 

@@ -1,7 +1,8 @@
+#include "catppuccin_mocha_palette.h"
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 0;        /* border pixel of windows */
+static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static int gap_y                    = 0;
 static int gap_x                    = 0;
@@ -10,24 +11,9 @@ static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int default_tickrate   = 1;
 static const int mouse_warp         = 1;
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
-static const char col_babyblue[]    = "#207597";
-static const char active_bg[]       = "#5c1a7b";
-static const char active_border[]   = "#8c1a9b";
-static const char col_gold[]        = "#9D800A";
-static const char col_black[]       = "#000000";
-static const char col_blue[]        = "#1B5378";
-static const char col_red[]         = "#FF0000";
-static const char col_green[]       = "#1E854A";
-static const char col_white[]       = "#ffffff";
 enum {
 	SchemeBattery = SchemeSel + 1,
 	SchemeClock,
-	SchemeSession,
 	SchemeCpu,
 	SchemeMemory,
 	SchemeNetwork,
@@ -36,25 +22,25 @@ enum {
 	SchemeCritical
 };
 static const char *colors[][3]      = {
-	/*                     fg         bg             border   */
-	[SchemeNorm]       = { col_gray3, col_gray1,     col_gray2 },
-	[SchemeSel]        = { col_gray4, active_bg,     active_border  },
-	[SchemeBattery]    = { col_gray4, col_green,     NULL },
-	[SchemeClock]      = { col_gray4, col_gray2,     NULL },
-	[SchemeSession]    = { col_gray4, col_black,     NULL },
-	[SchemeCpu]        = { col_gray4, col_blue,      NULL },
-	[SchemeMemory]     = { col_gray4, col_gold,      NULL },
-	[SchemeNetwork]    = { col_gray4, col_babyblue,  NULL },
-	[SchemeLow]        = { col_gray4, col_gray1,     NULL },
-	[SchemeNormal]     = { col_gray4, col_blue,      NULL },
-	[SchemeCritical]   = { col_gray4, col_red,       NULL },
+	/*                     fg             bg             border   */
+	[SchemeNorm]       = { col_Text,      col_Crust,     col_WinSeparator,    },
+	[SchemeSel]        = { col_Mauve,     col_Base,      col_Mauve },
+	[SchemeBattery]    = { col_Blue,      col_Base,      NULL },
+	[SchemeClock]      = { col_Mauve,     col_Base,      NULL },
+	[SchemeCpu]        = { col_Sapphire,  col_Base,      NULL },
+	[SchemeMemory]     = { col_Peach,     col_Base,      NULL },
+	[SchemeNetwork]    = { col_Red,       col_Base,      NULL },
+	[SchemeLow]        = { col_Rosewater, col_Base,      NULL },
+	[SchemeNormal]     = { col_Pink,      col_Base,      NULL },
+	[SchemeCritical]   = { col_Surface0,  col_Red,       NULL },
 };
 
 static const char dmenufont[]       = "MesloLGS NF:size=11";
 static const char *fonts[]          = { "MesloLGS NF:size=11:style=Bold" };
+static const char bar_plugin_separator[] = "│";
 
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-#define DMENU_ARGS "-m", dmenumon, "-i", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL
+#define DMENU_ARGS "-m", dmenumon, "-i", "-fn", dmenufont, "-nb", col_Base, "-nf", col_Text, "-sb", col_Mauve, "-sf", col_Surface0, NULL
 static const char *dmenucmd[] = { "dmenu_run", DMENU_ARGS };
 static const char *termcmd[]  = { "alacritty", NULL };
 static const char *dmenu_nmcli[]  = { "networkmanager_dmenu", "-l", "10", DMENU_ARGS, };
@@ -82,7 +68,7 @@ static const char *dmenu_nmcli[]  = { "networkmanager_dmenu", "-l", "10", DMENU_
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-
+// static const char *tags[] = { "🯱", 	"🯲", 	"🯳", 	"🯴", 	"🯵", 	"🯶", 	"🯷", 	"🯸", 	"🯹" };
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
@@ -157,15 +143,6 @@ bar_session_info(BarElementFuncArgs *data)
 /* commands */
 BarElement BarElements[] =
 {
-#ifdef LAPTOP
-	{
-			.data = &(keyboard_settings) {0},
-			.interval = default_tickrate,
-			.scheme = SchemeCpu,
-			.update = bar_keyboard,
-			.click = { [LeftClick] = bar_keyboard_click},
-	},
-#endif // LAPTOP
 	{
 		.data = &(network_settings) { .interface = "wlan0" },
 		.interval = default_tickrate,
