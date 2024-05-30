@@ -8,8 +8,7 @@ if status is-interactive
     set plugins "jorgebucaran/fisher" \
     "catppuccin/fish" \
     "jorgebucaran/hydro" \
-    "jethrokuan/z" \
-    "2m/fish-history-merge"
+    "jethrokuan/z" 
     set installed $(fisher list)
     for plugin in $plugins
         if not contains $plugin $installed
