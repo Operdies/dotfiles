@@ -27,38 +27,6 @@ endfunction
 command! DoGrep silent call Grephere('grep: ', '')
 command! DoFuzzyGrep silent call Grephere('fuzzy: ', 'f')
 
-def! UpdateBufferline(del: bool, write: bool)
-	var abuf = str2nr(expand("<abuf>"))
-	var bufnames = filter(getbufinfo(), 'v:val.listed')
-	var focused = bufnr()
-	var newtabline = ""
-	var sel = '%#TabLineSel#'
-	var nosel = '%#TabLine#'
-	var fill = '%#TabLineFill#'
-	for b in bufnames
-		# skip buffer if it was deleted
-		if del && abuf == b.bufnr
-			continue
-		endif
-		var prefix = ''
-		var postfix = (b.changed ? '+' : ' ')
-		if write && abuf == b.bufnr
-			postfix = ' '
-		endif
-
-		var name = prefix .. fnamemodify(b.name, ":t") .. ' [' .. b.bufnr .. ']' .. postfix
-
-		if b.bufnr == focused
-			name = sel .. name .. nosel .. ' '
-		else
-			name = nosel .. name .. ' '
-		endif
-		newtabline ..= name
-	endfor
-	newtabline ..= nosel
-	execute 'set tabline=' .. fnameescape(newtabline)
-enddef
-
 function! CompleteGitFiles(ArgLead, CmdLine, CursorPos)
 	return system("git ls-files")
 endfunction

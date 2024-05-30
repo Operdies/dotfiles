@@ -5,15 +5,6 @@ autocmd BufReadPost *
 			\ |   execute "normal! g`\""
 			\ | endif
 
-
-set updatetime=1000
-augroup bufferlinegrp
-	autocmd!
-	autocmd BufEnter,BufNew,CursorHold * call UpdateBufferline(v:false, v:false)
-	autocmd BufDelete * call UpdateBufferline(v:true, v:false)
-	autocmd BufWrite * call UpdateBufferline(v:false, v:true)
-augroup END
-
 augroup qf
 	autocmd!
 	autocmd FileType qf set nobuflisted
