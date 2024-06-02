@@ -27,4 +27,3 @@ col(Surface0, "#313244");
 col(Base, "#1e1e2e");
 col(Mantle, "#181825");
 col(Crust, "#11111b");
-col(WinSeparator, "#4e4e6e");

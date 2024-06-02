@@ -73,6 +73,7 @@ ensure_binaries() {
 		tmux gvim # vim-minimal does not have clipboard integration
 		unzip
 		valgrind
+		wmname # utility for setting the WM name (needed to fix broken java applications)
 		xautolock i3lock
 		xfce-polkit dex
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils xclip libx11 libxft libxinerama freetype2 
