@@ -1,12 +1,12 @@
 return {
   {
     "zbirenbaum/copilot.lua",
-    enabled = false,
-    event = "VeryLazy",
     cmd = "Copilot",
     build = ":Copilot auth",
+    keys = {
+      { "<M-j>", mode = "i" },
+    },
     opts = {
-      panel = { enabled = false },
       suggestion = {
         keymap = {
           next = "<M-j>",
@@ -14,82 +14,74 @@ return {
           accept = "<M-e>",
         }
       },
+      panel = { enabled = false },
     },
   },
 
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    enabled = false,
     branch = "canary",
-    event = "VeryLazy",
-    dependencies = {
-      { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
-      { "nvim-lua/plenary.nvim" },  -- for curl, log wrapper
-      { "ibhagwan/fzf-lua" },       -- for picker
-    },
-    opts = {
-      name = 'Copilot',
-      window = {
-        layout = 'horizontal',
-      },
-      prompts = {
-        FixDiagnostic = {
-          mapping = '<leader>ar',
-          description = 'AI Fix Diagnostic',
+    cmd = "CopilotChat",
+    opts = function()
+      local user = vim.env.USER or "User"
+      user = user:sub(1, 1):upper() .. user:sub(2)
+      return {
+        model = "gpt-4",
+        auto_insert_mode = true,
+        show_help = true,
+        question_header = "  " .. user .. " ",
+        answer_header = "  Copilot ",
+        window = {
+          width = 0.4,
         },
-        Explain = {
-          prompt = '/COPILOT_EXPLAIN /USER_EXPLAIN',
-          mapping = '<leader>ae',
-          description = 'AI Explain',
-        },
-        Documentation = {
-          prompt = '/COPILOT_DEVELOPER /USER_DOCS',
-          mapping = '<leader>ad',
-          description = 'AI Documentation',
-        },
-        Fix = {
-          prompt = '/COPILOT_DEVELOPER /USER_FIX',
-          mapping = '<leader>af',
-          description = 'AI Fix',
-        },
-        Optimize = {
-          prompt = '/COPILOT_DEVELOPER Optimize the selected code to improve performance and readability.',
-          mapping = '<leader>ao',
-          description = 'AI Optimize',
-        },
-        Simplify = {
-          prompt = '/COPILOT_DEVELOPER Simplify the selected code and improve readability',
-          mapping = '<leader>as',
-          description = 'AI Simplify',
-        },
-      },
-    },
+        selection = function(source)
+          local select = require("CopilotChat.select")
+          return select.visual(source) or select.buffer(source)
+        end,
+      }
+    end,
     keys = {
-      { "<leader>aa", function() require('CopilotChat').toggle() end, "Toggle Chat" },
-      { "<leader>ax", function() require('CopilotChat').reset() end,  "Reset Chat" },
+      {
+        "<leader>qa",
+        function()
+          return require("CopilotChat").toggle()
+        end,
+        desc = "Toggle (CopilotChat)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>qx",
+        function()
+          return require("CopilotChat").reset()
+        end,
+        desc = "Clear (CopilotChat)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>qq",
+        function()
+          local input = vim.fn.input("Quick Chat: ")
+          if input ~= "" then
+            require("CopilotChat").ask(input)
+          end
+        end,
+        desc = "Quick Chat (CopilotChat)",
+        mode = { "n", "v" },
+      },
     },
     config = function(_, opts)
-      local chat = require('CopilotChat')
-      local actions = require('CopilotChat.actions')
-      local integration = require('CopilotChat.integrations.fzflua')
+      local chat = require("CopilotChat")
+      require("CopilotChat.integrations.cmp").setup()
 
-      local function pick(pick_actions)
-        return function()
-          integration.pick(pick_actions(), {}, {
-            fzf_tmux_opts = {
-              ['-d'] = '45%',
-            },
-          })
-        end
-      end
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "copilot-chat",
+        callback = function()
+          vim.opt_local.relativenumber = false
+          vim.opt_local.number = false
+        end,
+      })
 
       chat.setup(opts)
-      vim.keymap.set(
-        { 'n', 'v' },
-        '<leader>ap',
-        pick(actions.prompt_actions),
-        { desc = 'AI Prompt Actions' }
-      )
-    end
+    end,
   },
 }

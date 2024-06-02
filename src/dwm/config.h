@@ -163,8 +163,11 @@ BarElement BarElements[] =
 		.update = bar_cpu_usage,
 	},
 	{
-		.click = { [LeftClick] = bar_battery_toggle_timer },
-		.data = &(battery_settings) { .show_details = 0 },
+		.click = { 
+				[LeftClick] = bar_battery_toggle_timer,
+				[RightClick] = bar_battery_toggle_percent,
+		},
+		.data = &(battery_settings) { .details = BAT_SHOW_ICON | BAT_SHOW_PERCENT | BAT_SHOW_TIME },
 		.interval = default_tickrate,
 		.scheme = SchemeBattery,
 		.update = bar_battery_status,

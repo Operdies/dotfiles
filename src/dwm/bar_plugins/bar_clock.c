@@ -9,10 +9,11 @@ bar_clock(BarElementFuncArgs *data)
 	time_t t;
 	time(&t);
 	struct tm *tm = localtime(&t);
+	int n = sprintf(data->e->buffer, "%s ", "");
 	if (s && s->show_seconds)
-		strftime(data->e->buffer, 100, "%a %b %d %H:%M:%S", tm);
+		strftime(data->e->buffer + n, 100, "%a %b %d %H:%M:%S", tm);
 	else
-		strftime(data->e->buffer, 100, "%a %b %d %H:%M", tm);
+		strftime(data->e->buffer + n, 100, "%a %b %d %H:%M", tm);
 }
 
 static void

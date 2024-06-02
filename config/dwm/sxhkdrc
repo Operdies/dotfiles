@@ -45,8 +45,9 @@ super + b : { shift + h, shift + l }
   ~/.config/sxhkd/scripts/backlight.sh {--set 32,--set 100}
 
 # {Enable,Disable} screen sleep timer
-super + b : { c,z }
-  xset s {on,off}
+super + b ; { c,z }
+  xset s { +dpms; xset s 60 60 ,\
+           -dpms; xset s off }
 
 # Screenshot
 Print

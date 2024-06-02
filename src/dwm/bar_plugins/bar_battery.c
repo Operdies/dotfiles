@@ -1,4 +1,5 @@
 enum { CHARGING = 1, DISCHARGING, FULL };
+enum BAT_DETAIL_FLAGS { BAT_SHOW_ICON = 1 << 0, BAT_SHOW_PERCENT = 1 << 1, BAT_SHOW_TIME = 1 << 2 };
 typedef struct {
 	int charge_full;
 	int charge_now;
@@ -49,7 +50,7 @@ read_bat(battery_info *bat) {
 }
 
 typedef struct {
-	int show_details;
+	enum BAT_DETAIL_FLAGS details;
 	int force_update;
 	int no_battery;
 	int state; // charging or discharging
@@ -114,10 +115,16 @@ bar_battery_status(BarElementFuncArgs *data) {
 	if (cursor == 0 || settings->force_update) {
 		settings->force_update = 0;
 		const char *icon = bat.state == CHARGING ? icon_charging : icon_charge_levels[percentage / 10];
-		if (settings->show_details && bat.state != FULL) {
-			sprintf(data->e->buffer, "%d%% | %dh%02dm | %s", percentage, hours, minutes, icon);
-		} else {
-			sprintf(data->e->buffer, "%s", icon);
+		int n = 0;
+		if (settings->details & BAT_SHOW_ICON)
+			n += sprintf(data->e->buffer + n, "%s ", icon);
+		if (settings->details & BAT_SHOW_PERCENT)
+			n += sprintf(data->e->buffer + n, "%d%% ", percentage);
+		if (settings->details & BAT_SHOW_TIME)
+			n += sprintf(data->e->buffer + n, "%dh%02dm", hours, minutes);
+		if (n && data->e->buffer[n-1] == ' ') {
+			data->e->buffer[n-1] = 0;
+			n--;
 		}
 	}
 	cursor = (cursor + 1) % LENGTH(chargebuf);
@@ -127,7 +134,13 @@ bar_battery_status(BarElementFuncArgs *data) {
 static void
 bar_battery_toggle_timer(BarElementFuncArgs *data) {
 	battery_settings *settings = (battery_settings*)data->e->data;
-	settings->show_details = !settings->show_details;
+	settings->details ^= BAT_SHOW_TIME;
 	settings->force_update = 1;
 }
 
+static void
+bar_battery_toggle_percent(BarElementFuncArgs *data) {
+	battery_settings *settings = (battery_settings*)data->e->data;
+	settings->details ^= BAT_SHOW_PERCENT;
+	settings->force_update = 1;
+}

@@ -45,9 +45,9 @@ dex /etc/xdg/autostart/blueman.desktop
 # Network Applet
 
 # nm-applet --indicator &
-if has picom; then
-	picom -b --config ~/.config/picom.conf &
-fi
+# if has picom; then
+# 	picom -b --config ~/.config/picom.conf &
+# fi
 
 # keyboard layout + caps mapping
 ~/.config/dwm/configurekeyboard.sh
