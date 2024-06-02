@@ -23,7 +23,7 @@ enum {
 };
 static const char *colors[][3]      = {
 	/*                     fg             bg             border   */
-	[SchemeNorm]       = { col_Text,      col_Crust,     col_WinSeparator,    },
+	[SchemeNorm]       = { col_Text,      col_Crust,     col_Overlay0,        },
 	[SchemeSel]        = { col_Mauve,     col_Base,      col_Mauve },
 	[SchemeBattery]    = { col_Blue,      col_Base,      NULL },
 	[SchemeClock]      = { col_Mauve,     col_Base,      NULL },
