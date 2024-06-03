@@ -28,7 +28,7 @@ return {
       return {
         model = "gpt-4",
         auto_insert_mode = true,
-        show_help = true,
+        show_help = false,
         question_header = "  " .. user .. " ",
         answer_header = "  Copilot ",
         window = {
