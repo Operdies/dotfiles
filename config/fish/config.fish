@@ -24,7 +24,7 @@ if status is-interactive
     fish_config theme choose "Catppuccin Mocha"
 
     # startx on login on VT 1 if no display is set and the current session is on a tty
-    if [ -t 0 -a -z "$DISPLAY" -a "$XDG_VTNR" -eq 1 -a ]
+    if [ -t 0 -a -z "$DISPLAY" -a "$XDG_VTNR" = 1 ]
         startx
     end
 end
