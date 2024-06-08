@@ -42,7 +42,7 @@ static const char bar_plugin_separator[] = "│";
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 #define DMENU_ARGS "-m", dmenumon, "-i", "-fn", dmenufont, "-nb", col_Base, "-nf", col_Text, "-sb", col_Mauve, "-sf", col_Surface0, NULL
 static const char *dmenucmd[] = { "dmenu_run", DMENU_ARGS };
-static const char *termcmd[]  = { "alacritty", NULL };
+static const char *termcmd[]  = { "alacritty", "-e", "tmux", NULL };
 static const char *dmenu_nmcli[]  = { "networkmanager_dmenu", "-l", "10", DMENU_ARGS, };
 
 #define CLAMP(x, lower, upper) ((x) < (lower) ? (lower) : (x) > (upper) ? (upper) : (x))
