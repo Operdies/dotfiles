@@ -1,3 +1,5 @@
+#pragma once
+#include "def.h"
 /*
  * Attempt to consolidate unavoidable suck into one file, away from dwl.c.  This
  * file is not meant to be pretty.  We use a .h file with static inline
