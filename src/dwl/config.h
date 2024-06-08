@@ -12,6 +12,7 @@ static const float *focuscolor            = col_Mauve;
 static const float *urgentcolor           = col_Red;
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 1.0f}; /* You can also use glsl colors */
+static int printstatus_enabled = 0;
 
 /* tagging - TAGCOUNT must be no greater than 31 */
 static const int TAGCOUNT = 9;
