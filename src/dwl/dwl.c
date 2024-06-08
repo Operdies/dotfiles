@@ -330,6 +330,7 @@ static void setmon(Client *c, Monitor *m, uint32_t newtags);
 static void setpsel(struct wl_listener *listener, void *data);
 static void setsel(struct wl_listener *listener, void *data);
 static void setup(void);
+static int solitary(Client *c);
 static void spawn(const Arg *arg);
 static void startdrag(struct wl_listener *listener, void *data);
 static void tag(const Arg *arg);
@@ -433,6 +434,7 @@ static xcb_atom_t netatom[NetLast];
 void
 applybounds(Client *c, struct wlr_box *bbox)
 {
+	c->bw = solitary(c) ? 0 : borderpx;
 	/* set minimum possible */
 	c->geom.width = MAX(1 + 2 * (int)c->bw, c->geom.width);
 	c->geom.height = MAX(1 + 2 * (int)c->bw, c->geom.height);
@@ -2544,6 +2546,20 @@ setup(void)
 		fprintf(stderr, "failed to setup XWayland X server, continuing without it\n");
 	}
 #endif
+}
+
+int
+solitary(Client *q)
+{
+	Client *c;
+	if (q->isfloating) return false;
+	if (&monocle == q->mon->lt[q->mon->sellt]->arrange)
+		return true;
+	wl_list_for_each(c, &clients, link) {
+		if (VISIBLEON(c, selmon) && !c->isfloating && c != q)
+			return false;
+	}
+	return true;
 }
 
 void
