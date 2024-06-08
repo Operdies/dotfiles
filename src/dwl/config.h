@@ -1,5 +1,5 @@
 #pragma once
-#include "dwl.c"
+#include "def.h"
 #include <xkbcommon/xkbcommon-keysyms.h>
 #include "catppuccin_mocha_palette.h"
 /* appearance */
