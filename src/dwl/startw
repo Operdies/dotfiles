@@ -1,0 +1,3 @@
+#!/bin/env bash
+
+"$HOME/repos/dotfiles/src/dwl/dwl" -s 'waybar' > /tmp/dwl-output
