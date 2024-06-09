@@ -1,3 +1,18 @@
 #!/bin/env bash
 
-"$HOME/repos/dotfiles/src/dwl/dwl" -s 'waybar' > /tmp/dwl-output
+do_startup() {
+  waybar &
+  if [ ! -z "$WALLPAPER_CMD" ]; then
+    sh -c "$WALLPAPER_CMD" &
+  fi
+}
+case "$1" in
+  startup)
+  do_startup
+  ;;
+  *) echo default
+    "$HOME/repos/dotfiles/src/dwl/dwl" -s "$0 startup" > /tmp/dwl-output
+  ;;
+esac
+
+
