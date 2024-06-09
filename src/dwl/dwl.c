@@ -628,15 +628,21 @@ createpointer(struct wlr_pointer *pointer)
 	if (wlr_input_device_is_libinput(&pointer->base)
 			&& (device = wlr_libinput_get_device_handle(&pointer->base))) {
 
-		if (libinput_device_config_tap_get_finger_count(device)) {
+		// This is a bit of a hack. I am assuming only touchpads have finger_count functionality
+		bool is_touchpad = libinput_device_config_tap_get_finger_count(device);
+		if (is_touchpad) {
 			libinput_device_config_tap_set_enabled(device, tap_to_click);
 			libinput_device_config_tap_set_drag_enabled(device, tap_and_drag);
 			libinput_device_config_tap_set_drag_lock_enabled(device, drag_lock);
 			libinput_device_config_tap_set_button_map(device, button_map);
 		}
 
-		if (libinput_device_config_scroll_has_natural_scroll(device))
-			libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling);
+		if (libinput_device_config_scroll_has_natural_scroll(device)) {
+			if (is_touchpad)
+				libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling_touchpad);
+			else
+				libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling_mouse);
+		}
 
 		if (libinput_device_config_dwt_is_available(device))
 			libinput_device_config_dwt_set_enabled(device, disable_while_typing);
