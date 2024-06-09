@@ -1,0 +1,60 @@
+[
+  {
+    "layer": "top",
+    "spacing": "4px",
+    "position": "top",
+    "reload_style_on_change": true,
+    "output": "eDP-1",
+    "modules-left": ["custom/dwl#X11-1"],
+    "modules-right": ["network", "memory", "cpu", "backlight", "battery", "clock", "tray"],
+    "custom/dwl#X11-1": {
+      "exec": "~/.config/waybar/waybar-dwl.sh 'eDP-1'",
+      "format": "{}",
+      "return-type": "json",
+      "max-length": 80,
+    },
+    "battery": {
+      "states": {
+        "good": 95,
+        "warning": 30,
+        "critical": 15
+      },
+      "format-alt": "{time} {icon}",
+      "format": "{capacity}% {icon}",
+      "format-full": "{capacity}% {icon}",
+      "format-charging": "{capacity}% ",
+      "format-plugged": "{capacity}% ",
+      // "format-good": "", // An empty format will hide the module
+      // "format-full": "",
+      "format-icons": ["", "", "", "", ""]
+    },
+    "backlight": {
+      // "device": "acpi_video1",
+      "scroll-step": 2,
+      "interval": 100,
+      "format": "{percent}% {icon}",
+      "format-icons": ["", "", "", "", "", "", "", "", ""]
+    },
+    "clock": {
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+      "format": "{0:%A %B %d %R}",
+    },
+    "cpu": {
+      "format": "{usage}% ",
+      "tooltip": false
+    },
+    "memory": {
+      "format-alt": "{}% ",
+      "format": "{used}G / {total}G",
+    },
+    "network": {
+      // "interface": "wlp2*", // (Optional) To force the use of this interface
+      "format-wifi": "{essid} ({signalStrength}%) ",
+      "format-ethernet": "{ipaddr}/{cidr} ",
+      "tooltip-format": "{ifname} via {gwaddr} ",
+      "format-linked": "{ifname} (No IP) ",
+      "format-disconnected": "Disconnected ⚠",
+      "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+  }
+]
