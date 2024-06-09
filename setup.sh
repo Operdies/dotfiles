@@ -74,7 +74,7 @@ ensure_binaries() {
 		tmux gvim # vim-minimal does not have clipboard integration
 		unzip
 		valgrind
-		wlroots wayland-protocols swaylock waybar wofi xorg-xwayland # wayland stuff dependencies (dwl)
+		wlroots wayland-protocols swaybg swaylock waybar wofi xorg-xwayland # wayland stuff dependencies (dwl)
 		wmname # utility for setting the WM name (needed to fix broken java applications)
 		xautolock i3lock
 		xfce-polkit dex
