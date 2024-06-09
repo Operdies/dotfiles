@@ -1557,39 +1557,37 @@ printstatus(void)
 	uint32_t occ, urg, sel;
 	const char *appid, *title;
 
-	if (printstatus_enabled) {
-		wl_list_for_each(m, &mons, link) {
-			occ = urg = 0;
-			wl_list_for_each(c, &clients, link) {
-				if (c->mon != m)
-					continue;
-				occ |= c->tags;
-				if (c->isurgent)
-					urg |= c->tags;
-			}
-			if ((c = focustop(m))) {
-				title = client_get_title(c);
-				appid = client_get_appid(c);
-				printf("%s title %s\n", m->wlr_output->name, title ? title : broken);
-				printf("%s appid %s\n", m->wlr_output->name, appid ? appid : broken);
-				printf("%s fullscreen %d\n", m->wlr_output->name, c->isfullscreen);
-				printf("%s floating %d\n", m->wlr_output->name, c->isfloating);
-				sel = c->tags;
-			} else {
-				printf("%s title \n", m->wlr_output->name);
-				printf("%s appid \n", m->wlr_output->name);
-				printf("%s fullscreen \n", m->wlr_output->name);
-				printf("%s floating \n", m->wlr_output->name);
-				sel = 0;
-			}
-
-			printf("%s selmon %u\n", m->wlr_output->name, m == selmon);
-			printf("%s tags %"PRIu32" %"PRIu32" %"PRIu32" %"PRIu32"\n",
-					m->wlr_output->name, occ, m->tagset[m->seltags], sel, urg);
-			printf("%s layout %s\n", m->wlr_output->name, m->ltsymbol);
+	wl_list_for_each(m, &mons, link) {
+		occ = urg = 0;
+		wl_list_for_each(c, &clients, link) {
+			if (c->mon != m)
+				continue;
+			occ |= c->tags;
+			if (c->isurgent)
+				urg |= c->tags;
 		}
-		fflush(stdout);
+		if ((c = focustop(m))) {
+			title = client_get_title(c);
+			appid = client_get_appid(c);
+			printf("%s title %s\n", m->wlr_output->name, title ? title : broken);
+			printf("%s appid %s\n", m->wlr_output->name, appid ? appid : broken);
+			printf("%s fullscreen %d\n", m->wlr_output->name, c->isfullscreen);
+			printf("%s floating %d\n", m->wlr_output->name, c->isfloating);
+			sel = c->tags;
+		} else {
+			printf("%s title \n", m->wlr_output->name);
+			printf("%s appid \n", m->wlr_output->name);
+			printf("%s fullscreen \n", m->wlr_output->name);
+			printf("%s floating \n", m->wlr_output->name);
+			sel = 0;
+		}
+
+		printf("%s selmon %u\n", m->wlr_output->name, m == selmon);
+		printf("%s tags %"PRIu32" %"PRIu32" %"PRIu32" %"PRIu32"\n",
+				 m->wlr_output->name, occ, m->tagset[m->seltags], sel, urg);
+		printf("%s layout %s\n", m->wlr_output->name, m->ltsymbol);
 	}
+	fflush(stdout);
 }
 
 void
@@ -1719,25 +1717,12 @@ run(char *startup_cmd)
 	if (!wlr_backend_start(backend))
 		die("startup: backend_start");
 
-	/* Now that the socket exists and the backend is started, run the startup command */
-	if (startup_cmd) {
-		int piperw[2];
-		if (pipe(piperw) < 0)
-			die("startup: pipe:");
-		if ((child_pid = fork()) < 0)
-			die("startup: fork:");
-		if (child_pid == 0) {
-			dup2(piperw[0], STDIN_FILENO);
-			close(piperw[0]);
-			close(piperw[1]);
-			execl("/bin/sh", "/bin/sh", "-c", startup_cmd, NULL);
-			die("startup: execl:");
-		}
-		dup2(piperw[1], STDOUT_FILENO);
-		close(piperw[1]);
-		close(piperw[0]);
-	}
 	printstatus();
+	/* Now that the socket exists and the backend is started, run the startup command */
+	if (startup_cmd && fork() == 0) {
+		execl("/bin/sh", "/bin/sh", "-c", startup_cmd, NULL);
+		die("startup: execl:");
+	}
 
 	/* At this point the outputs are initialized, choose initial selmon based on
 	 * cursor position, and set default cursor image */
