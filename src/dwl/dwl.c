@@ -1719,9 +1719,8 @@ run(char *startup_cmd)
 
 	printstatus();
 	/* Now that the socket exists and the backend is started, run the startup command */
-	if (startup_cmd && fork() == 0) {
-		execl("/bin/sh", "/bin/sh", "-c", startup_cmd, NULL);
-		die("startup: execl:");
+	if (startup_cmd) {
+		shell_exec(&(Arg){ .v = startup_cmd });
 	}
 
 	/* At this point the outputs are initialized, choose initial selmon based on
@@ -2126,6 +2125,17 @@ solitary(Client *q)
 	return true;
 }
 
+void
+shell_exec(const Arg *arg)
+{
+	if (fork() == 0) {
+		dup2(STDERR_FILENO, STDOUT_FILENO);
+		setsid();
+
+		execl("/bin/sh", "/bin/sh", "-c", arg->v, NULL);
+		die("dwl: execl %s failed:", arg->v);
+	}
+}
 void
 spawn(const Arg *arg)
 {
