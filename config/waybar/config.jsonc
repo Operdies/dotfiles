@@ -4,14 +4,14 @@
     "spacing": "4px",
     "position": "top",
     "reload_style_on_change": true,
-    "output": "eDP-1",
+    "output": ["eDP-1", "DP-1"],
     "modules-left": ["custom/dwl#X11-1"],
     "modules-right": ["network", "memory", "cpu", "backlight", "battery", "clock", "tray"],
     "custom/dwl#X11-1": {
-      "exec": "~/.config/waybar/waybar-dwl.sh 'eDP-1'",
+      "exec": "~/.config/waybar/waybar-dwl.sh",
       "format": "{}",
       "return-type": "json",
-      "max-length": 80,
+      "max-length": 80
     },
     "battery": {
       "states": {
@@ -37,7 +37,7 @@
     },
     "clock": {
       "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-      "format": "{0:%A %B %d %R}",
+      "format": "{0:%A %B %d %R}"
     },
     "cpu": {
       "format": "{usage}% ",
@@ -45,7 +45,7 @@
     },
     "memory": {
       "format-alt": "{}% ",
-      "format": "{used}G / {total}G",
+      "format": "{used}G / {total}G"
     },
     "network": {
       // "interface": "wlp2*", // (Optional) To force the use of this interface
@@ -55,6 +55,6 @@
       "format-linked": "{ifname} (No IP) ",
       "format-disconnected": "Disconnected ⚠",
       "format-alt": "{ifname}: {ipaddr}/{cidr}"
-    },
+    }
   }
 ]
