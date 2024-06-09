@@ -115,11 +115,6 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 	{ MODKEY|WLR_MODIFIER_SHIFT, SKEY,           tag,             {.ui = 1 << TAG} }, \
 	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,SKEY,toggletag, {.ui = 1 << TAG} }
 
-/* commands */
-// static const char *termcmd[] = { "alacritty", NULL };
-static const char *termcmd[] = { "alacritty", "-e", "tmux", NULL };
-static const char *rofi_drun[] = { "rofi", "-show", "drun", NULL };
-static const char *rofi_run[] = { "rofi", "-show", "run", NULL };
 
 static void AdjustBrightness(const Arg *a) {
   char cmdbuf[100];
@@ -132,9 +127,9 @@ static void AdjustBrightness(const Arg *a) {
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                            function            argument */
-	{ MODKEY,                    XKB_KEY_d,                     spawn,              {.v = rofi_run} },
-	{ MODKEY,                    XKB_KEY_p,                     spawn,              {.v = rofi_drun} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,                spawn,              {.v = termcmd} },
+	{ MODKEY,                    XKB_KEY_d,                     shell_exec,         {.v = "rofi -show run"} },
+	{ MODKEY,                    XKB_KEY_p,                     shell_exec,         {.v = "rofi -show drun"} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,                shell_exec,         {.v = "alacritty -e tmux"} },
 	{ MODKEY,                    XKB_KEY_j,                     focusstack,         {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                     focusstack,         {.i = -1} },
 	{ MODKEY,                    XKB_KEY_i,                     incnmaster,         {.i = +1} },
@@ -167,7 +162,11 @@ static const Key keys[] = {
 	TAGKEYS(          XKB_KEY_7, XKB_KEY_ampersand,                                  6),
 	TAGKEYS(          XKB_KEY_8, XKB_KEY_asterisk,                                   7),
 	TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                                  8),
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,                     quit,               {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,                     shell_exec,         {.v = "swaylock"} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_W,                     quit,               {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_E,                     shell_exec,         {.v = "systemctl poweroff"} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_R,                     shell_exec,         {.v = "systemctl reboot"} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_T,                     shell_exec,         {.v = "systemctl suspend"} },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
