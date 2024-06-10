@@ -1,6 +1,17 @@
 [
   {
     "include": [ "~/.config/waybar/default-modules.jsonc" ],
+    "output": "HDMI-A-1",
+    "modules-left": [ "custom/dwl" ],
+    "custom/dwl": {
+      "exec": "~/.config/waybar/waybar-dwl.sh 'HDMI-A-1'",
+      "format": "{}",
+      "return-type": "json",
+      "max-length": 120
+    }
+  },
+  {
+    "include": [ "~/.config/waybar/default-modules.jsonc" ],
     "output": "DP-1",
     "modules-left": [ "custom/dwl" ],
     "custom/dwl": {
