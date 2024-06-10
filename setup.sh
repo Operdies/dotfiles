@@ -76,11 +76,13 @@ ensure_binaries() {
 		tmux gvim # vim-minimal does not have clipboard integration
 		unzip
 		valgrind
+		way-displays # daemon for display handling -- handles laptop lid closing / plugging new monitors
 		wlroots wayland-protocols  wofi xorg-xwayland # wayland stuff dependencies (dwl)
 		wmname # utility for setting the WM name (needed to fix broken java applications)
 		xautolock i3lock
 		xfce-polkit dex
-		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils xclip libx11 libxft libxinerama freetype2 
+		xclip wl-clipboard # clipboard tools
+		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils libx11 libxft libxinerama freetype2 
 		zsh ttf-meslo-nerd-font-powerlevel10k # need a chonky font for a chonky shell
 	)
 

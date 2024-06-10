@@ -495,6 +495,8 @@ createlocksurface(struct wl_listener *listener, void *data)
 void
 createmon(struct wl_listener *listener, void *data)
 {
+	// FIXME: this crashes when I close and open my laptop lid while way-displays is running
+
 	/* This event is raised by the backend when a new output (aka a display or
 	 * monitor) becomes available. */
 	struct wlr_output *wlr_output = data;
