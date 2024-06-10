@@ -24,7 +24,7 @@ window#waybar {
 #memory,
 #temperature,
 #network,
-#custom-dwl1,
+#custom-dwl,
 #custom-media,
 #tray,
 #pulseaudio,
@@ -39,7 +39,7 @@ window#waybar {
   color: @text;
 }
 
-#custom-dwl1,
+#custom-dwl,
 #pulseaudio {
   border-left: 0;
 }
