@@ -81,13 +81,13 @@ readonly dwl_output_filename=/tmp/dwl-output
 # Number of lables must match dwl's config.h tagcount
 readonly labels=(1 2 3 4 5 6 7 8 9) 
 bold="font-face:"
-pango_tag_active="<span overline='single' overline_color='$text'>" # Pango span style for 'active' tags
-pango_tag_default="<span                             foreground='$overlay0'>" # Pango span style for 'default' tags
-pango_tag_selected="<span                            foreground='$mauve'>" # Pango span style for 'selected' tags
-pango_tag_urgent="<span                              background='$peach'>" # Pango span style for 'urgent' tags
-pango_layout="<span                                  foreground='$mauve'>" # Pango span style for 'layout' character
-pango_title="<span                                   foreground='$mauve'>" # Pango span style for 'title' monitor
-pango_inactive="<span                                foreground='$overlay0'>" # Pango span style for elements on an INACTIVE monitor
+pango_tag_active="<span   overline='single' overline_color='$text'>" 
+pango_tag_default="<span  foreground='$overlay0'>" 
+pango_tag_selected="<span foreground='$mauve'>" 
+pango_tag_urgent="<span   background='$peach'>"
+pango_layout="<span       foreground='$text'>" 
+pango_title="<span        foreground='$mauve'>"
+pango_inactive="<span     foreground='$overlay0'>" 
 ############### USER: MODIFY THESE VARIABLES ###############
 
 dwl_log_lines_per_focus_change=7 # This has changed several times as dwl has developed and may not yet be rock solid
@@ -132,26 +132,22 @@ _cycle() {
 }
 
 while [[ -n "$(pgrep waybar)" ]] ; do
-    [[ ! -f "${dwl_output_filename}" ]] && printf -- '%s\n' \
-				    "You need to redirect dwl stdout to ~/.cache/dwltags" >&2
-
-    # Get info from the file
-    dwl_latest_output_by_monitor="$(grep  "${monitor}" "${dwl_output_filename}" | tail -n${dwl_log_lines_per_focus_change})"
-    title="$(echo   "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* title'  | cut -d ' ' -f 3- )"
-    title="${title//\"/“}" # Replace quotation - prevent waybar crash
-    title="${title//\&/+}" # Replace ampersand - prevent waybar crash
-    layout="$(echo  "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* layout' | cut -d ' ' -f 3- )"
-    selmon="$(echo  "${dwl_latest_output_by_monitor}" | grep 'selmon' | cut -d ' ' -f 3)"
-
-    # Get the tag bit mask as a decimal
-    activetags="$(  echo "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* tags' | awk '{print $3}')"
-    selectedtags="$(echo "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* tags' | awk '{print $4}')"
-    urgenttags="$(  echo "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* tags' | awk '{print $6}')"
-
-    _cycle
-    printf -- '{"text":"%s"}\n' "${output_text}"
-
-    # 60-second timeout keeps this from becoming a zombified process when waybar is no longer running
-    inotifywait -t 60 -qq --event modify "${dwl_output_filename}"
+    if [[ -f "${dwl_output_filename}" ]]; then
+	# Get info from the file
+	dwl_latest_output_by_monitor="$(grep  "${monitor}" "${dwl_output_filename}" | tail -n${dwl_log_lines_per_focus_change})"
+	title="$(echo   "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* title'  | cut -d ' ' -f 3- )"
+	title="${title//\"/“}" # Replace quotation - prevent waybar crash
+	title="${title//\&/+}" # Replace ampersand - prevent waybar crash
+	layout="$(echo  "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* layout' | cut -d ' ' -f 3- )"
+	selmon="$(echo  "${dwl_latest_output_by_monitor}" | grep 'selmon' | cut -d ' ' -f 3)"
+	# Get the tag bit mask as a decimal
+	activetags="$(  echo "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* tags' | awk '{print $3}')"
+	selectedtags="$(echo "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* tags' | awk '{print $4}')"
+	urgenttags="$(  echo "${dwl_latest_output_by_monitor}" | grep '^[[:graph:]]* tags' | awk '{print $6}')"
+	_cycle
+	printf -- '{"text":"%s"}\n' "${output_text}"
+	# 60-second timeout keeps this from becoming a zombified process when waybar is no longer running
+	inotifywait -t 60 -qq --event modify "${dwl_output_filename}"
+    fi
 done
 
