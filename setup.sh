@@ -62,6 +62,7 @@ ensure_binaries() {
 		libbsd # neat C headers
 		libinput xf86-input-libinput libinput-gestures # touchpad gestures
 		libnotify tiramisu-git # simple notification daemon that writes to stdout
+		mako # notification ademon
 		man-db man-pages less
 		mesa # picom requires iris_dri.so for the glx backed which is provided by mesa, but not mesa-amber
 		networkmanager iw iwd # wifi + wifi cli tools
@@ -69,12 +70,13 @@ ensure_binaries() {
 		picom
 		qmk udisks2 # flash keyboard + mount liatris controller
 		sudo
+		swaybg swayidle swaylock waybar # thank you sway community for making compositor agnostic utils
 		thunar thunar-volman gvfs # gvfs is needed for volume management / fuse integration in thunar
 		tldr
 		tmux gvim # vim-minimal does not have clipboard integration
 		unzip
 		valgrind
-		wlroots wayland-protocols swaybg swaylock waybar wofi xorg-xwayland # wayland stuff dependencies (dwl)
+		wlroots wayland-protocols  wofi xorg-xwayland # wayland stuff dependencies (dwl)
 		wmname # utility for setting the WM name (needed to fix broken java applications)
 		xautolock i3lock
 		xfce-polkit dex
