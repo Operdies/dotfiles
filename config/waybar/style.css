@@ -15,7 +15,7 @@
 window#waybar {
   /* you can also GTK3 CSS functions! */
   background-color: shade(@base, 0.9);
-  border: 1px solid alpha(@crust, 0.3);
+  border-bottom: 1px solid alpha(@overlay0, 0.5);
 }
 
 #clock,
@@ -23,40 +23,45 @@ window#waybar {
 #cpu,
 #memory,
 #temperature,
-#backlight,
 #network,
-#pulseaudio,
+#custom-dwl1,
 #custom-media,
 #tray,
+#pulseaudio,
+#backlight,
 #mode,
 #idle_inhibitor,
 #mpd {
-    padding: 0 10px;
-    margin: 0px 0px; 
-    border-right: 1px solid @overlay0;
-    background-color: @base;
-    color: @text;
+  padding: 0 10px;
+  margin: 0px 0px; 
+  border-left: 1px solid @overlay0;
+  background-color: @base;
+  color: @text;
 }
 
-#tray {
-  border-right: 0;
+#custom-dwl1,
+#pulseaudio {
+  border-left: 0;
 }
 
-#clock {
-  color: @mauve;
-}
-#battery {
-  color: @sapphire;
+#pulseaudio {
+  color: @green;
 }
 #backlight {
-  color: @flamingo;
+  color: @yellow;
 }
-#cpu {
-  color: @lavender;
+#network {
+  color: @red;
 }
 #memory {
   color: @teal;
 }
-#network {
-  color: @red;
+#cpu {
+  color: @lavender;
+}
+#battery {
+  color: @sapphire;
+}
+#clock {
+  color: @mauve;
 }

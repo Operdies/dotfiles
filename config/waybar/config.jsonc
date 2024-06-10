@@ -5,9 +5,9 @@
     "position": "top",
     "reload_style_on_change": true,
     "output": ["eDP-1", "DP-1"],
-    "modules-left": ["custom/dwl#X11-1"],
-    "modules-right": ["network", "memory", "cpu", "backlight", "battery", "clock", "tray"],
-    "custom/dwl#X11-1": {
+    "modules-left": ["custom/dwl1"],
+    "modules-right": ["pulseaudio", "backlight", "network", "memory", "cpu", "battery", "clock", "tray"],
+    "custom/dwl1": {
       "exec": "~/.config/waybar/waybar-dwl.sh",
       "format": "{}",
       "return-type": "json",
@@ -55,6 +55,24 @@
       "format-linked": "{ifname} (No IP) ",
       "format-disconnected": "Disconnected ⚠",
       "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "pulseaudio": {
+      "format": "{volume}% {icon}",
+      "format-bluetooth": "{volume}% {icon}",
+      "format-muted": "",
+      "format-icons": {
+        "alsa_output.pci-0000_00_1f.3.analog-stereo": "",
+        "headphones": "",
+        "handsfree": "",
+        "headset": "",
+        "phone": "",
+        "portable": "",
+        "car": "",
+        "default": ["", ""]
+      },
+      "scroll-step": 1,
+      "on-click": "pavucontrol"
     }
+
   }
 ]
