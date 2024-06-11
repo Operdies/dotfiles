@@ -2131,7 +2131,7 @@ solitary(Client *q)
 	if (&monocle == q->mon->lt[q->mon->sellt]->arrange)
 		return true;
 	wl_list_for_each(c, &clients, link) {
-		if (VISIBLEON(c, selmon) && !c->isfloating && c != q)
+		if (VISIBLEON(c, q->mon) && !c->isfloating && c != q)
 			return false;
 	}
 	return true;
