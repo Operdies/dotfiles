@@ -95,6 +95,7 @@ arrange(Monitor *m)
 		m->lt[m->sellt]->arrange(m);
 	motionnotify(0, NULL, 0, 0, 0, 0);
 	checkidleinhibitor(NULL);
+	warpcursor(c);
 }
 
 void
@@ -897,6 +898,8 @@ focusclient(Client *c, int lift)
 	if (locked)
 		return;
 
+	warpcursor(c);
+
 	/* Raise client in stacking order if requested */
 	if (c && lift)
 		wlr_scene_node_raise_to_top(&c->scene->node);
@@ -997,6 +1000,7 @@ focusstack(const Arg *arg)
 	}
 	/* If only one client is visible on selmon, then c == sel */
 	focusclient(c, 1);
+	warpcursor(focustop(selmon));
 }
 
 /* We probably should change the name of this, it sounds like
@@ -2509,6 +2513,27 @@ virtualpointer(struct wl_listener *listener, void *data)
 	wlr_cursor_attach_input_device(cursor, &pointer.base);
 	if (event->suggested_output)
 		wlr_cursor_map_input_to_output(cursor, &pointer.base, event->suggested_output);
+}
+
+void
+warpcursor(const Client *c) {
+	if (cursor_mode != CurNormal) {
+		return;
+	}
+	if (!c && selmon) {
+		wlr_cursor_warp_closest(cursor,
+			  NULL,
+			  selmon->w.x + selmon->w.width / 2.0 ,
+			  selmon->w.y + selmon->w.height / 2.0);
+	}
+	else if ( c && (cursor->x < c->geom.x ||
+		cursor->x > c->geom.x + c->geom.width ||
+		cursor->y < c->geom.y ||
+		cursor->y > c->geom.y + c->geom.height))
+		wlr_cursor_warp_closest(cursor,
+			  NULL,
+			  c->geom.x + c->geom.width / 2.0,
+			  c->geom.y + c->geom.height / 2.0);
 }
 
 Monitor *
