@@ -185,6 +185,7 @@ set_default_apps() {
 	xdg-mime default firefox.desktop x-scheme-handler/https x-scheme-handler/http
 	xdg-mime default feh.desktop image/png
 	xdg-mime default feh.desktop image/jpeg
+	xdg-mime default thunar.desktop inode/directory
 }
 
 case "$1" in
