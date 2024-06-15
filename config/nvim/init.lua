@@ -785,11 +785,26 @@ require('mason-lspconfig').setup()
 local lspconfig = require('lspconfig')
 local servers = {
   clangd = {
-    keys = {
-      { "<leader>cR", "<cmd>ClangdSwitchSourceHeader<cr>", desc = "Switch Source/Header (C/C++)" },
-    },
-    single_file_support = false,
-    root_dir = lspconfig.util.root_pattern('compile_commands.json'),
+    on_attach = function(_, bufnr)
+      vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
+        { buffer = bufnr, desc = "Switch Source/Header" })
+    end,
+    root_dir = function(fname)
+      return require("lspconfig.util").root_pattern(
+        "Makefile",
+        "compile_commands.json",
+        -- I never use autoconf, so let's disable this until it's needed
+        -- "configure.ac",
+        -- "configure.in",
+        -- "config.h.in",
+        -- if meson.build exists in nested source directories, we get a separate clangd instance for each meson.build file
+        -- "meson.build",
+        "meson_options.txt",
+        "build.ninja"
+      )(fname) or require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt")(
+        fname
+      ) or require("lspconfig.util").find_git_ancestor(fname)
+    end,
     capabilities = {
       offsetEncoding = { "utf-16" },
     },
@@ -815,10 +830,7 @@ local servers = {
     handlers = {
       ["textDocument/definition"] = require("omnisharp_extended").handler,
     },
-    on_attach = function(client, bufnr)
-      -- Use omnisharp_extended for decompilation
-
-      -- stylua: ignore
+    on_attach = function(_, bufnr)
       vim.keymap.set("n", "gd", "<cmd>lua require('omnisharp_extended').telescope_lsp_definitions()<cr>",
         { buffer = bufnr, desc = "Goto Definition" })
     end,
