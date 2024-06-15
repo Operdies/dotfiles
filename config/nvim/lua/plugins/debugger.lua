@@ -34,7 +34,7 @@ return {
             ui.close()
           end
           local function scan_executables()
-            local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', 'out', '-t', 'x' })
+            local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', 'out', 'build', '-t', 'x' })
             if ok and executables then
               local cfgs = {}
               local seen = {}
@@ -63,8 +63,7 @@ return {
               dap.configurations.c = cfgs
             end
           end
-          vim.keymap.set("n", "<leader>dr", scan_executables,
-            { desc = "Scan for executables (lldb)" })
+          vim.keymap.set("n", "<leader>dr", scan_executables, { desc = "Scan for executables (lldb)" })
         end,
       },
 
@@ -121,7 +120,6 @@ return {
       { "<F11>",      function() require("dap").step_into() end,                     desc = "Step Into" },
       { "<F12>",      function() require("dap").step_out() end,                      desc = "Step Out" },
       { "<leader>dp", function() require("dap").pause() end,                         desc = "Pause" },
-      { "<leader>dr", function() require("dap").repl.toggle() end,                   desc = "Toggle REPL" },
       { "<leader>ds", function() require("dap").session() end,                       desc = "Session" },
       { "<F2>",       function() require("dap").terminate() end,                     desc = "Terminate" },
       { "<F17>",      function() require("dap").terminate() end,                     desc = "Terminate" },
