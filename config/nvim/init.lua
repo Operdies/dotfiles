@@ -628,16 +628,18 @@ local function telescope_live_grep_open_files()
     prompt_title = 'Live Grep in Open Files',
   }
 end
+
+local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>f/', telescope_live_grep_open_files, { desc = '[S]earch [/] in Open Files' })
-vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Select [B]uffer' })
--- vim.keymap.set('n', '<leader>ff', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Select [B]uffer' })
+-- vim.keymap.set('n', '<leader>ff', builtin.git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>ff', "<cmd>Telescope fd<cr>", { desc = 'Search with fd' })
-vim.keymap.set('n', '<leader>fF', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = 'Search Help' })
-vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>fG', ':LiveGrepGitRoot<cr>', { desc = 'Grep git root' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
-vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
+vim.keymap.set('n', '<leader>fF', builtin.git_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = 'Search Help' })
+vim.keymap.set('n', '<leader>fg', ':LiveGrepGitRoot<cr>', { desc = 'Grep git root' })
+vim.keymap.set('n', '<leader>fG', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
