@@ -31,7 +31,7 @@ return {
             path = 1,
           }
         },
-        lualine_x = { 'encoding' },
+        lualine_x = { 'filetype',  'encoding' },
         lualine_y = { 'progress' },
         lualine_z = { 'location' },
       },
