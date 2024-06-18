@@ -56,6 +56,7 @@ ensure_binaries() {
 		fish
 		gcc gdb go rustup npm git ctags
 		gsimplecal
+		gitmux # required to show git status in tmux
 		htop powertop lazygit
 		imagemagick
 		inotify-tools
