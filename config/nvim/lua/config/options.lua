@@ -1,3 +1,8 @@
+vim.o.termguicolors = true
+vim.o.completeopt = 'menuone,noselect'
+vim.wo.signcolumn = 'yes'
+vim.o.breakindent = true
+vim.o.mouse = 'a'
 vim.o.compatible = false
 vim.o.shiftwidth = 2
 vim.o.tabstop = 2
@@ -7,7 +12,6 @@ vim.o.smartcase = true
 vim.o.ruler = true
 vim.o.showcmd = true
 vim.o.hlsearch = true
-vim.o.wildmenu = true
 vim.o.number = false
 vim.o.scrolloff = 0
 vim.o.incsearch = true
