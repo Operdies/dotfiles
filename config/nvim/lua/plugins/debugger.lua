@@ -34,34 +34,38 @@ return {
             ui.close()
           end
           local function scan_executables()
-            local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', 'out', 'build', '-t', 'x' })
-            if ok and executables then
-              local cfgs = {}
-              local seen = {}
-              for ex in pairs(executables) do
-                local nm = executables[ex]
-                local index = string.find(nm, "/[^/]*$")
-                local pretty = nm:sub(1 + (index or 0))
-                local existing = seen[pretty]
-                if existing ~= nil then
-                  pretty = nm
-                  cfgs[existing.index].name = executables[existing.sourceIndex]
-                end
-                seen[pretty] = { index = #cfgs+1, sourceIndex = ex }
+            local function scan_dir(cfgs, dir)
+              local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', dir, '-u', '-t', 'x' })
+              if ok and executables then
+                local seen = {}
+                for ex in pairs(executables) do
+                  local nm = executables[ex]
+                  local index = string.find(nm, "/[^/]*$")
+                  local pretty = nm:sub(1 + (index or 0))
+                  local existing = seen[pretty]
+                  if existing ~= nil then
+                    pretty = nm
+                    cfgs[existing.index].name = executables[existing.sourceIndex]
+                  end
+                  seen[pretty] = { index = #cfgs + 1, sourceIndex = ex }
 
-                cfgs[#cfgs + 1] = {
-                  args = {},
-                  console = "integratedTerminal",
-                  cwd = "${workspaceFolder}",
-                  name = pretty,
-                  program = nm,
-                  request = "launch",
-                  stopOnEntry = false,
-                  type = "codelldb"
-                }
+                  cfgs[#cfgs + 1] = {
+                    args = {},
+                    console = "integratedTerminal",
+                    cwd = "${workspaceFolder}",
+                    name = pretty,
+                    program = nm,
+                    request = "launch",
+                    stopOnEntry = false,
+                    type = "codelldb"
+                  }
+                end
               end
-              dap.configurations.c = cfgs
             end
+            local cfgs = {}
+            scan_dir(cfgs, 'out')
+            scan_dir(cfgs, 'build')
+            dap.configurations.c = cfgs
           end
           vim.keymap.set("n", "<leader>dr", scan_executables, { desc = "Scan for executables (lldb)" })
         end,

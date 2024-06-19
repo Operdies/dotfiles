@@ -92,8 +92,8 @@ require('lazy').setup({
         },
         {
           "<leader>rr",
-          "<cmd>OverseerToggle right<cr>",
-          desc = "Open Overseer on the right",
+          "<cmd>OverseerQuickAction restart<cr>",
+          desc = "Restart the most recent oversser action",
         },
       },
       opts = {
