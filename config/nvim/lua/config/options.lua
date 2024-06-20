@@ -1,3 +1,6 @@
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 vim.o.termguicolors = true
 vim.o.completeopt = 'menuone,noselect'
 vim.wo.signcolumn = 'yes'
