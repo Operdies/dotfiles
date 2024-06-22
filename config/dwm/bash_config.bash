@@ -17,6 +17,7 @@ autorandr --change
 nitrogen --restore
 
 DEFAULT_PREFIX='super + space ; '
+TERM="alacritty"
 
 pkill -USR1 -x rhkd
 
@@ -72,7 +73,7 @@ common_apps() {
 		qutebrowser q 'Qutebrowser'
 		firefox f 'Firefox'
 		pavucontrol p 'pavucontrol'
-		'xfce4-terminal:xfce4-terminal -e "tmux attach"' x 'tmux attach most recent'
+		"$TERM:$TERM -e 'tmux attach'" x 'tmux attach most recent'
 	)
 
 	PREFIX="$DEFAULT_PREFIX r ; "
@@ -85,10 +86,9 @@ common_apps() {
 
 terminal() {
 	PREFIX="$DEFAULT_PREFIX "
-	# Set xfce4-terminal as main terminal, and wezterm as fallback
 	BINDINGS=(
+		"$TERM" Return "$TERM"
 		'st' Return 'st'
-		'xfce4-terminal' Return 'xfce4-terminal'
 		'wezterm:wezterm start' Return 'Wezterm'
 	)
 
@@ -104,7 +104,7 @@ terminal() {
 etcetera() {
 	PREFIX="$DEFAULT_PREFIX "
 	BINDINGS=(
-		'rofi -modi drun -show drun -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal xfce4-terminal -show-icons -drun-icon-theme "Arc-X-D" -font "Droid Sans Regular 10"'
+		"rofi -modi drun -show drun -line-padding 4 -columns 2 -padding 50 -hide-scrollbar -terminal $TERM -show-icons -drun-icon-theme 'Arc-X-D' -font 'Droid Sans Regular 10'"
 		d
 		'Rofi Launcher'
 	)
@@ -140,7 +140,7 @@ etcetera() {
 	# 	'{next,previous} window'
 	# )
 	# bind_unconditional -t "Cycle Windows" -o
-	# BINDINGS=('xfce4-terminal' '@Super_L ; Return' 'Open Terminal')
+	# BINDINGS=('$TERM' '@Super_L ; Return' 'Open Terminal')
 	# bind_unconditional -t "Terminal" -o
 }
 
@@ -184,7 +184,7 @@ tmuxes2() {
 			break;
 		fi
 		session="${MAPFILE[i]}"
-		BINDINGS+=("st -e tmux attach -t '$session'" "${keys[i]}" "Attach to $session")
+		BINDINGS+=("$TERM -e tmux attach -t '$session'" "${keys[i]}" "Attach to $session")
 	done
 	bind_unconditional -t 'Tmux Sessions' -o
 }
@@ -200,7 +200,7 @@ tmuxes() {
 			return
 		fi
 		session="${MAPFILE[i]}"
-		bind "a ; ${keys[i]}" "xfce4-terminal -e 'tmux attach -t \"$session\"'" -d "Attach to '$session'" -t "Attach to tmux session"
+		bind "a ; ${keys[i]}" "$TERM -e 'tmux attach -t \"$session\"'" -d "Attach to '$session'" -t "Attach to tmux session"
 	done
 }
 
