@@ -148,7 +148,6 @@ return {
               set_jumps = true, -- whether to set jumps in the jumplist
               goto_next_start = {
                 [']]'] = '@function.outer',
-                ['<Tab>'] = '@parameter.inner'
               },
               goto_next_end = {
                 [']['] = '@function.outer',
