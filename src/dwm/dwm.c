@@ -46,6 +46,7 @@
 
 #include "drw.h"
 #include "util.h"
+#include "bsdtime.h"
 
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
