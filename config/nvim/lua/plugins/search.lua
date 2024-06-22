@@ -80,8 +80,8 @@ return {
 
       local builtin = require('telescope.builtin')
 
-      vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = '[?] Find recently opened files' })
-      vim.keymap.set('n', '<leader><space>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = 'Find recently opened files' })
+      vim.keymap.set('n', '<leader><space>', builtin.buffers, { desc = 'Find existing buffers' })
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to telescope to change theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -97,15 +97,15 @@ return {
         }
       end
 
-      vim.keymap.set('n', '<leader>f/', telescope_live_grep_open_files, { desc = '[S]earch [/] in Open Files' })
-      vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Select [B]uffer' })
+      vim.keymap.set('n', '<leader>f/', telescope_live_grep_open_files, { desc = 'Search / in Open Files' })
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Select Buffer' })
       vim.keymap.set('n', '<leader>ff', "<cmd>Telescope fd<cr>", { desc = 'Search with fd' })
-      vim.keymap.set('n', '<leader>fF', builtin.git_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>fF', builtin.git_files, { desc = 'Search Files' })
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = 'Search Help' })
       vim.keymap.set('n', '<leader>fg', live_grep_git_root, { desc = 'Grep git root' })
-      vim.keymap.set('n', '<leader>fG', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+      vim.keymap.set('n', '<leader>fG', builtin.live_grep, { desc = 'Search by Grep' })
+      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Search Diagnostics' })
+      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = 'Search Resume' })
 
       -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
       vim.defer_fn(function()
