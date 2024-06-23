@@ -83,8 +83,11 @@ return {
       })
     end,
   },
-  -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
+  {
+    -- Detect tabstop and shiftwidth automatically
+    'tpope/vim-sleuth',
+    enabled = false,
+  },
   {
     -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
