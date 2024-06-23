@@ -68,3 +68,6 @@ vim.keymap.set('n', '[q', ':cprev<cr>', { desc = 'Go to previous quickfix item' 
 vim.keymap.set('n', ']q', ':cnext<cr>', { desc = 'Go to next quickfix item' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+-- Register access with " feels super awkward. Set up + and - as easy access registers
+vim.keymap.set({'v', 'n'}, '-', '"-', { desc = "Copy to - register", noremap = true })
+vim.keymap.set({'v', 'n'}, '+', '"+', { desc = "Copy to system clipboard", noremap = true })
