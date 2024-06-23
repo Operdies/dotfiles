@@ -205,6 +205,8 @@ return {
       vim.keymap.set('n', '<leader>f/', telescope_live_grep_open_files, { desc = 'Search / in Open Files' })
       vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Select Buffer' })
       vim.keymap.set('n', '<leader>ff', "<cmd>Telescope fd<cr>", { desc = 'Search with fd' })
+      vim.keymap.set('n', '<leader>ft', builtin.tagstack, { desc = 'Search tag stack' })
+      vim.keymap.set('n', '<leader>fj', builtin.jumplist, { desc = 'Search jump list' })
       vim.keymap.set('n', '<leader>fF', builtin.git_files, { desc = 'Search Files' })
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = 'Search Help' })
       vim.keymap.set('n', '<leader>fg', live_grep_git_root, { desc = 'Grep git root' })
