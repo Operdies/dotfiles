@@ -163,6 +163,10 @@ return {
         min_height = 15,
         default_detail = 2,
         dap = true,
+        bindings = {
+          ["<C-c>"] = "<cmd>OverseerQuickAction stop<cr>",
+          ["<C-r>"] = "<cmd>OverseerQuickAction restart<cr>",
+        }
       },
     },
   },
