@@ -36,3 +36,6 @@ vim.opt.fileencoding = "utf-8" -- the encoding written to a file
 
 vim.opt.relativenumber = false
 vim.g.autoformat = false
+vim.o.laststatus = 1
+vim.o.scrolloff = 3
+
