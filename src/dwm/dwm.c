@@ -69,6 +69,7 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck, NetWMFullscreen, NetActi
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
 enum { LeftClick = Button1, MiddleClick = Button2, RightClick = Button3, ScrollUp = Button4, ScrollDown = Button5, ScrollLeft, ScrollRight, MouseButtonsLast };
+enum { FloatLeft = 1, FloatRight = 2, FloatTop = 4, FloatBottom = 8, FloatCenter = FloatLeft | FloatRight | FloatTop | FloatBottom };
 
 typedef union {
 	int i;
@@ -137,13 +138,18 @@ struct Monitor {
 };
 
 typedef struct {
+	int floatposition;
+	int width;
+	int height;
+} PositionRule;
+
+typedef struct {
 	const char *class;
 	const char *instance;
 	const char *title;
 	unsigned int tags;
-	int isfloating;
 	int monitor;
-	int centerfloating;
+	PositionRule pos;
 } Rule;
 
 typedef struct BarElement BarElement;
@@ -339,15 +345,43 @@ applyrules(Client *c)
 		&& (!r->class || strstr(class, r->class))
 		&& (!r->instance || strstr(instance, r->instance)))
 		{
-			c->isfloating = r->isfloating;
+			c->isfloating = r->pos.floatposition ? 1 : 0;
 			c->tags |= r->tags;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
 
-			if (c->mon && c->isfloating && !c->isfullscreen && r->centerfloating) {
-				c->x = (c->mon->ww / 2) - (c->w / 2);
-				c->y = (c->mon->wh / 2) - (c->h / 2);
+			if (c->mon && c->isfloating && !c->isfullscreen && r->pos.floatposition) {
+				if (r->pos.width && r->pos.width < c->mon->ww) {
+					c->w = r->pos.width;
+				}
+				if (r->pos.height && r->pos.height < c->mon->wh) {
+					c->h = r->pos.height;
+				}
+
+				switch (r->pos.floatposition & (FloatLeft | FloatRight)) {
+					case FloatLeft:
+						c->x = c->mon->wx;
+						break;
+					case FloatRight:
+						c->x = c->mon->wx + c->mon->ww - c->w - borderpx * 2;
+						break;
+					default:
+						c->x = c->mon->wx + c->mon->ww / 2 - c->w / 2;
+						break;
+				}
+
+				switch (r->pos.floatposition & (FloatTop | FloatBottom)) {
+					case FloatTop:
+						c->y = c->mon->wy;
+						break;
+					case FloatBottom:
+						c->y = c->mon->wy + c->mon->wh - c->h - borderpx * 2;
+						break;
+					default:
+						c->y = c->mon->wy + c->mon->wh / 2 - c->h / 2;
+						break;
+				}
 			}
 		}
 	}

@@ -74,19 +74,19 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class             instance    title        tags mask     isfloating   monitor */
-	{ "firefox",         NULL,       NULL,        0,            0,           -1,     },
-	{ "Pavucontrol",     NULL,       NULL,        0,            1,           -1,     },
-	{ "discord",         NULL,       NULL,        0,            0,           -1,     },
-	{ "Zathura",         NULL,       NULL,        0,            0,           -1,     },
-	{ "nvim",            "nvim",     "nvim",      0,            0,           -1,     },
-	{ "vim",             "vim",      "vim",       0,            0,           -1,     },
-	{ "tmux",            NULL,       "tmux",      0,            0,           -1,     },
-	{ "st",              NULL,       NULL,        0,            0,           -1,     },
-	{ "thunar",          NULL,       NULL,        0,            0,           -1,     },
-	{ "steam_app_6910",  NULL,       NULL,        0,            1,           -1,     },
-	{ "steam_proton",    NULL,       NULL,        0,            1,           -1,     },
-	{ NULL,              NULL,       "riderterm", 0,            1,           -1, .centerfloating = 1,     },
+	/* class             instance    title        tags mask monitor position */
+	{ "firefox",         NULL,       NULL,        0,        -1,                                                    },
+	{ "Pavucontrol",     NULL,       NULL,        0,        -1,                                                    },
+	{ "discord",         NULL,       NULL,        0,        -1,                                                    },
+	{ "Zathura",         NULL,       NULL,        0,        -1,                                                    },
+	{ "nvim",            "nvim",     "nvim",      0,        -1,                                                    },
+	{ "vim",             "vim",      "vim",       0,        -1,                                                    },
+	{ "tmux",            NULL,       "tmux",      0,        -1,                                                    },
+	{ "st",              NULL,       NULL,        0,        -1,                                                    },
+	{ "Thunar",          NULL,       NULL,        0,        -1,     .pos = { FloatBottom|FloatRight, 1200, 800 }   },
+	{ "steam_app_6910",  NULL,       NULL,        0,        -1,                                                    },
+	{ "steam_proton",    NULL,       NULL,        0,        -1,                                                    },
+	{ NULL,              NULL,       "riderterm", 0,        -1,     .pos = { FloatCenter, 1200, 800 }              },
 };
 
 /* layout(s) */
