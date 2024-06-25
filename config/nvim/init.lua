@@ -296,6 +296,13 @@ require('lazy').setup({
     },
 
     {
+      "iamcco/markdown-preview.nvim",
+      cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+      ft = { "markdown" },
+      build = function() vim.fn["mkdp#util#install"]() end,
+    },
+
+    {
       -- Add indentation guides even on blank lines
       'lukas-reineke/indent-blankline.nvim',
       -- Enable `lukas-reineke/indent-blankline.nvim`
