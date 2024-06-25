@@ -16,6 +16,7 @@ do_startup() {
   waybar &
   start_sway_idle &
   pgrep -x mako || mako &
+  way-displays &
 
   if [ ! -z "$WALLPAPER_CMD" ]; then
     sh -c "$WALLPAPER_CMD" &
@@ -26,7 +27,7 @@ case "$1" in
   do_startup
   ;;
   *) echo default
-    "$HOME/repos/dotfiles/src/dwl/dwl" -s "$0 startup" > /tmp/dwl-output
+    "$HOME/repos/dotfiles/src/dwl/dwl" -s "$0 startup" > /tmp/dwl-output 2>> /tmp/dwl-stderr
   ;;
 esac
 
