@@ -5,6 +5,8 @@ has() {
 }
 
 INSTALLED=($(pacman -Qq))
+HERE="$(dirname "$0")"
+cd "$HERE"
 
 has_pkg() {
 	local needle="$1"
@@ -18,11 +20,9 @@ has_pkg() {
 		local guess="$(((end - start) / 2 + start))"
 		local item=${INSTALLED[guess]}
 
-		if [ "$item" == "$needle" ]
-		then
+		if [ "$item" == "$needle" ]; then
 			return 0
-		elif [ "$item" \< "$needle" ]
-		then
+		elif [ "$item" \< "$needle" ]; then
 			start=$guess
 		else
 			end=$guess
@@ -180,6 +180,10 @@ ensure_make() {
 	done
 }
 
+ensure_etc() {
+  cp -v --update --archive ./etc/ /
+}
+
 set_default_apps() {
 	# check filetype with e.g. xdg-mime query filetype <file>
 	xdg-mime default org.pwmt.zathura.desktop application/pdf
@@ -194,6 +198,9 @@ case "$1" in
 		INSTALL=1
 		ensure_make
 		;;
+  etc)
+    ensure_etc
+    ;;
 	*)
 		ensure_links
 		ensure_yay
