@@ -36,7 +36,6 @@ ZSH_CUSTOM=${ZSH_CUSTOM:-$ZSH/custom}
 [ -d $ZSH_CUSTOM/plugins/zsh-autosuggestions ] || sh -c "git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions"
 [ -d $ZSH_CUSTOM/plugins/zsh-z ] || sh -c "git clone https://github.com/agkozak/zsh-z $ZSH_CUSTOM/plugins/zsh-z"
 [ -d $ZSH_CUSTOM/plugins/fzf-zsh-plugin ] || sh -c "git clone https://github.com/unixorn/fzf-zsh-plugin $ZSH_CUSTOM/plugins/fzf-zsh-plugin"
-[ -d $ZSH_CUSTOM/plugins/fzf-tab-completion ] || sh -c "git clone https://github.com/lincheney/fzf-tab-completion $ZSH_CUSTOM/plugins/fzf-tab-completion"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
@@ -46,7 +45,6 @@ ZSH_CUSTOM=${ZSH_CUSTOM:-$ZSH/custom}
 plugins=(git zsh-syntax-highlighting zsh-autosuggestions zsh-z fzf-zsh-plugin)
 
 source $ZSH/oh-my-zsh.sh
-source $ZSH_CUSTOM/plugins/fzf-tab-completion/zsh/fzf-zsh-completion.sh
 
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -67,7 +65,6 @@ autoload -U compinit; compinit
 autoload -U +X bashcompinit && bashcompinit
 
 alias yank='xclip -selection clipboard'
-alias cd='z'
 
 my_ctags() {
   ctags -R --map-C=+.h --languages=c --c++-kinds=+p --fields=+iaS --extras=+q --sort=foldcase $*
