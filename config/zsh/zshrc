@@ -37,7 +37,6 @@ ZSH_CUSTOM=${ZSH_CUSTOM:-$ZSH/custom}
 [ -d $ZSH_CUSTOM/plugins/zsh-z ] || sh -c "git clone https://github.com/agkozak/zsh-z $ZSH_CUSTOM/plugins/zsh-z"
 [ -d $ZSH_CUSTOM/plugins/fzf-zsh-plugin ] || sh -c "git clone https://github.com/unixorn/fzf-zsh-plugin $ZSH_CUSTOM/plugins/fzf-zsh-plugin"
 [ -d $ZSH_CUSTOM/plugins/fzf-tab-completion ] || sh -c "git clone https://github.com/lincheney/fzf-tab-completion $ZSH_CUSTOM/plugins/fzf-tab-completion"
-source $ZSH_CUSTOM/plugins/fzf-tab-completion/zsh/fzf-zsh-completion.sh
 
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
@@ -47,6 +46,7 @@ source $ZSH_CUSTOM/plugins/fzf-tab-completion/zsh/fzf-zsh-completion.sh
 plugins=(git zsh-syntax-highlighting zsh-autosuggestions zsh-z fzf-zsh-plugin)
 
 source $ZSH/oh-my-zsh.sh
+source $ZSH_CUSTOM/plugins/fzf-tab-completion/zsh/fzf-zsh-completion.sh
 
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -68,7 +68,6 @@ autoload -U +X bashcompinit && bashcompinit
 
 alias yank='xclip -selection clipboard'
 alias cd='z'
-bindkey '^I' fzf_completion
 
 my_ctags() {
   ctags -R --map-C=+.h --languages=c --c++-kinds=+p --fields=+iaS --extras=+q --sort=foldcase $*
@@ -77,5 +76,9 @@ my_ctags() {
 vimtags() {
   ctags -R --languages=vim .
 }
+
+alias psh='/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoLogo -NoExit -Command cd C:\git'
+alias pwsh='/mnt/c/Program\ Files/PowerShell/7/pwsh.exe -NoLogo -NoExit -Command cd C:\git'
+alias wnvim='/mnt/c/Program\ Files/Neovim/bin/nvim.exe'
 
 # vim: set et sw=2 sts=2 tw=78 ft=sh:
