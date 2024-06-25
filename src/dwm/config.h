@@ -87,6 +87,7 @@ static const Rule rules[] = {
 	{ "steam_app_6910",  NULL,       NULL,        0,        -1,                                                    },
 	{ "steam_proton",    NULL,       NULL,        0,        -1,                                                    },
 	{ NULL,              NULL,       "riderterm", 0,        -1,     .pos = { FloatCenter, 1200, 800 }              },
+	{ NULL,              NULL,       "wlroots - X11-1", 0,  -1,     .pos = { FloatTop|FloatRight, 960, 540 }       },
 };
 
 /* layout(s) */
