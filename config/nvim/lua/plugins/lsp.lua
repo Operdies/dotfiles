@@ -191,14 +191,23 @@ return {
         gopls = {},
         pyright = {},
         omnisharp = {
-          filetypes = { "cs", "csx" },
           handlers = {
-            ["textDocument/definition"] = require("omnisharp_extended").handler,
+            ["textDocument/definition"] = function(...)
+              return require("omnisharp_extended").handler(...)
+            end,
           },
-          on_attach = function(_, bufnr)
-            vim.keymap.set("n", "gd", "<cmd>lua require('omnisharp_extended').telescope_lsp_definitions()<cr>",
-              { buffer = bufnr, desc = "Goto Definition" })
-          end,
+          keys = {
+            {
+              "gd",
+              function()
+                require("omnisharp_extended").telescope_lsp_definitions()
+              end,
+              desc = "Goto Definition",
+            },
+          },
+          enable_roslyn_analyzers = true,
+          organize_imports_on_format = true,
+          enable_import_completion = true,
         },
         rust_analyzer = {},
         -- tsserver = {},
