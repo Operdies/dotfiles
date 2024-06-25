@@ -93,7 +93,7 @@ ensure_binaries() {
 		mpkg="${missing[*]}"
 		echo "Missing packages: $mpkg"
 
-		cmd="yay -Sy $mpkg --noconfirm --needed"
+		cmd="yay -Syu $mpkg --noconfirm --needed"
 		while true; do
 			read -p "Install missing packages? ($cmd) (yn) " yn
 			case $yn in
