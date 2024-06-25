@@ -27,7 +27,9 @@ return {
   {
     "stevearc/oil.nvim",
     cmd = { "Oil " },
-    config = true,
+    opts = {
+      skip_confirm_for_simple_edits = true,
+    },
     dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
       {
