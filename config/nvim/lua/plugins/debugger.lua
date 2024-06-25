@@ -7,7 +7,10 @@ return {
       -- fancy UI for the debugger
       {
         "rcarriga/nvim-dap-ui",
-        dependencies = { "nvim-neotest/nvim-nio" },
+        dependencies = {
+          "nvim-neotest/nvim-nio",
+          "jay-babu/mason-nvim-dap.nvim",
+        },
         -- stylua: ignore
         keys = {
           { "<leader>du",    function() require("dapui").toggle({}) end,                  desc = "Dap UI" },
@@ -33,6 +36,7 @@ return {
           dap.listeners.before.event_exited.dapui_config = function()
             ui.close()
           end
+
           local function scan_executables()
             local function scan_dir(cfgs, dir)
               local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', dir, '-u', '-t', 'x' })
@@ -68,6 +72,31 @@ return {
             dap.configurations.c = cfgs
           end
           vim.keymap.set("n", "<leader>dr", scan_executables, { desc = "Scan for executables (lldb)" })
+
+
+          if not dap.adapters["netcoredbg"] then
+            require("dap").adapters["netcoredbg"] = {
+              type = "executable",
+              command = vim.fn.exepath("netcoredbg"),
+              args = { "--interpreter=vscode" },
+            }
+          end
+          for _, lang in ipairs({ "cs", "fsharp", "vb" }) do
+            if not dap.configurations[lang] then
+              dap.configurations[lang] = {
+                {
+                  type = "netcoredbg",
+                  name = "Launch file",
+                  request = "launch",
+                  ---@diagnostic disable-next-line: redundant-parameter
+                  program = function()
+                    return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/", "file")
+                  end,
+                  cwd = "${workspaceFolder}",
+                },
+              }
+            end
+          end
         end,
       },
 
