@@ -74,18 +74,19 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class             instance    title       tags mask     isfloating   monitor    icon*/
-	{ "firefox",         NULL,       NULL,       0,            0,           -1,        .icon="",   },
-	{ "Pavucontrol",     NULL,       NULL,       0,            1,           -1,        .icon="",   },
-	{ "discord",         NULL,       NULL,       0,            0,           -1,        .icon="ﭮ",   },
-	{ "Zathura",         NULL,       NULL,       0,            0,           -1,        .icon="󰈦",   },
-	{ "nvim",            "nvim",     "nvim",     0,            0,           -1,        .icon="",   },
-	{ "vim",             "vim",      "vim",      0,            0,           -1,        .icon="",   },
-	{ "tmux",            NULL,       "tmux",     0,            0,           -1,        .icon="",   },
-	{ "st",              NULL,       NULL,       0,            0,           -1,        .icon="",   },
-	{ "thunar",          NULL,       NULL,       0,            0,           -1,        .icon="",   },
-	{ "steam_app_6910",  NULL,       NULL,       0,            1,           -1,        .icon="",   },
-	{ "steam_proton",    NULL,       NULL,       0,            1,           -1,        .icon="",   },
+	/* class             instance    title        tags mask     isfloating   monitor */
+	{ "firefox",         NULL,       NULL,        0,            0,           -1,     },
+	{ "Pavucontrol",     NULL,       NULL,        0,            1,           -1,     },
+	{ "discord",         NULL,       NULL,        0,            0,           -1,     },
+	{ "Zathura",         NULL,       NULL,        0,            0,           -1,     },
+	{ "nvim",            "nvim",     "nvim",      0,            0,           -1,     },
+	{ "vim",             "vim",      "vim",       0,            0,           -1,     },
+	{ "tmux",            NULL,       "tmux",      0,            0,           -1,     },
+	{ "st",              NULL,       NULL,        0,            0,           -1,     },
+	{ "thunar",          NULL,       NULL,        0,            0,           -1,     },
+	{ "steam_app_6910",  NULL,       NULL,        0,            1,           -1,     },
+	{ "steam_proton",    NULL,       NULL,        0,            1,           -1,     },
+	{ NULL,              NULL,       "riderterm", 0,            1,           -1, .centerfloating = 1,     },
 };
 
 /* layout(s) */

@@ -143,7 +143,7 @@ typedef struct {
 	unsigned int tags;
 	int isfloating;
 	int monitor;
-	const char *icon;
+	int centerfloating;
 } Rule;
 
 typedef struct BarElement BarElement;
@@ -344,6 +344,11 @@ applyrules(Client *c)
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
+
+			if (c->mon && c->isfloating && !c->isfullscreen && r->centerfloating) {
+				c->x = (c->mon->ww / 2) - (c->w / 2);
+				c->y = (c->mon->wh / 2) - (c->h / 2);
+			}
 		}
 	}
 	if (ch.res_class)
