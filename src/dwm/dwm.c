@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <poll.h>
+#include <stdbool.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -1555,22 +1556,39 @@ void
 resizemouse(const Arg *arg)
 {
 	int ocx, ocy, nw, nh;
+	int x0, y0, w0, h0;
 	Client *c;
 	Monitor *m;
 	XEvent ev;
 	Time lasttime = 0;
+	bool topdrag, leftdrag;
 
 	if (!(c = selmon->sel))
 		return;
 	if (c->isfullscreen) /* no support resizing fullscreen windows by mouse */
 		return;
 	restack(selmon);
-	ocx = c->x;
-	ocy = c->y;
 	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 		None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess)
 		return;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
+
+	x0 = c->x;
+	y0 = c->y;
+	w0 = c->w;
+	h0 = c->h;
+
+	if (getrootptr(&ocx, &ocy)) {
+		leftdrag = abs(c->x - ocx) < abs((c->x + c->w) - ocx);
+		topdrag = abs(c->y - ocy) < abs((c->y + c->h) - ocy);
+		ocx = leftdrag ? c->x : c->x + c->w;
+		ocy = topdrag ? c->y : c->y + c->h;
+	} else { // fallback -- is this possible?
+		ocx = c->x;
+		ocy = c->y;
+		topdrag = leftdrag = false;
+	}
+
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, leftdrag ? 0 : c->w + c->bw - 1, topdrag ? 0 : c->h + c->bw - 1);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch(ev.type) {
@@ -1584,21 +1602,34 @@ resizemouse(const Arg *arg)
 				continue;
 			lasttime = ev.xmotion.time;
 
-			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
-			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-			if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
-			&& c->mon->wy + nh >= selmon->wy && c->mon->wy + nh <= selmon->wy + selmon->wh)
-			{
-				if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
-				&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
-					togglefloating(NULL);
+			{ // Todo: update this logic
+				nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
+				nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
+				if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
+					&& c->mon->wy + nh >= selmon->wy && c->mon->wy + nh <= selmon->wy + selmon->wh)
+				{
+					if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
+						&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
+						togglefloating(NULL);
+				}
 			}
-			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
-				resize(c, c->x, c->y, nw, nh, 1);
+
+			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating) {
+				int dx = ev.xmotion.x_root - ocx;
+				int dy = ev.xmotion.y_root - ocy;
+				resize(c, 
+					 leftdrag ? x0 + dx : x0,      // x
+					 topdrag  ? y0 + dy : y0,       // y
+					 leftdrag ? w0 - dx : w0 + dx, // w
+					 topdrag  ? h0 - dy : h0 + dy,  // h
+					1);
+			}
 			break;
 		}
 	} while (ev.type != ButtonRelease);
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
+	// XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, leftdrag ? 0 : c->w + c->bw - 1, topdrag ? 0 : c->h + c->bw - 1);
+
 	XUngrabPointer(dpy, CurrentTime);
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
