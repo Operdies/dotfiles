@@ -41,5 +41,5 @@ else
 	tnoremap <esc>q <cmd>FloatermKill<cr>
 endif
 
-nnoremap <space>gg <cmd>FloatermNew --cwd=<buffer> --name=lazygit --autoclose=2 lazygit<cr>
+silent nnoremap <space>gg <cmd>silent !lazygit<cr>:redraw!<cr>
 
