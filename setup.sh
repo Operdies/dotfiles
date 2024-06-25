@@ -150,10 +150,7 @@ ensure_clones() {
 	REPO_DIR="$HOME/repos"
 	[ -d "$REPO_DIR" ] || mkdir -p "$REPO_DIR"
 	projects=(
-		gwatch.nvim
-		gwatch
 		sxhkd-whichkey
-		polybar-iconography
 	)
 	pushd "$REPO_DIR" || return
 	for ((i = 0; i < ${#projects[@]}; i += 2)); do
