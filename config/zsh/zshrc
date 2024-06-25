@@ -6,7 +6,7 @@ export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH:$HOME/go/bin:$HOME/.
 export PATH="$HOME/.node_modules/bin:$PATH"
 export npm_config_prefix=~/.node_modules
 export LANG=en_US.UTF-8
-export EDITOR='vim'
+export EDITOR='nvim'
 export FZF_DEFAULT_OPTS='--layout=reverse'
 export MANPAGER='nvim +Man! -'
 
