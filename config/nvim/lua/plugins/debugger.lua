@@ -14,8 +14,8 @@ return {
         -- stylua: ignore
         keys = {
           { "<leader>du",    function() require("dapui").toggle({}) end,                  desc = "Dap UI" },
-          { "<leader>k",     function() require("dapui").eval(nil, { enter = true }) end, desc = "Eval",  mode = { "n", "v" } },
-          { "<2-LeftMouse>", function() require("dapui").eval(nil, { enter = true }) end, desc = "Eval",  mode = { "n", "v" } },
+          { "<CR>",          function() require("dapui").eval(nil, { enter = true }) end, desc = "Eval",  mode = { "n", "v" } },
+          { "<2-LeftMouse>", function() require("dapui").eval(nil, { enter = false }) end, desc = "Eval",  mode = { "n", "v" } },
         },
         opts = {},
         config = function(_, opts)
