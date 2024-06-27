@@ -93,7 +93,7 @@ return {
       toggleterm.setup(opts)
     end,
     keys = {
-      { "<M-CR>" },
+      { "<C-\\>" },
       {
         "<leader>gg",
         function()
@@ -107,7 +107,7 @@ return {
     opts = {
       direction = "float",
       size = 20,
-      open_mapping = "<M-CR>",
+      open_mapping = "<C-\\>",
       hide_numbers = true,
       shade_terminals = true,
       shading_factor = 2,
