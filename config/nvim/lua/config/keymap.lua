@@ -69,5 +69,15 @@ vim.keymap.set('n', ']q', ':cnext<cr>', { desc = 'Go to next quickfix item' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 -- Register access with " feels super awkward. Set up + and - as easy access registers
-vim.keymap.set({'v', 'n'}, '-', '"-', { desc = "Copy to - register", noremap = true })
-vim.keymap.set({'v', 'n'}, '+', '"+', { desc = "Copy to system clipboard", noremap = true })
+vim.keymap.set({ 'v', 'n' }, '-', '"-', { desc = "Copy to - register", noremap = true })
+vim.keymap.set({ 'v', 'n' }, '+', '"+', { desc = "Copy to system clipboard", noremap = true })
+
+local function add_header_guard()
+  local guard = vim.fn.expand('%:t:r'):upper() .. "_H"
+  vim.fn.append(0, "#ifndef " .. guard)
+  vim.fn.append(1, "#define " .. guard)
+  vim.fn.append(2, "")
+  vim.fn.append(vim.fn.line('$'), "")
+  vim.fn.append(vim.fn.line('$'), "#endif //  " .. guard)
+end
+vim.api.nvim_create_user_command('AddHeaderGuard', add_header_guard, {})
