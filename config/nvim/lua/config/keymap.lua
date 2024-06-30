@@ -80,4 +80,19 @@ local function add_header_guard()
   vim.fn.append(vim.fn.line('$'), "")
   vim.fn.append(vim.fn.line('$'), "#endif //  " .. guard)
 end
+
+local function scrolloff_reader()
+  local deactivate = vim.wo.scrolloff
+  local activate = 99
+  return function()
+    if vim.wo.scrolloff == activate then
+      vim.wo.scrolloff = deactivate
+    else
+      deactivate = vim.wo.scrolloff
+      vim.wo.scrolloff = activate
+    end
+  end
+end
+
+vim.keymap.set('n', '<leader>tr', scrolloff_reader(), { desc = "Toggle Reader Mode" })
 vim.api.nvim_create_user_command('AddHeaderGuard', add_header_guard, {})
