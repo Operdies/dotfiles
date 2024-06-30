@@ -183,7 +183,7 @@ return {
       {
         "<leader>rr",
         "<cmd>OverseerQuickAction restart<cr>",
-        desc = "Restart the most recent oversser action",
+        desc = "Restart the most recent overseer action",
       },
     },
     opts = {
