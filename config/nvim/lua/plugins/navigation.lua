@@ -210,9 +210,9 @@ return {
       vim.keymap.set('n', '<leader>fj', builtin.jumplist, { desc = 'Search jump list' })
       vim.keymap.set('n', '<leader>fF', builtin.git_files, { desc = 'Search Files' })
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = 'Search Help' })
-      vim.keymap.set('n', '<leader>fg', live_grep_git_root, { desc = 'Grep git root' })
+      vim.keymap.set('n', '<leader>fg', live_grep_git_root, { desc = 'Grep open files' })
       vim.keymap.set('n', '<leader>fG', builtin.live_grep, { desc = 'Search by Grep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Search Diagnostics' })
+      vim.keymap.set('n', '<leader>cd', builtin.diagnostics, { desc = 'Search Diagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = 'Search Resume' })
 
       -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
