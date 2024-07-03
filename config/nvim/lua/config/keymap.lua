@@ -16,9 +16,6 @@ nmap("[<space>", "m'O<esc>`'")
 nmap("]<space>", "m'o<esc>`'")
 -- restore position after reindenting
 nmap("=ip", "m`=ip``")
--- reindent on paste
-nmap("p", "p`[v`]=")
-nmap("<S-p>", "P`[v`]=")
 -- visual select last paste
 nmap("gp", "`[v`]")
 nmap("<C-s>", ":w<cr>")
