@@ -178,7 +178,7 @@ ensure_make() {
 }
 
 ensure_etc() {
-  cp -v --update --archive ./etc/ /
+  find etc -type f | xargs -I{} install -v --owner=root -D {} /{}
 }
 
 set_default_apps() {
@@ -199,6 +199,10 @@ case "$1" in
     ensure_etc
     ;;
 	*)
+		if [ "$EUID" -eq 0 ]; then
+			echo "Don't run setup as root"
+			exit 1
+		fi
 		ensure_links
 		ensure_yay
 		ensure_binaries
