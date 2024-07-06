@@ -13,8 +13,8 @@ return {
         },
         -- stylua: ignore
         keys = {
-          { "<leader>du",    function() require("dapui").toggle({}) end,                  desc = "Dap UI" },
-          { "<leader>k",     function() require("dapui").eval(nil, { enter = true }) end, desc = "Eval",  mode = { "n", "v" } },
+          { "<leader>du",    function() require("dapui").toggle({}) end,                   desc = "Dap UI" },
+          { "<leader>k",     function() require("dapui").eval(nil, { enter = true }) end,  desc = "Eval",  mode = { "n", "v" } },
           { "<2-LeftMouse>", function() require("dapui").eval(nil, { enter = false }) end, desc = "Eval",  mode = { "n", "v" } },
         },
         opts = {},
@@ -156,47 +156,5 @@ return {
   {
     "theHamsta/nvim-dap-virtual-text",
     opts = {},
-  },
-  {
-    "stevearc/overseer.nvim",
-    keys = {
-      {
-        "<leader>rp",
-        "<cmd>OverseerLoadBundle<cr>",
-        desc = "Pick a saved task bundle",
-      },
-      {
-        "<leader>rw",
-        "<cmd>OverseerQuickAction watch<cr>",
-        desc = "Rerun on save (Overseer)",
-      },
-      {
-        "<leader>rt",
-        "<cmd>OverseerRun<cr>",
-        desc = "Run task (Overseer)",
-      },
-      {
-        "<leader>rT",
-        "<cmd>OverseerToggle<cr>",
-        desc = "Toggle task list (Overseer)",
-      },
-      {
-        "<leader>rr",
-        "<cmd>OverseerQuickAction restart<cr>",
-        desc = "Restart the most recent overseer action",
-      },
-    },
-    opts = {
-      task_list = {
-        direction = "bottom",
-        min_height = 15,
-        default_detail = 2,
-        dap = true,
-        bindings = {
-          ["<C-c>"] = "<cmd>OverseerQuickAction stop<cr>",
-          ["<C-r>"] = "<cmd>OverseerQuickAction restart<cr>",
-        }
-      },
-    },
   },
 }
