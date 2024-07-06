@@ -34,7 +34,7 @@ return {
     },
     opts = {
       task_list = {
-        direction = "bottom",
+        direction = "left",
         min_height = 15,
         default_detail = 2,
         dap = true,
