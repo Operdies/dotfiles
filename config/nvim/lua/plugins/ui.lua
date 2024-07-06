@@ -108,14 +108,15 @@ return {
     },
     lazy = false, -- As https://github.com/nvimdev/dashboard-nvim/pull/450, dashboard-nvim shouldn't be lazy-loaded to properly handle stdin.
     opts = function()
+      -- stylua: ignore
       local logo = [[
 
-     █████╗    ██╗       ██████╗   ██╗   ██╗
-    ██╔══██╗   ██║       ██╔═══╝    ██╗ ██╔╝
-    ██║  ██║   ██║       █████╗      ████╔╝
-    ███████║   ██║       ██╔══╝     ██╔ ██╗
-    ██╔══██║   ███████╗  ██████╗   ██╔╝  ██╗
-    ╚═╝  ╚═╝   ╚══════╝  ╚═════╝   ╚═╝   ╚═╝
+       █████╗   ██╗      ██████╗  ██╗   ██╗  
+      ██╔══██╗  ██║      ██╔═══╝   ██╗ ██╔╝  
+      ██║  ██║  ██║      █████╗     ████╔╝   
+      ███████║  ██║      ██╔══╝    ██╔ ██╗   
+      ██╔══██║  ██████╗  ██████╗  ██╔╝  ██╗  
+      ╚═╝  ╚═╝  ╚═════╝  ╚═════╝  ╚═╝   ╚═╝  
     ]]
 
       logo = string.rep("\n", 8) .. logo .. "\n\n"
@@ -134,9 +135,10 @@ return {
           header = vim.split(logo, "\n"),
           -- stylua: ignore
           center = {
-            { action = 'Oil ', desc = " Browse Files", icon = " ", key = "o" },
+            { action = 'Oil ', desc = " Browse Files", icon = " ", key = "o" },
             { action = 'Telescope git_files', desc = " Find File", icon = " ", key = "f" },
             { action = 'Telescope oldfiles', desc = " Recent Files", icon = " ", key = "r" },
+            { action = 'Telescope projects', desc = " Projects", icon = "󰊢 ", key = "p" },
             { action = function() require("persistence").load() end, desc = " Restore Session", icon = " ", key = "s" },
             { action = "Lazy", desc = " Lazy", icon = "󰒲 ", key = "l" },
             { action = function() vim.api.nvim_input("<cmd>qa<cr>") end, desc = " Quit", icon = " ", key = "q" },

@@ -183,6 +183,7 @@ return {
       local t = require('telescope')
       t.setup(opts)
       pcall(t.load_extension, 'fzf')
+      pcall(t.load_extension, 'projects')
 
       local builtin = require('telescope.builtin')
 
