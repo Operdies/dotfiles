@@ -27,6 +27,16 @@ return {
         desc = "Toggle task list (Overseer)",
       },
       {
+        "<leader>ro",
+        "<cmd>OverseerQuickAction open float<cr>",
+        desc = "Open action output in floating window",
+      },
+      {
+        "<leader>rq",
+        "<cmd>OverseerQuickAction open output in quickfix<cr>",
+        desc = "Open action output in quick fix",
+      },
+      {
         "<leader>rr",
         "<cmd>OverseerQuickAction restart<cr>",
         desc = "Restart the most recent overseer action",
