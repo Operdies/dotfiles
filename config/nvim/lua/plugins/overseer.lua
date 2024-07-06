@@ -19,7 +19,11 @@ return {
       },
       {
         "<leader>rT",
-        "<cmd>OverseerToggle<cr>",
+        function()
+          local win = vim.api.nvim_get_current_win()
+          vim.cmd('OverseerToggle')
+          vim.api.nvim_set_current_win(win)
+        end,
         desc = "Toggle task list (Overseer)",
       },
       {
