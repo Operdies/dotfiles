@@ -50,7 +50,7 @@ vmap(">", ">gv")
 imap("<C-d>", "<del>")
 
 -- double escape: go to normal mode from a terminal
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>")
+vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
