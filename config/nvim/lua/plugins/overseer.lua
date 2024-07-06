@@ -3,7 +3,7 @@ return {
     "stevearc/overseer.nvim",
     keys = {
       {
-        "<leader>rp",
+        "<leader>rl",
         "<cmd>OverseerLoadBundle<cr>",
         desc = "Pick a saved task bundle",
       },
@@ -25,6 +25,16 @@ return {
           vim.api.nvim_set_current_win(win)
         end,
         desc = "Toggle task list (Overseer)",
+      },
+      {
+        "<leader>rp",
+        function()
+          vim.cmd[[OverseerOpen]]
+          local sidebar = require("overseer.task_list.sidebar")
+          local sb = sidebar.get_or_create()
+          sb:toggle_preview()
+        end,
+        desc = "Open action output in floating preview window",
       },
       {
         "<leader>ro",
