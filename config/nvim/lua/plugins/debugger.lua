@@ -10,6 +10,7 @@ return {
         dependencies = {
           "nvim-neotest/nvim-nio",
           "jay-babu/mason-nvim-dap.nvim",
+          "stevearc/overseer.nvim", -- needed for .vscode task integration
         },
         -- stylua: ignore
         keys = {
