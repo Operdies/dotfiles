@@ -37,6 +37,11 @@ dex /etc/xdg/autostart/xfce-polkit.desktop
 # blueman-applet
 dex /etc/xdg/autostart/blueman.desktop
 
+# start kwallet service
+kwalletd6 &
+# export secrets needed to use wallet
+export $(dbus-launch)
+
 # the firewall-applet in /etc/xdg/autostart/firewall-applet.desktop
 # does not check if it is already running and will launch new instances.
 # This hack just kills them all and starts a new one
