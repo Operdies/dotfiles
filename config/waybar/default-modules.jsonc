@@ -3,6 +3,7 @@
   "spacing": "4px",
   "position": "top",
   "reload_style_on_change": true,
+  "modules-left": ["dwl/tags", "dwl/window"],
   "modules-right": ["pulseaudio", "backlight", "network", "memory", "cpu", "battery", "clock", "tray"],
   "battery": {
     "states": {
@@ -33,6 +34,13 @@
   "cpu": {
     "format": "{usage}% ",
     "tooltip": false
+  },
+  "dwl/tags": {
+    "num-tags": 9
+  },
+  "dwl/window": {
+    "format": "{layout} {app_id} -- {title}",
+    "icon": false
   },
   "memory": {
     "format-alt": "{}% ",

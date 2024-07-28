@@ -1,35 +1,14 @@
 [
   {
     "include": [ "~/.config/waybar/default-modules.jsonc" ],
-    "output": "HDMI-A-1",
-    "modules-left": [ "custom/dwl" ],
-    "custom/dwl": {
-      "exec": "~/.config/waybar/waybar-dwl.sh 'HDMI-A-1'",
-      "format": "{}",
-      "return-type": "json",
-      "max-length": 120
-    }
+    "output": "HDMI-A-1"
   },
   {
     "include": [ "~/.config/waybar/default-modules.jsonc" ],
-    "output": "DP-1",
-    "modules-left": [ "custom/dwl" ],
-    "custom/dwl": {
-      "exec": "~/.config/waybar/waybar-dwl.sh 'DP-1'",
-      "format": "{}",
-      "return-type": "json",
-      "max-length": 120
-    }
+    "output": "DP-1"
   },
   {
     "include": [ "~/.config/waybar/default-modules.jsonc" ],
-    "output": "eDP-1",
-    "modules-left": [ "custom/dwl" ],
-    "custom/dwl": {
-      "exec": "~/.config/waybar/waybar-dwl.sh 'eDP-1'",
-      "format": "{}",
-      "return-type": "json",
-      "max-length": 80
-    }
+    "output": "eDP-1"
   }
 ]

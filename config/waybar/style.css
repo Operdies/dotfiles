@@ -40,6 +40,7 @@ window#waybar {
 }
 
 #custom-dwl,
+#tags,
 #pulseaudio {
   border-left: 0;
 }
@@ -64,4 +65,32 @@ window#waybar {
 }
 #clock {
   color: @mauve;
+}
+
+#tags {
+  padding-right: 10px;
+}
+#tags button > * {
+  color: @text;
+  padding: 0px 0px;
+  margin: 0px 0px;
+  text-decoration-style: solid;
+}
+
+#tags button.occupied > label {
+  text-decoration-line: underline;
+  text-decoration-color: @mauve;
+}
+#tags button.focused > label {
+  color: @mauve;
+  background-color: @crust;
+}
+#tags button.urgent > label {
+  color: @red;
+  text-decoration-color: @red;
+}
+
+#tags button.focused.urgent > label {
+  text-decoration-style: double;
+  text-decoration-color: @teal;
 }
