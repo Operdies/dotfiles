@@ -60,10 +60,11 @@ ensure_binaries() {
 		htop powertop lazygit
 		imagemagick
 		inotify-tools
+		kwallet # keyring
 		libbsd # neat C headers
 		libinput xf86-input-libinput libinput-gestures # touchpad gestures
 		libnotify tiramisu-git # simple notification daemon that writes to stdout
-		mako # notification ademon
+		mako # notification daemon
 		man-db man-pages less
 		mesa # picom requires iris_dri.so for the glx backed which is provided by mesa, but not mesa-amber
 		networkmanager iw iwd # wifi + wifi cli tools
@@ -78,10 +79,11 @@ ensure_binaries() {
 		unzip
 		valgrind
 		way-displays # daemon for display handling -- handles laptop lid closing / plugging new monitors
-		wlroots wayland-protocols  wofi xorg-xwayland # wayland stuff dependencies (dwl)
+		wlroots wayland-protocols wofi xorg-xwayland # wayland stuff dependencies (dwl)
+    wlr-which-key # nvim-which-key like launcher for wayland
 		wmname # utility for setting the WM name (needed to fix broken java applications)
 		xautolock i3lock
-		xfce-polkit dex
+		xfce-polkit dex # polkit daemon + desktop launcher
 		xclip wl-clipboard # clipboard tools
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils libx11 libxft libxinerama freetype2 
 		zsh ttf-meslo-nerd-font-powerlevel10k # need a chonky font for a chonky shell
