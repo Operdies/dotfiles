@@ -26,7 +26,8 @@ if status is-interactive
     # startx on login on VT 1 if no display is set and the current session is on a tty
     if [ -t 0 -a -z "$DISPLAY" -a -z "$WAYLAND_DISPLAY" -a "$XDG_VTNR" = 1 ]
         # startw
-        startx
+        # startx
+        ~/repos/dwl/startup.sh
     end
 end
 
