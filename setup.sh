@@ -71,6 +71,7 @@ ensure_binaries() {
 		noto-fonts noto-fonts-emoji # needed for Discord to display emojis
 		picom
 		qmk udisks2 # flash keyboard + mount liatris controller
+		slurp grim # wayland screenshots
 		sudo
 		swaybg swayidle swaylock waybar # thank you sway community for making compositor agnostic utils
 		thunar thunar-volman gvfs # gvfs is needed for volume management / fuse integration in thunar
