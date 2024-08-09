@@ -71,5 +71,8 @@
     },
     "scroll-step": 1,
     "on-click": "pavucontrol"
+  },
+  "tray": {
+    "spacing": 10
   }
 }
