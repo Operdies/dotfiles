@@ -85,7 +85,7 @@ ensure_binaries() {
 		wmname # utility for setting the WM name (needed to fix broken java applications)
 		xautolock i3lock
 		xfce-polkit dex # polkit daemon + desktop launcher
-		xclip wl-clipboard # clipboard tools
+		xclip wl-clipboard clipman # clipboard tools
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils libx11 libxft libxinerama freetype2 
 		zsh ttf-meslo-nerd-font-powerlevel10k # need a chonky font for a chonky shell
 	)
