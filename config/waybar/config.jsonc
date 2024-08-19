@@ -9,6 +9,11 @@
   },
   {
     "include": [ "~/.config/waybar/default-modules.jsonc" ],
+    "output": "DP-2"
+  },
+  {
+    "include": [ "~/.config/waybar/default-modules.jsonc" ],
+    "modules-center": ["network"],
     "output": "eDP-1"
   }
 ]
