@@ -1,0 +1,24 @@
+# Theming
+font: JetBrainsMono Nerd Font 12
+background: "#11111bd0"
+color: "#cba6f7"
+border: "#cba6f7"
+separator: " ➜ "
+border_width: 2
+corner_r: 10
+padding: 15 # Defaults to corner_r
+
+# Anchor and margin
+anchor: center # One of center, left, right, top, bottom, bottom-left, top-left, etc.
+# Only relevant when anchor is not center
+margin_right: 0
+margin_bottom: 0
+margin_left: 0
+margin_top: 0
+
+menu: 
+  "a": { desc: "Snip", cmd: "grim -g \"$(slurp)\" - | wl-copy" }
+  "e": { desc: "Screenshot", cmd: "grim - | wl-copy" }
+  "s": { desc: "Screenshot Screen", cmd: "notify-send 'Current Monitor not implemented.'" }
+  "w": { desc: "Screenshot Window", cmd: "notify-send 'Current Window not implemented.'" }
+
