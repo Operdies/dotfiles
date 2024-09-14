@@ -47,6 +47,7 @@ ensure_yay() {
 ensure_binaries() {
 	packages=(
 		arc-gtk-theme nitrogen
+		bash bash-completion
 		curl
 		discord
 		dmenu networkmanager-dmenu-git rofi
