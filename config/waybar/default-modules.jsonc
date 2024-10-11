@@ -39,7 +39,7 @@
     "num-tags": 9
   },
   "dwl/window": {
-    "format": "{layout} {app_id} -- {title}",
+    "format": "{layout} {app_id}┃{title}",
     "icon": false
   },
   "memory": {
