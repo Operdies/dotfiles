@@ -14,6 +14,7 @@ export EDITOR='nvim'
 export FZF_DEFAULT_OPTS='--layout=reverse'
 export MANPAGER='nvim +Man! -'
 export HISTCONTROL=ignoreboth:erasedups
+export HISTSIZE=10000
 
 # Start desktop environment if
 # fd 0 is open and refers to a terminal
