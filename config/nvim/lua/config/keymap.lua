@@ -14,6 +14,8 @@ end
 -- Insert blank line before/after cursor and restore position
 nmap("[<space>", "m'O<esc>`'")
 nmap("]<space>", "m'o<esc>`'")
+nmap("]<tab>", "<cmd>tabnext<cr>")
+nmap("[<tab>", "<cmd>tabprev<cr>")
 -- restore position after reindenting
 nmap("=ip", "m`=ip``")
 -- visual select last paste
