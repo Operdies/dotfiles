@@ -69,3 +69,9 @@ function PS1_WHEREAMI() {
 PS1='$(PS1_EXITCODE)$(PS1_WHOAMI) $(PS1_WHEREAMI)$(PS1_GITINFO)\n❱ '
 PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
+command -v zoxide > /dev/null 2>&1 && eval "$(zoxide init bash)"
+
+function take() {
+  mkdir -p "$@"
+  cd "$@"
+}
