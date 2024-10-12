@@ -146,6 +146,9 @@ return {
         nmap('<leader>wl', function()
           print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
         end, 'Workspace List Folders')
+        nmap('<leader>i', function()
+          vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+        end, "Toggle Inlay Hints")
       end
 
       local lspconfig = require('lspconfig')
