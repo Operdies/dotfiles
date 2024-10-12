@@ -35,6 +35,7 @@ return {
         completion = {
           auto_bracktes = {},
           completeopt   = 'menu,menuone,noinsert',
+          autocomplete = false,
         },
         experimental = {
           ghost_text = {
