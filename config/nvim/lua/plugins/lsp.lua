@@ -187,8 +187,8 @@ return {
             "--fallback-style=llvm",
           },
           init_options = {
-            usePlaceholders = true,
-            completeUnimported = true,
+            usePlaceholders = false,
+            completeUnimported = false,
             clangdFileStatus = true,
           },
         },
