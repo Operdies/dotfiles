@@ -88,6 +88,7 @@ ensure_binaries() {
 		xfce-polkit dex # polkit daemon + desktop launcher
 		xclip wl-clipboard clipman # clipboard tools
 		xorg-server xorg-xinit xorg-xinput xdotool xorg-xwininfo xdg-utils libx11 libxft libxinerama freetype2 
+		xorg-xhost # needed for compatibility with some X apps (gparted)
 		zsh ttf-meslo-nerd-font-powerlevel10k # need a chonky font for a chonky shell
 	)
 
