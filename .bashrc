@@ -13,6 +13,9 @@ export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 export EDITOR='nvim'
 export FZF_DEFAULT_OPTS='--layout=reverse'
 export MANPAGER='nvim +Man! -'
+# MANWIDTH fixes weird wrapping issues in neovim 
+# The wrapping issues don't occur in a "--clean" install, only with plugins.
+export MANWIDTH=999
 export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=10000
 
