@@ -21,7 +21,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup("XmlIndent", { clear = true }),
-  pattern = { "*.csproj", "*.props" },
+  pattern = { "*.csproj", "*.props", "*.targets" },
   callback = function()
     vim.opt_local.filetype = "xml"
     vim.opt_local.shiftwidth = 4
