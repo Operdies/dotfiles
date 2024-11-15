@@ -78,3 +78,5 @@ function take() {
   mkdir -p "$@"
   cd "$@"
 }
+
+[ -f ~/.bashrc_local ] && source ~/.bashrc_local
