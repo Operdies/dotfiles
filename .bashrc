@@ -7,15 +7,30 @@ alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles exce
 
 [[ "$(whoami)" = "root" ]] && return
 
+function has() {
+  command -v "$@" > /dev/null 2>&1
+}
+
 export LANG=en_US.UTF-8
-export DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-export EDITOR='nvim'
-export FZF_DEFAULT_OPTS='--layout=reverse'
-export MANPAGER='nvim +Man! -'
-# MANWIDTH fixes weird wrapping issues in neovim 
+
+# Taken from /etc/profile.d/debuginfod.sh
+if [ -z "$DEBUGINFOD_URLS" ]; then
+    DEBUGINFOD_URLS=$(find "/etc/debuginfod" -name "*.urls" -print0 2>/dev/null | xargs -0 cat 2>/dev/null | tr '\n' ' ' || :)
+    [ -n "$DEBUGINFOD_URLS" ] && export DEBUGINFOD_URLS || unset DEBUGINFOD_URLS
+fi
+
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+
+if has nvim; then
+  # MANWIDTH fixes weird wrapping issues in neovim 
+  export MANWIDTH=999
+  export EDITOR='nvim'
+  export MANPAGER='nvim +Man! -'
+elif has vim; then
+  export EDITOR='vim'
+fi
+
 # The wrapping issues don't occur in a "--clean" install, only with plugins.
-export MANWIDTH=999
 export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=10000
 
