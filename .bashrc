@@ -17,6 +17,9 @@ export LANG=en_US.UTF-8
 if [ -z "$DEBUGINFOD_URLS" ]; then
     DEBUGINFOD_URLS=$(find "/etc/debuginfod" -name "*.urls" -print0 2>/dev/null | xargs -0 cat 2>/dev/null | tr '\n' ' ' || :)
     [ -n "$DEBUGINFOD_URLS" ] && export DEBUGINFOD_URLS || unset DEBUGINFOD_URLS
+    if [ -z "$DEBUGINFOD_URLS" ]; then
+      export DEBUGINFOD_URLS="https://debuginfod.s.voidlinux.org/"
+    fi
 fi
 
 [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
@@ -34,11 +37,23 @@ fi
 export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=10000
 
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+alias ls='ls --color=auto'
+alias ll='ls -lav --ignore=..'   # show long listing of all except ".."
+alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles except "."
+
+[[ "$(whoami)" = "root" ]] && return
+
 # Start desktop environment if
 # fd 0 is open and refers to a terminal
 # DISPAY variables are not set
 # We are on tty1
-[ -t 0 -a -z "$DISPLAY" -a -z "$WAYLAND_DISPLAY" -a "$XDG_VTNR" = 1 ] && ~/repos/dwl/startup.sh && return
+if [ -t 0 -a -z "$DISPLAY" -a -z "$WAYLAND_DISPLAY" -a "$XDG_VTNR" = 1 ]; then
+  ~/repos/dwl/startup.sh
+  return
+fi
 
 [[ -z "$FUNCNEST" ]] && export FUNCNEST=100          # limits recursive functions, see 'man bash'
 
