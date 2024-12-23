@@ -28,6 +28,17 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup("CIndent", { clear = true }),
+  pattern = { "*.c", "*.h" },
+  callback = function()
+    -- Use cinoptions for indentation instead of treesitter
+    vim.bo.indentexpr = nil
+    vim.opt_local.filetype = "c"
+  end,
+})
+
+
 vim.api.nvim_create_autocmd('BufReadPost', {
   group = vim.api.nvim_create_augroup("RestoreLastKnownCursorLine", { clear = true }),
   callback = function()

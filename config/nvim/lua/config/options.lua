@@ -24,8 +24,8 @@ vim.o.writebackup = false
 vim.o.swapfile = false
 vim.o.textwidth = 0 -- disable automatic text reflowing on long lines
 vim.g.termdebug_config = { winbar = 0 }
-vim.opt.cino:append { "t0" }
-
+-- set cino=:0=1sl-2st0
+vim.opt.cino = { ":0", "=1s", "l-2s", "t0" }
 vim.o.wildmenu = true
 vim.opt.wildignore = { "*.o", "*.a" }
 vim.o.wildmode = "longest:full,full"

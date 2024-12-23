@@ -29,7 +29,7 @@ return {
       {
         "<leader>rp",
         function()
-          vim.cmd[[OverseerOpen]]
+          vim.cmd [[OverseerOpen]]
           local sidebar = require("overseer.task_list.sidebar")
           local sb = sidebar.get_or_create()
           sb:toggle_preview()
@@ -45,6 +45,39 @@ return {
         "<leader>rq",
         "<cmd>OverseerQuickAction open output in quickfix<cr>",
         desc = "Open action output in quick fix",
+      },
+      {
+        "<leader>rb",
+        function()
+          if OVERSEER_PREV_RUN_BUILD ~= nil then
+            OVERSEER_PREV_RUN_BUILD:dispose(true)
+          end
+
+          local build_options = {
+            build = { available = vim.fn.executable("./run") == 1, cmd = "./run", args = {} },
+          }
+
+          for _, build in pairs(build_options) do
+            if build.available then
+              local task = require('overseer').new_task({
+                cmd = { build.cmd },
+                args = build.args,
+                components = {
+                  { "restart_on_save", delay = 50 },
+                  { "on_output_quickfix", open = true },
+                  "default"
+                },
+              })
+              task:start()
+              -- local win = vim.api.nvim_get_current_win()
+              -- vim.cmd('OverseerOpen')
+              -- vim.api.nvim_set_current_win(win)
+              OVERSEER_PREV_RUN_BUILD = task
+              return
+            end
+          end
+        end,
+        desc = "Start a watch + build.sh task",
       },
       {
         "<leader>rr",

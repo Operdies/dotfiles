@@ -37,11 +37,6 @@ return {
           completeopt   = 'menu,menuone,noinsert',
           autocomplete = false,
         },
-        experimental = {
-          ghost_text = {
-            hl_group = "CmpGhostText",
-          },
-        },
         sorting = cmp_defaults.sorting,
         mapping = cmp.mapping.preset.insert {
           ['<C-n>'] = cmp.mapping.select_next_item(),

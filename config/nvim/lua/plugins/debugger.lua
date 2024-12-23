@@ -39,9 +39,16 @@ return {
           end
 
           local function scan_executables()
+            local found = false
             local function scan_dir(cfgs, dir)
-              local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', dir, '-u', '-t', 'x' })
+              -- check if dir exists
+              if vim.fn.isdirectory(dir) == 0 then
+                return
+              end
+
+              local ok, executables = pcall(vim.fn.systemlist, { 'fd', '.', dir, '-t', 'x' })
               if ok and executables then
+                found = true
                 local seen = {}
                 for ex in pairs(executables) do
                   local nm = executables[ex]
