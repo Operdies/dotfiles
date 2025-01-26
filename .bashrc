@@ -92,11 +92,12 @@ function PS1_GITINFO() {
 }
 
 function PS1_WHOAMI() {
-  printf '\e[0;31m[%s@%s]\e[m' "$USER" "$HOSTNAME"
+  # %.local: remove trailing .local to hostname which for some reason happens on mac
+  printf '\e[0;31m[%s@%s]\e[m' "$USER" "${HOSTNAME%.local}"
 }
 
 function PS1_WHEREAMI() {
-  printf '\e[0;32m%s\e[m' "${PWD/"$HOME"/"~"}"
+  printf '\e[0;32m%s\e[m' "${PWD/"$HOME"/~}"
 }
 
 PS1='$(PS1_EXITCODE)$(PS1_WHOAMI) $(PS1_WHEREAMI)$(PS1_GITINFO)\n❱ '
