@@ -22,7 +22,11 @@ if [ -z "$DEBUGINFOD_URLS" ]; then
     fi
 fi
 
-[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
+if [ "$(uname)" = "Darwin" ]; then
+  BREW="/opt/homebrew/bin/brew"
+  [ -x "$BREW" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 if has nvim; then
   # MANWIDTH fixes weird wrapping issues in neovim 
@@ -70,7 +74,7 @@ bind -s 'set completion-ignore-case on'
 bind -s 'set show-all-if-ambiguous on'
 bind -s 'set menu-complete-display-prefix on'
 
-bind 'TAB:menu-complete'
+bind '[Z:menu-complete'
 # shift-tab
 bind '"\e[Z":menu-complete-backward'
 # M-q
