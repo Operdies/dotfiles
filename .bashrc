@@ -13,13 +13,15 @@ function has() {
 
 export LANG=en_US.UTF-8
 
-# Taken from /etc/profile.d/debuginfod.sh
-if [ -z "$DEBUGINFOD_URLS" ]; then
-    DEBUGINFOD_URLS=$(find "/etc/debuginfod" -name "*.urls" -print0 2>/dev/null | xargs -0 cat 2>/dev/null | tr '\n' ' ' || :)
-    [ -n "$DEBUGINFOD_URLS" ] && export DEBUGINFOD_URLS || unset DEBUGINFOD_URLS
-    if [ -z "$DEBUGINFOD_URLS" ]; then
-      export DEBUGINFOD_URLS="https://debuginfod.s.voidlinux.org/"
-    fi
+if [ "$(uname)" != "Darwin" ]; then
+  # Taken from /etc/profile.d/debuginfod.sh
+  if [ -z "$DEBUGINFOD_URLS" ]; then
+      DEBUGINFOD_URLS=$(find "/etc/debuginfod" -name "*.urls" -print0 2>/dev/null | xargs -0 cat 2>/dev/null | tr '\n' ' ' || :)
+      [ -n "$DEBUGINFOD_URLS" ] && export DEBUGINFOD_URLS || unset DEBUGINFOD_URLS
+      if [ -z "$DEBUGINFOD_URLS" ]; then
+        export DEBUGINFOD_URLS="https://debuginfod.s.voidlinux.org/"
+      fi
+  fi
 fi
 
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
@@ -54,9 +56,11 @@ alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles exce
 # fd 0 is open and refers to a terminal
 # DISPAY variables are not set
 # We are on tty1
-if [ -t 0 -a -z "$DISPLAY" -a -z "$WAYLAND_DISPLAY" -a "$XDG_VTNR" = 1 ]; then
-  ~/repos/dwl/startup.sh
-  return
+if [ "$(uname)" != "Darwin" ]; then
+  if [ -t 0 -a -z "${DISPLAY}" -a -z "$WAYLAND_DISPLAY" -a "$XDG_VTNR" = 1 ]; then
+    ~/repos/dwl/startup.sh
+    return
+  fi
 fi
 
 [[ -z "$FUNCNEST" ]] && export FUNCNEST=100          # limits recursive functions, see 'man bash'
@@ -101,7 +105,7 @@ function PS1_WHOAMI() {
 }
 
 function PS1_WHEREAMI() {
-  printf '\e[0;32m%s\e[m' "${PWD/"$HOME"/~}"
+  printf '\e[0;32m%s\e[m' "${PWD/"$HOME"/\~}"
 }
 
 PS1='$(PS1_EXITCODE)$(PS1_WHOAMI) $(PS1_WHEREAMI)$(PS1_GITINFO)\n❱ '
@@ -114,4 +118,6 @@ function take() {
   cd "$@"
 }
 
-[ -f ~/.bashrc_local ] && source ~/.bashrc_local
+if [ -f ~/.bashrc_local ]; then
+  source ~/.bashrc_local
+fi
