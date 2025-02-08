@@ -112,7 +112,6 @@ return {
 
       -- Additional lua configuration, makes nvim stuff amazing!
       { 'folke/neodev.nvim', opts = {} },
-      'Hoffs/omnisharp-extended-lsp.nvim',
     },
     config = function(_, _)
       local on_attach = function(_, bufnr)
@@ -193,23 +192,6 @@ return {
         },
         gopls = {},
         pyright = {},
-        omnisharp = {
-          handlers = {
-            ["textDocument/definition"] = function(...)
-              return require("omnisharp_extended").handler(...)
-            end,
-          },
-          on_attach = function(_, bufnr)
-            vim.keymap.set("n", "gd",
-              function()
-                require("omnisharp_extended").telescope_lsp_definitions()
-              end,
-              { buffer = bufnr, desc = "Goto Definition (omnisharp)" })
-          end,
-          enable_roslyn_analyzers = true,
-          organize_imports_on_format = true,
-          enable_import_completion = true,
-        },
         rust_analyzer = {},
         -- tsserver = {},
         html = { filetypes = { 'html' } },
