@@ -16,6 +16,8 @@ return {
       'rafamadriz/friendly-snippets',
       -- ctag support
       'quangnguyen30192/cmp-nvim-tags',
+      -- completion scoring etc.
+      "p00f/clangd_extensions.nvim",
     },
     config = function(_, _)
       local cmp = require 'cmp'
@@ -26,6 +28,10 @@ return {
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
       local cmp_defaults = require("cmp.config.default")()
 
+      local sorting = cmp_defaults.sorting or {}
+      sorting.comparators = sorting.comparators or {}
+      table.insert(sorting.comparators, 1, require("clangd_extensions.cmp_scores"))
+
       cmp.setup({
         snippet = {
           expand = function(args)
@@ -35,9 +41,9 @@ return {
         completion = {
           auto_bracktes = {},
           completeopt   = 'menu,menuone,noinsert',
-          autocomplete = false,
+          -- autocomplete  = false,
         },
-        sorting = cmp_defaults.sorting,
+        sorting = sorting,
         mapping = cmp.mapping.preset.insert {
           ['<C-n>'] = cmp.mapping.select_next_item(),
           ['<C-p>'] = cmp.mapping.select_prev_item(),
@@ -154,20 +160,18 @@ return {
               { buffer = bufnr, desc = "Switch Source/Header" })
           end,
           root_dir = function(fname)
-            return require("lspconfig.util").root_pattern(
+            return vim.fs.dirname(vim.fs.find({
               "Makefile",
               "compile_commands.json",
-              -- I never use autoconf, so let's disable this until it's needed
-              -- "configure.ac",
-              -- "configure.in",
-              -- "config.h.in",
+              "configure.ac",
+              "configure.in",
+              "config.h.in",
               -- if meson.build exists in nested source directories, we get a separate clangd instance for each meson.build file
               -- "meson.build",
+              -- I guess we just assume meson options will only be in the root
               "meson_options.txt",
-              "build.ninja"
-            )(fname) or require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt")(
-              fname
-            ) or require("lspconfig.util").find_git_ancestor(fname)
+              "build.ninja",
+              '.git' }, { path = fname, upward = true })[1])
           end,
           capabilities = {
             offsetEncoding = { "utf-16" },
