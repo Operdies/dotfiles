@@ -78,7 +78,7 @@ bind -s 'set completion-ignore-case on'
 bind -s 'set show-all-if-ambiguous on'
 bind -s 'set menu-complete-display-prefix on'
 
-bind '[Z:menu-complete'
+bind 'TAB:menu-complete'
 # shift-tab
 bind '"\e[Z":menu-complete-backward'
 # M-q
@@ -100,8 +100,10 @@ function PS1_GITINFO() {
 }
 
 function PS1_WHOAMI() {
-  # %.local: remove trailing .local to hostname which for some reason happens on mac
-  printf '\e[0;31m[%s@%s]\e[m' "$USER" "${HOSTNAME%.local}"
+  # remove trailing lan / local which is added on MacOS
+  local host2="${HOSTNAME%.lan}"
+  host2="${HOSTNAME%.local}"
+  printf '\e[0;31m[%s@%s]\e[m' "$USER" "${host2}"
 }
 
 function PS1_WHEREAMI() {
