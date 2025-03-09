@@ -80,7 +80,7 @@ local function add_header_guard()
   vim.fn.append(1, "#define " .. guard)
   vim.fn.append(2, "")
   vim.fn.append(vim.fn.line('$'), "")
-  vim.fn.append(vim.fn.line('$'), "#endif //  " .. guard)
+  vim.fn.append(vim.fn.line('$'), "#endif /*  " .. guard .. " */")
 end
 
 local function scrolloff_reader()
