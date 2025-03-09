@@ -88,9 +88,19 @@ bind '"\ew":backward-kill-word'
 
 
 function PS1_EXITCODE() {
-  err=$?
-  # if ! [ err -eq 0 ]; then echo "\e[0;31m$err \e[m"; fi
-  [ $err -ne 0 ] && printf '\e[0;31m%s | \e[m' "$err"
+  errors=("${PIPESTATUS[@]}")
+  sum=0
+  for err in ${errors[@]}; do
+    sum=$((sum+err))
+  done
+  if ((sum > 0)); then
+    printf '\e[0;33m<'
+    if [[ ${#errors[@]} -gt 1 ]]; then
+      printf ' %s |' ${errors[@]::${#errors[@]}-1}
+    fi
+    printf ' %s ' ${errors[${#errors[@]}-1]}
+    printf '>\e[m'
+  fi
 }
 
 function PS1_GITINFO() {
