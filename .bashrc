@@ -95,10 +95,17 @@ function PS1_EXITCODE() {
   done
   if ((sum > 0)); then
     printf '\e[0;33m<'
-    if [[ ${#errors[@]} -gt 1 ]]; then
-      printf ' %s |' ${errors[@]::${#errors[@]}-1}
-    fi
-    printf ' %s ' ${errors[${#errors[@]}-1]}
+    local cnt=${#errors[@]}
+    for ((i=0;i<cnt;i++)); do
+      local err=${errors[i]};
+      if [ "$err" = 130 ]; then err='^C'; fi
+      if [ "$err" = 131 ]; then err='^\Q'; fi
+      if ((i == (cnt-1))); then
+        printf ' %s ' $err
+      else
+        printf ' %s |' $err
+      fi
+    done
     printf '>\e[m'
   fi
 }
@@ -112,7 +119,7 @@ function PS1_GITINFO() {
 function PS1_WHOAMI() {
   # remove trailing lan / local which is added on MacOS
   local host2="${HOSTNAME%.lan}"
-  host2="${HOSTNAME%.local}"
+  host2="${host2%.local}"
   printf '\e[0;31m[%s@%s]\e[m' "$USER" "${host2}"
 }
 
