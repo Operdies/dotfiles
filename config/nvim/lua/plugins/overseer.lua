@@ -64,7 +64,7 @@ return {
                 args = build.args,
                 components = {
                   { "restart_on_save", delay = 50 },
-                  { "on_output_quickfix", open = true },
+                  { "on_output_quickfix", open = false },
                   "default"
                 },
               })
