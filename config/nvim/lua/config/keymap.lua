@@ -1,31 +1,32 @@
-local opts = { silent = true, noremap = true }
+local defaultMapOpts = { silent = true, noremap = true }
 local function nmap(keys, action)
-  vim.keymap.set("n", keys, action, opts)
+  vim.keymap.set("n", keys, action, defaultMapOpts)
 end
 
 local function vmap(keys, action)
-  vim.keymap.set("v", keys, action, opts)
+  vim.keymap.set("v", keys, action, defaultMapOpts)
 end
 
 local function imap(keys, action)
-  vim.keymap.set("i", keys, action, opts)
+  vim.keymap.set("i", keys, action, defaultMapOpts)
 end
 
--- Insert blank line before/after cursor and restore position
-nmap("[<space>", "m'O<esc>`'")
-nmap("]<space>", "m'o<esc>`'")
+local function map(modes, keys, action, opts)
+  vim.keymap.set(modes, keys, action, opts or defaultMapOpts)
+end
+
 nmap("]<tab>", "<cmd>tabnext<cr>")
 nmap("[<tab>", "<cmd>tabprev<cr>")
 -- restore position after reindenting
 nmap("=ip", "m`=ip``")
 -- visual select last paste
 nmap("gp", "`[v`]")
-nmap("<C-s>", ":w<cr>")
-nmap("<esc>", "<esc>:nohlsearch<cr>")
-nmap("<S-h>", ":bprev<cr>")
-nmap("<S-l>", ":bnext<cr>")
+nmap("<C-s>", "<cmd>w<cr>")
+nmap("<esc>", "<esc><cmd>nohlsearch<cr>")
+nmap("<S-h>", "<cmd>bprev<cr>")
+nmap("<S-l>", "<cmd>bnext<cr>")
 -- delete the active buffer without deleting its window
-nmap("<leader>bd", ":bp|bd #<cr>")
+nmap("<leader>bd", "<cmd>bp|bd #<cr>")
 nmap("g?", function()
   local success, err = pcall(function() vim.cmd("Man " .. vim.fn.expand("<cword>")) end)
   if not success then
@@ -34,13 +35,13 @@ nmap("g?", function()
   end
 end)
 
-vmap("<M-j>", ":m '>+1<cr>gv=gv")
-vmap("<M-k>", ":m '<-2<cr>gv=gv")
-nmap("<M-j>", ":m .+1<cr>==")
-nmap("<M-k>", ":m .-2<cr>==")
+vmap("<M-j>", "<cmd>m '>+1<cr>gv=gv")
+vmap("<M-k>", "<cmd>m '<-2<cr>gv=gv")
+nmap("<M-j>", "<cmd>m .+1<cr>==")
+nmap("<M-k>", "<cmd>m .-2<cr>==")
 
 nmap("<C-]>", "g<C-]>")
-nmap("<C-j>", ":execute 'ptag ' .. expand('<cword>')<cr>")
+nmap("<C-j>", "<cmd>execute 'ptag ' .. expand('<cword>')<cr>")
 
 -- create undo point before pasting
 imap("<C-r>", "<C-G>u<C-r>")
@@ -64,15 +65,15 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('n', '<C-k>', "<cmd>Man<cr>", { desc = "Open manual for word under cursor.", silent = true, noremap = true, remap = true})
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '[q', ':cprev<cr>', { desc = 'Go to previous quickfix item' })
-vim.keymap.set('n', ']q', ':cnext<cr>', { desc = 'Go to next quickfix item' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+map('n', '[d', function() vim.diagnostic.jump({count=-1, float=true}) end, { desc = 'Go to previous diagnostic message' })
+map('n', ']d', function() vim.diagnostic.jump({count=1, float=true}) end, { desc = 'Go to next diagnostic message' })
+map('n', '[q', '<cmd>cprev<cr>', { desc = 'Go to previous quickfix item' })
+map('n', ']q', '<cmd>cnext<cr>', { desc = 'Go to next quickfix item' })
+map('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
+map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 -- Register access with " feels super awkward. Set up + and - as easy access registers
-vim.keymap.set({ 'v', 'n' }, '-', '"-', { desc = "Copy to - register", noremap = true })
-vim.keymap.set({ 'v', 'n' }, '+', '"+', { desc = "Copy to system clipboard", noremap = true })
+map({ 'v', 'n' }, '-', '"-', { desc = "Copy to - register", noremap = true })
+map({ 'v', 'n' }, '+', '"+', { desc = "Copy to system clipboard", noremap = true })
 
 local function add_header_guard()
   local guard = vim.fn.expand('%:t:r'):upper() .. "_H"

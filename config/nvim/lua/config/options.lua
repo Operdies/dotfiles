@@ -1,6 +1,10 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.o.number = true
+vim.o.cursorline = true
+vim.o.cursorlineopt = 'number'
+
 vim.o.termguicolors = true
 vim.o.completeopt = 'menuone,noselect'
 vim.wo.signcolumn = 'yes'
@@ -14,8 +18,6 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.ruler = true
 vim.o.showcmd = true
-vim.o.hlsearch = true
-vim.o.number = false
 vim.o.scrolloff = 0
 vim.o.incsearch = true
 vim.o.backup = false
@@ -38,4 +40,6 @@ vim.opt.relativenumber = false
 vim.g.autoformat = false
 vim.o.laststatus = 2
 vim.o.scrolloff = 3
+
+vim.g.zig_fmt_autosave = 0
 
