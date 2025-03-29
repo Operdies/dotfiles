@@ -97,10 +97,15 @@ return {
       -- Automatically install LSPs to stdpath for neovim
       {
         'williamboman/mason.nvim',
-        opts = true,
-        config = function(_, _)
+        opts = {
+          registries = {
+            "github:mason-org/mason-registry",
+            "github:Crashdummyy/mason-registry",
+          },
+        },
+        config = function(_, opts)
           -- mason-lspconfig requires that these setup functions are called in this order before setting up the servers.
-          require('mason').setup()
+          require('mason').setup(opts)
           require('mason-lspconfig').setup()
         end
       },
@@ -150,6 +155,7 @@ return {
           vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
         end, "Toggle Inlay Hints")
       end
+      on_attach(nil, nil);
 
       local lspconfig = require('lspconfig')
       local servers = {
@@ -179,9 +185,9 @@ return {
             "clangd",
             "--background-index",
             "--clang-tidy",
-            "--header-insertion=iwyu",
+            "--header-insertion=never",
             "--completion-style=detailed",
-            "--function-arg-placeholders",
+            -- "--function-arg-placeholders",
             "--fallback-style=llvm",
           },
           init_options = {
