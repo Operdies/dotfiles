@@ -1,9 +1,9 @@
 if vim.g.neovide then
-  vim.o.guifont = "MesloLGS Nerd Font Mono:h14"
   vim.opt.linespace = 0
   vim.g.neovide_input_macos_option_key_is_meta = 'only_left'
   vim.g.neovide_input_ime = false
   vim.g.neovide_hide_mouse_when_typing = true
+  vim.g.neovide_remember_window_size = true
 
   -- turn animations way down
   vim.g.neovide_cursor_animation_length = 0
@@ -44,9 +44,21 @@ if vim.g.neovide then
   vim.g.terminal_color_14 = "#94e2d5"
   vim.g.terminal_color_15 = "#a6adc8"
 
-  -- <Cmd> bindings for mac
-  if vim.fn.has('mac') then
-    local opts = { silent = true, noremap = true }
+  local opts = { silent = true, noremap = true }
+
+  local sys = vim.loop.os_uname().sysname
+  if sys == "Windows_NT" then
+    -- ctrl+shift binds for windows
+    vim.o.guifont = "MesloLGS NF:h12"
+    vim.keymap.set('i', '<C-S-v>', '<C-r>+', opts)
+    vim.keymap.set({ 'n', 'v' }, '<C-S-c>', '"+y', opts)
+    vim.keymap.set({ 'n', 'v' }, '<C-S-v>', '"+p', opts)
+    vim.keymap.set('t', '<C-S-v>', '<C-\\><C-o>"+p', opts)
+    vim.keymap.set('n', '<C-S-s>', '<cmd>w<cr>', opts)
+    vim.keymap.set('n', '<C-S-o>', '<cmd>w<cr><cmd>so %<cr>', opts)
+  else
+    -- <Cmd> bindings for mac
+    vim.o.guifont = "MesloLGS NF:h14"
     vim.keymap.set('i', '<D-v>', '<C-r>+', opts)
     vim.keymap.set({ 'n', 'v' }, '<D-c>', '"+y', opts)
     vim.keymap.set({ 'n', 'v' }, '<D-v>', '"+p', opts)
