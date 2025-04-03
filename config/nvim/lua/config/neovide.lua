@@ -13,8 +13,8 @@ if vim.g.neovide then
 
   -- window settings
   vim.g.neovide_window_blurred = true
-  vim.g.neovide_opacity = 0.8
-  vim.g.neovide_normal_opacity = 0.8
+  vim.g.neovide_opacity = 0.9
+  vim.g.neovide_normal_opacity = 0.9
   vim.g.neovide_show_border = true
 
   -- floating window settings
@@ -58,7 +58,7 @@ if vim.g.neovide then
     vim.keymap.set('n', '<C-S-o>', '<cmd>w<cr><cmd>so %<cr>', opts)
   else
     -- <Cmd> bindings for mac
-    vim.o.guifont = "MesloLGS NF:h14"
+    vim.o.guifont = "MesloLGS Nerd Font Mono:h12"
     vim.keymap.set('i', '<D-v>', '<C-r>+', opts)
     vim.keymap.set({ 'n', 'v' }, '<D-c>', '"+y', opts)
     vim.keymap.set({ 'n', 'v' }, '<D-v>', '"+p', opts)

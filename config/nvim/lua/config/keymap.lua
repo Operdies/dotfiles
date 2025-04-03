@@ -74,6 +74,9 @@ map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list
 -- Register access with " feels super awkward. Set up + and - as easy access registers
 map({ 'v', 'n' }, '-', '"-', { desc = "Copy to - register", noremap = true })
 map({ 'v', 'n' }, '+', '"+', { desc = "Copy to system clipboard", noremap = true })
+-- Side scrolling is annoying
+map({'n', 'i', 't', 'v'}, '<ScrollWheelLeft>' , '<nop>')
+map({'n', 'i', 't', 'v'}, '<ScrollWheelRight>' , '<nop>')
 
 local function add_header_guard()
   local guard = vim.fn.expand('%:t:r'):upper() .. "_H"
