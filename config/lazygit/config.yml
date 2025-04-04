@@ -1,7 +1,11 @@
 os:
-  edit: '~/.config/lazygit/nvim-wrapper.sh {{filename}}'                           
-  editAtLine: '~/.config/lazygit/nvim-wrapper.sh +{{line}} -- {{filename}}'        
-  editAtLineAndWait: '~/.config/lazygit/nvim-wrapper.sh +{{line}} -- {{filename}}' 
+  # <C-q> is my mapping to hide the floating terminal hosting lazygit without closing it.
+  edit: 'nvim --server "$NVIM" --remote-send "<C-q>" ; nvim --server "$NVIM" --remote-silent {{filename}}'
+  # nvim does not yet support the '+{cmd}' syntax supported by vim. As a hack, we can instead send the keystroke to go to a specific line after opening.
+  editAtLine: 'nvim --server "$NVIM" --remote-send "<C-q>" ; nvim --server "$NVIM" --remote-silent {{filename}} ; nvim --server "$NVIM" --remote-send "{{line}}gg"; '
   editInTerminal: true
 gui:
   skipDiscardChangeWarning: true
+notARepository: skip
+promptToReturnFromSubprocess: false
+
