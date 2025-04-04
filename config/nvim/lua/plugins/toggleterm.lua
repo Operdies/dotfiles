@@ -5,6 +5,7 @@ return {
     keys = {
       { "<C-\\>",     desc = "toggleterm" },
       { "<leader>gg", desc = "lazygit", },
+      { "<C-'>", desc = "lazygit", },
     },
     opts = {
       direction = "float",
@@ -23,15 +24,13 @@ return {
         border = "curved",
       },
       autochdir = true,
-      env = {
-        EDITOR = "nvr -l",
-      },
     },
     config = function(_, opts)
       if 'Windows_NT' == vim.loop.os_uname().sysname then
         vim.cmd [[
-            let &shell = 'powershell'
-            let &shellcmdflag = '-NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';'
+            let &shell = 'pwsh'
+            let &shellcmdflag = '-NoLogo -Command'
+            " let &shellcmdflag = '-NoLogo -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';'
             let &shellredir = '2>&1 | %%{ "$_" } | Out-File %s; exit $LastExitCode'
             let &shellpipe  = '2>&1 | %%{ "$_" } | Tee-Object %s; exit $LastExitCode'
             set shellquote= shellxquote=
@@ -48,9 +47,11 @@ return {
         direction = "float",
         on_open = function(term)
           vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-q>", '<cmd>close<cr>', { noremap = true, silent = true })
+          vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-'>", '<cmd>close<cr>', { noremap = true, silent = true })
         end,
       })
       vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
+      vim.keymap.set("n", "<C-'>", function() lazygit:toggle() end, { desc = "lazygit" })
     end,
   },
 }
