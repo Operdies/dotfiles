@@ -1,0 +1,10 @@
+os:
+  # lazygit escapes '%' to '^%', so as far as I can tell there is no way to do variable expansion on Windows.
+  edit: 'C:/Users/allarsen/AppData/Roaming/lazygit/edit.cmd {{filename}}'
+  editAtLine: 'C:/Users/allarsen/AppData/Roaming/lazygit/edit.cmd +{{line}} {{filename}}'
+  editInTerminal: true
+gui:
+  skipDiscardChangeWarning: true
+notARepository: skip
+promptToReturnFromSubprocess: false
+
