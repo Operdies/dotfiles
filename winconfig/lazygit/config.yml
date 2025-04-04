@@ -7,4 +7,7 @@ gui:
   skipDiscardChangeWarning: true
 notARepository: skip
 promptToReturnFromSubprocess: false
-
+keybinding:
+  universal:
+    quit: <disabled>
+    open: <disabled>
