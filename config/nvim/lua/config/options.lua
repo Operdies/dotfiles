@@ -43,3 +43,7 @@ vim.o.scrolloff = 3
 
 vim.g.zig_fmt_autosave = 0
 
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
