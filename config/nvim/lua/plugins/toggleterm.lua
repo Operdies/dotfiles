@@ -5,7 +5,6 @@ return {
     keys = {
       { "<C-\\>",     desc = "toggleterm" },
       { "<leader>gg", desc = "lazygit", },
-      { "<C-'>", desc = "lazygit", },
     },
     opts = {
       direction = "float",
@@ -51,7 +50,6 @@ return {
         end,
       })
       vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
-      vim.keymap.set("n", "<C-'>", function() lazygit:toggle() end, { desc = "lazygit" })
     end,
   },
 }

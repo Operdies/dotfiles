@@ -20,7 +20,7 @@ return {
     opts = {
       keymap = {
         preset = 'super-tab',
-        ['<C-a>'] = { 'cancel' },
+        ['<C-y>'] = { 'cancel' },
         ['<C-e>'] = { 'accept' },
       },
       appearance = {
@@ -70,6 +70,7 @@ return {
           map('gt', require('telescope.builtin').lsp_type_definitions, 'Go to Type')
           map('<leader>cf', vim.lsp.buf.format, 'Format Buffer', 'n')
           map('<leader>cf', vim.lsp.buf.format, 'Format Range', 'v')
+          map('<leader>ch', "<cmd>LspClangdSwitchSourceHeader<cr>", "Switch Source/Header");
           ---@param client vim.lsp.Client
           ---@param method vim.lsp.protocol.Method
           ---@param bufnr? integer some lsp support methods only in specific files

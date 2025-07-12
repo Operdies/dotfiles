@@ -113,7 +113,7 @@ return {
     },
     event = "VeryLazy",
     opts = {
-      autoclose                  = false,
+      autoclose                  = true,
       threshold                  = 10,
       close_command              = function(bufnr)
         vim.api.nvim_buf_delete(bufnr, {})
@@ -264,6 +264,8 @@ return {
       vim.keymap.set('n', '<leader>fG', builtin.live_grep, { desc = 'Grep cwd' })
       vim.keymap.set('n', '<leader>cd', builtin.diagnostics, { desc = 'Search Diagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = 'Search Resume' })
+      vim.keymap.set('n', '<leader>cs', builtin.lsp_document_symbols, { desc = 'Document Symbols' })
+      vim.keymap.set('n', '<leader>cS', builtin.lsp_workspace_symbols, { desc = 'Document Symbols' })
 
       -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
       vim.defer_fn(function()
