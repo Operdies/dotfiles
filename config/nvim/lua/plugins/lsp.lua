@@ -1,3 +1,7 @@
+local function feed(keys)
+  local codes = vim.api.nvim_replace_termcodes(keys, true, true, true);
+  vim.api.nvim_feedkeys(codes, "n", true)
+end
 return {
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -29,6 +33,14 @@ return {
       completion = { documentation = { auto_show = false } },
       sources = {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+      cmdline = {
+        keymap = {
+          preset = 'inherit',
+          ['<C-p>'] = { function(cmp) if cmp.is_visible() then cmp.select_prev() else feed("<Up>") end end },
+          ['<C-n>'] = { function(cmp) if cmp.is_visible() then cmp.select_next() else feed("<Down>") end end },
+        },
+        completion = { menu = { auto_show = true } },
       },
       fuzzy = { implementation = "prefer_rust_with_warning" }
     },
