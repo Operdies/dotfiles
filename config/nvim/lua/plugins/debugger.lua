@@ -57,6 +57,7 @@ return {
           dap.listeners.before.event_exited.dapui_config = function()
             ui.close()
           end
+          dap.adapters.cppdbg = dap.adapters.codelldb
 
           -- if not dap.adapters["netcoredbg"] then
           --   require("dap").adapters["netcoredbg"] = {
