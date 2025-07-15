@@ -58,42 +58,12 @@ return {
             ui.close()
           end
           dap.adapters.cppdbg = dap.adapters.codelldb
-
-          -- if not dap.adapters["netcoredbg"] then
-          --   require("dap").adapters["netcoredbg"] = {
-          --     type = "executable",
-          --     command = vim.fn.exepath("netcoredbg"),
-          --     args = { "--interpreter=vscode" },
-          --     options = {
-          --       detached = false,
-          --     },
-          --   }
-          -- end
-          -- dap.adapters.coreclr = dap.adapters.netcoredbg
-          --
-          -- for _, lang in ipairs({ "cs", "fsharp", "vb" }) do
-          --   if not dap.configurations[lang] then
-          --     dap.configurations[lang] = {
-          --       {
-          --         type = "netcoredbg",
-          --         name = "Launch file",
-          --         request = "launch",
-          --         ---@diagnostic disable-next-line: redundant-parameter
-          --         program = function()
-          --           return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/", "file")
-          --         end,
-          --         cwd = "${workspaceFolder}",
-          --       },
-          --     }
-          --   end
-          -- end
         end,
       },
 
       -- virtual text for the debugger
       {
         "theHamsta/nvim-dap-virtual-text",
-        opts = {},
       },
 
       -- mason.nvim integration
@@ -484,6 +454,21 @@ return {
   },
   {
     "theHamsta/nvim-dap-virtual-text",
-    opts = {},
+    opts = {
+      clear_on_continue = true,
+      virt_text_pos = 'eol',
+    },
+    config = function(_, opts)
+      local virt = require('nvim-dap-virtual-text')
+      opts.display_callback = function(variable, buf, _, node, _)
+        local limit = 40
+        local str = ' = ' .. variable.value:gsub("%s+", " ")
+        if #str > limit then
+          str = string.sub(str, 1, limit) .. "..."
+        end
+        return str
+      end
+      virt.setup(opts)
+    end
   },
 }
