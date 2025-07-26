@@ -35,6 +35,7 @@ return {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
       },
       cmdline = {
+        enabled = false,
         keymap = {
           preset = 'inherit',
           ['<C-p>'] = { function(cmp) if cmp.is_visible() then cmp.select_prev() else feed("<Up>") end end },
