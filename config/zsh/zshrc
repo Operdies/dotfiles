@@ -1,105 +1,50 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+bindkey -e
 
-export DEBUGINFOD_URLS="https://debuginfod.archlinux.org/"
-export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH:$HOME/go/bin:$HOME/.cargo/bin
-# add npm binaries
-export PATH="$HOME/.node_modules/bin:$PATH"
-export npm_config_prefix=~/.node_modules
-export LANG=en_US.UTF-8
+alias ls='ls --color'
+
+generate_command_shortcuts () {
+  for kvp in "$@"; do
+    local key="${kvp%%:*}"
+    local val="${kvp#*:}"
+    local funcname="zle_autogen_$key"
+    source <(<< EOF
+$funcname () {
+  printf '%s\n\n\n' "\$($val 2>&1)"; zle redisplay;
+}
+zle -N $funcname
+bindkey '^[$key' $funcname
+EOF
+)
+  done
+}
+
+bindkey '\e\C-u' up-directory
+generate_command_shortcuts \
+  's:git -c color.ui=always status' \
+  'l:ls -lh' \
+  'e:eval $BUFFER'
+
 export EDITOR='nvim'
-export FZF_DEFAULT_OPTS='--layout=reverse'
 export MANPAGER='nvim +Man! -'
 
-# startx on login on VT 1
-if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && [ -t 0 ]; then
-  startx
-fi
-
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-# Set the directory we want to store zinit and plugins
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-
-# Download Zinit, if it's not there yet
-if [ ! -d "$ZINIT_HOME" ]; then
-  mkdir -p "$(dirname $ZINIT_HOME)"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
-
-# Source/Load zinit
-source "${ZINIT_HOME}/zinit.zsh"
-
-# Add in Powerlevel10k
-zinit ice depth=1; zinit light romkatv/powerlevel10k
-
-# Add in zsh plugins
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light agkozak/zsh-z
-
-# Load completions
-autoload -Uz compinit && compinit
-
-zinit cdreplay -q
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Keybindings
-bindkey -e
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
-bindkey '^[w' backward-kill-word
-function my_ls {
-  echo
-  command ls --color=auto
-  zle redisplay
-}
-zle -N my_ls
-bindkey '^[l' my_ls
-
-# History
-HISTSIZE=5000
-HISTFILE=~/.zsh_history
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
-
-
-# Completion styling
+autoload -U compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' menu select
-# Not sure why this is needed, but cd colors are wrong without it
-eval $(dircolors -b)
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
+eval "$(starship init zsh)"
+eval "$(starship completions zsh)"
+eval "$(zoxide init zsh)"
 
-# Aliases
-alias ls='ls --color'
-alias vim='nvim'
+# Make / and . delimit words
+WORDCHARS=${WORDCHARS//[\/\.\-]}
 
-# Make ^w stop on directory delimiter
-autoload -U select-word-style
-select-word-style bash
+# Ensure no dups in history
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+# Save history immediately instead of waiting for session to end
+setopt INC_APPEND_HISTORY
 
-# don't nest nvim
-if [ -n "$NVIM" ]; then
-  if command -v nvr &> /dev/null; then
-    alias nvim="nvr -l"
-    export MANPAGER='nvr -l +Man! -'
-    export EDITOR='nvr -l'
-  fi
-fi
-
-alias yank='xclip -selection clipboard'
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
