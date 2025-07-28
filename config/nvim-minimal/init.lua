@@ -55,6 +55,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
     vim.keymap.set('n', 'K', vim.lsp.buf.hover)
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
+    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
+    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
+    vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float)
   end,
 })
 
