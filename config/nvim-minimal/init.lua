@@ -119,6 +119,7 @@ vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
 -- Side scrolling is annoying
 vim.keymap.set({'n', 'i', 't', 'v'}, '<ScrollWheelLeft>' , '<nop>')
 vim.keymap.set({'n', 'i', 't', 'v'}, '<ScrollWheelRight>' , '<nop>')
+--]]
 
 --[[theming]]
 require "vague".setup({ transparent = true })
@@ -136,7 +137,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- Treat C# files as xmll
+-- Treat C# files as xml
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup("XmlIndent", { clear = true }),
   pattern = { "*.csproj", "*.props", "*.targets" },
@@ -200,5 +201,4 @@ local lazygit = require("toggleterm.terminal").Terminal:new({
 vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
 --]]
 
--- vim: set foldmethod=marker
--- vim: set foldmarker=--[[,--]]
+-- vim: foldmethod=marker foldmarker=--[[,--]]
