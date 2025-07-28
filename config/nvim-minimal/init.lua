@@ -1,4 +1,4 @@
---[[basic options]]
+--[[ basic options ]]
 vim.o.autochdir = true
 vim.o.number = true
 vim.o.relativenumber = true
@@ -24,8 +24,9 @@ vim.o.mouse = 'a'
 vim.o.compatible = false
 
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal", "localoptions"  }
-vim.opt.completeopt = { "menu", "menuone", "popup", "noselect" }
+vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal",
+  "localoptions" }
+vim.opt.completeopt = { "menu", "menuone", "popup", "noselect", "fuzzy" }
 
 vim.o.wildmenu = true
 vim.o.wildmode = "longest:full,full"
@@ -33,7 +34,7 @@ vim.o.wildoptions = "fuzzy,pum,tagfile"
 vim.opt.wildignore = { "*.o", "*.a" }
 --]]
 
---[[plugins]]
+--[[ plugins ]]
 vim.pack.add({
   { src = "https://github.com/vague2k/vague.nvim" },
   { src = "https://github.com/stevearc/oil.nvim" },
@@ -44,7 +45,7 @@ vim.pack.add({
 })
 --]]
 
---[[lsp config]]
+--[[ lsp config ]]
 vim.lsp.enable({ "lua_ls", "clangd" })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
@@ -66,37 +67,74 @@ vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = t
 
 --]]
 
---[[oil]]
+--[[ oil ]]
 require "oil".setup()
 --]]
 
---[[pick]]
-require "mini.pick".setup()
+--[[ pick ]]
+local pick = require('mini.pick')
+local win_config = function()
+  local height = math.floor(0.618 * vim.o.lines)
+  local width = math.floor(0.618 * vim.o.columns)
+  return {
+    anchor = 'NW',
+    height = height,
+    width = width,
+    row = math.floor(0.5 * (vim.o.lines - height)),
+    col = math.floor(0.5 * (vim.o.columns - width)),
+  }
+end
+pick.setup({ window = { config = win_config } })
+pick.registry.project = function()
+  local projects = vim.fs.dir("$HOME/repos")
+  local lst = {}
+  for project in projects do
+    lst[#lst + 1] = project
+  end
+  pick.ui_select(lst, {
+    prompt = 'Pick a Project',
+    format_item = function(item)
+      return item
+    end,
+  }, function(choice)
+    if choice then
+      local fullpath = vim.fn.expand("$HOME/repos/" .. choice)
+      -- we need to schedule this function because MiniPick refuses
+      -- to open the selected file if the new picker is opened inside this handler.
+      vim.schedule(function()
+        vim.fn.chdir(fullpath)
+        pick.builtin.files({ tool = 'git' })
+      end)
+    end
+  end)
+end
 --]]
 
---[[treesitter]]
+--[[ treesitter ]]
 require "nvim-treesitter.configs".setup({
   ensure_installed = { "c" },
   highlight = { enable = true }
 })
 --]]
 
---[[keymap]]
+--[[ keymap ]]
 vim.keymap.set({ 'n', 'v', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
 vim.keymap.set({ 'n', 'v', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
-vim.keymap.set('n', '<C-s>', "<cmd>update<cr>") -- write buffer if it has unsaved changes
-vim.keymap.set('n', '<leader>ff', "<cmd>Pick files<CR>")
+vim.keymap.set('n', '<C-s>', "<cmd>update<cr>")       -- write buffer if it has unsaved changes
+vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
+vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>fb', "<cmd>Pick buffers<CR>")
 vim.keymap.set('n', '<leader>fr', "<cmd>Pick resume<CR>")
+vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
 vim.keymap.set('n', '<leader>cf', vim.lsp.buf.format)
-vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>") -- close current buffer
+vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>")    -- close current buffer
 vim.keymap.set('n', "<esc>", "<esc><cmd>nohlsearch<cr>") -- clear search highlight on escape
-vim.keymap.set('n', "gp", "`[v`]") -- visually select last paste
+vim.keymap.set('n', "gp", "`[v`]")                       -- visually select last paste
 
-vim.keymap.set('n', "<M-j>", "<cmd>m .+1<cr>==") -- swap current line with next line
-vim.keymap.set('n', "<M-k>", "<cmd>m .-2<cr>==") -- swap current line with previous line
+vim.keymap.set('n', "<M-j>", "<cmd>m .+1<cr>==")         -- swap current line with next line
+vim.keymap.set('n', "<M-k>", "<cmd>m .-2<cr>==")         -- swap current line with previous line
 
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -117,17 +155,17 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
 
 -- Side scrolling is annoying
-vim.keymap.set({'n', 'i', 't', 'v'}, '<ScrollWheelLeft>' , '<nop>')
-vim.keymap.set({'n', 'i', 't', 'v'}, '<ScrollWheelRight>' , '<nop>')
+vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelLeft>', '<nop>')
+vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
 --]]
 
---[[theming]]
+--[[ theming ]]
 require "vague".setup({ transparent = true })
 vim.cmd("colorscheme vague")
 vim.cmd(":hi statusline guibg=NONE")
 --]]
 
---[[autocommands]]
+--[[ autocommands ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
@@ -148,17 +186,18 @@ vim.api.nvim_create_autocmd('BufEnter', {
 })
 
 -- Remember cursor position
-vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup("XmlIndent", { clear = true }),
-  pattern = { "*.csproj", "*.props", "*.targets" },
+vim.api.nvim_create_autocmd('BufReadPost', {
+  group = vim.api.nvim_create_augroup("RestoreLastKnownCursorLine", { clear = true }),
   callback = function()
-    vim.opt_local.filetype = "xml"
-    vim.opt_local.shiftwidth = 4
+    local line = vim.fn.line("'\"")
+    if line > 0 and line <= vim.fn.line("$") then
+      vim.fn.execute [[normal! g'"]]
+    end
   end,
 })
 --]]
 
---[[toggleterm]]
+--[[ toggleterm ]]
 if 'Windows_NT' == vim.loop.os_uname().sysname then
   vim.cmd [[
   let &shell = 'pwsh'
