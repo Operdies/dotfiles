@@ -37,6 +37,10 @@ eval "$(zoxide init zsh)"
 # Make / and . delimit words
 WORDCHARS=${WORDCHARS//[\/\.\-]}
 
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory
 # Ensure no dups in history
 setopt HIST_EXPIRE_DUPS_FIRST
 setopt HIST_IGNORE_DUPS
