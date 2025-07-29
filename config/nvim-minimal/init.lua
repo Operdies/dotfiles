@@ -26,7 +26,7 @@ vim.o.compatible = false
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal",
   "localoptions" }
-vim.opt.completeopt = { "menu", "menuone", "popup", "noselect", "fuzzy" }
+vim.opt.completeopt = { "menu", "menuone", "popup", "noinsert", "fuzzy" }
 
 vim.o.wildmenu = true
 vim.o.wildmode = "longest:full,full"
@@ -47,25 +47,75 @@ vim.pack.add({
 --]]
 
 --[[ lsp config ]]
+local lspconfig = require('lspconfig')
+--[[ clangd config ]]
+local clangd = {
+  on_attach = function(_, bufnr)
+    vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
+    { buffer = bufnr, desc = "Switch Source/Header" })
+  end,
+  root_dir = function(fname)
+    return vim.fs.dirname(vim.fs.find({
+      "Makefile",
+      "compile_commands.json",
+      "configure.ac",
+      "configure.in",
+      "config.h.in",
+      -- if meson.build exists in nested source directories, we get a separate clangd instance for each meson.build file
+      -- "meson.build",
+      -- I guess we just assume meson options will only be in the root
+      "meson_options.txt",
+      "build.ninja",
+      '.git' }, { path = fname, upward = true })[1])
+  end,
+  capabilities = {
+    offsetEncoding = { "utf-16" },
+  },
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=never",
+    "--completion-style=detailed",
+    "--function-arg-placeholders=0",
+    "--fallback-style=llvm",
+  },
+  init_options = {
+    usePlaceholders = false,
+    completeUnimported = false,
+    clangdFileStatus = true,
+  },
+}
+lspconfig.clangd.setup(clangd)
+--]]
 vim.lsp.enable({ "lua_ls", "clangd" })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client:supports_method('textDocument/completion') then
-      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = false })
     end
     vim.keymap.set('n', 'K', vim.lsp.buf.hover)
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
     vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
     vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float)
+
+    local function toggle_inline_diagnostics()
+      local enabled = false
+      return function()
+        enabled = not enabled
+        vim.diagnostic.config({ virtual_text = enabled })
+      end
+    end
+    vim.keymap.set('n', '<leader>cD', toggle_inline_diagnostics())
   end,
 })
 
 -- tab completion -- omnicomplete if popup is closed, otherwise next option
 vim.keymap.set('i', '<tab>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-n>'", { expr = true })
 -- Open popup if closed, otherwise accept selected option
-vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o><C-n>' : '<C-y>'", { expr = true })
+vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true })
 -- Abort completion if popup menu is active, otherwise fallback to default <C-a> behavior
 vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = true })
 
