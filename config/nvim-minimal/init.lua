@@ -193,8 +193,8 @@ require "nvim-treesitter.configs".setup({
 --]]
 
 --[[ keymap ]]
-vim.keymap.set({ 'n', 'v', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
-vim.keymap.set({ 'n', 'v', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
+vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
+vim.keymap.set({ 'n', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
 vim.keymap.set('n', '<C-s>', "<cmd>update<cr>")       -- write buffer if it has unsaved changes
 vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
 vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
@@ -221,10 +221,10 @@ vim.keymap.set('i', '<C-r>+', '<C-G>u<C-r>+<C-G>u')
 vim.keymap.set('i', "<C-d>", "<del>")
 
 -- keep visual selection when 'denting
-vim.keymap.set('v', "<", "<gv")
-vim.keymap.set('v', ">", ">gv")
+vim.keymap.set('x', "<", "<gv")
+vim.keymap.set('x', ">", ">gv")
 
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Space>', '<Nop>', { silent = true })
 
 -- double escape: go to normal mode from a terminal
 vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
