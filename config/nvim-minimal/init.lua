@@ -18,10 +18,10 @@ vim.o.scrolloff = 3
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.list = true
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
 vim.o.mouse = 'a'
 vim.o.compatible = false
+-- vim.o.updatetime = 250
+-- vim.o.timeoutlen = 300
 
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal",
