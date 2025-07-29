@@ -42,6 +42,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig" },
   { src = "https://github.com/akinsho/toggleterm.nvim" },
+  { src = "https://github.com/wellle/targets.vim" },
 })
 --]]
 
