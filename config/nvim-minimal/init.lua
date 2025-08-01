@@ -52,7 +52,7 @@ local lspconfig = require('lspconfig')
 local clangd = {
   on_attach = function(_, bufnr)
     vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
-    { buffer = bufnr, desc = "Switch Source/Header" })
+      { buffer = bufnr, desc = "Switch Source/Header" })
   end,
   root_dir = function(fname)
     return vim.fs.dirname(vim.fs.find({
@@ -245,7 +245,7 @@ require "nvim-treesitter.configs".setup({
 --[[ keymap ]]
 vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
 vim.keymap.set({ 'n', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
-vim.keymap.set('n', '<C-s>', "<cmd>update<cr>")       -- write buffer if it has unsaved changes
+vim.keymap.set('n', '<C-s>', "<cmd>update<cr>")  -- write buffer if it has unsaved changes
 vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
 vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
@@ -307,6 +307,22 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
     vim.opt_local.filetype = "xml"
     vim.opt_local.shiftwidth = 4
+  end,
+})
+
+-- chdir to git root or file if not present (autochdir behavior)
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup("autochdir-to-git-or-file", { clear = true }),
+  callback = function()
+    local bufpath = vim.fn.expand('%:p')
+    if bufpath then
+      local err, realpath = pcall(vim.uv.fs_realpath, bufpath)
+      if not err then
+        local dirname = vim.fs.dirname(realpath)
+        local root = vim.fs.root(dirname, ".git")
+        vim.fn.chdir(root or dirname)
+      end
+    end
   end,
 })
 
