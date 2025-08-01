@@ -95,7 +95,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client:supports_method('textDocument/completion') then
-      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = false })
+      local triggers = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.>'
+
+      local chars = {}; triggers:gsub(".", function(c) table.insert(chars, c) end)
+      client.server_capabilities.completionProvider.triggerCharacters = chars
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
     end
     vim.keymap.set('n', 'K', vim.lsp.buf.hover)
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
