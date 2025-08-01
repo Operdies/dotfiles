@@ -45,7 +45,68 @@ vim.pack.add({
   { src = "https://github.com/wellle/targets.vim" },
   { src = "https://github.com/stevearc/overseer.nvim" },
   { src = "https://github.com/tpope/vim-fugitive" },
+  { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
+--]]
+
+--[[ gitsigns ]]
+-- Adds git related signs to the gutter, as well as utilities for managing changes
+local gs = require('gitsigns')
+local gitsigns_opts = {
+  -- See `:help gitsigns.txt`
+  signs = {
+    add = { text = '+' },
+    change = { text = '~' },
+    delete = { text = '_' },
+    topdelete = { text = '‾' },
+    changedelete = { text = '~' },
+  },
+  on_attach = function(bufnr)
+    local function bufmap(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    -- Navigation
+    bufmap({ 'n', 'v' }, ']c', function()
+      if vim.wo.diff then
+        return ']c'
+      end
+      vim.schedule(gs.next_hunk)
+      return '<Ignore>'
+    end, { expr = true, desc = 'Jump to next hunk' })
+
+    bufmap({ 'n', 'v' }, '[c', function()
+      if vim.wo.diff then
+        return '[c'
+      end
+      vim.schedule(gs.prev_hunk)
+      return '<Ignore>'
+    end, { expr = true, desc = 'Jump to previous hunk' })
+
+    -- Actions
+    -- visual mode
+    bufmap('v', '<leader>hs', function() gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' } end, { desc = 'stage git hunk' })
+    bufmap('v', '<leader>hr', function() gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' } end, { desc = 'reset git hunk' })
+    -- normal mode
+    bufmap('n', '<leader>hs', gs.stage_hunk, { desc = 'git stage hunk' })
+    bufmap('n', '<leader>hr', gs.reset_hunk, { desc = 'git reset hunk' })
+    -- bufmap('n', '<leader>hS', gs.stage_buffer, { desc = 'git stage buffer' })
+    bufmap('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'undo stage hunk' })
+    -- bufmap('n', '<leader>hR', gs.reset_buffer, { desc = 'git reset buffer' })
+    -- bufmap('n', '<leader>hp', gs.preview_hunk, { desc = 'preview git hunk' })
+    bufmap('n', '<leader>hb', function() gs.blame_line { full = false } end, { desc = 'git blame line' })
+
+    -- Toggles
+    bufmap('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
+    bufmap('n', '<leader>td', gs.toggle_deleted, { desc = 'toggle git show deleted' })
+
+    -- Text object
+    bufmap({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
+  end
+}
+gs.setup(gitsigns_opts)
 --]]
 
 --[[ lsp config ]]
