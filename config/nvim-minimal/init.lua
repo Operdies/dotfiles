@@ -222,18 +222,21 @@ end)
 
 --[[ pick ]]
 local pick = require('mini.pick')
-local win_config = function()
-  local height = math.floor(0.618 * vim.o.lines)
-  local width = math.floor(0.618 * vim.o.columns)
-  return {
-    anchor = 'NW',
-    height = height,
-    width = width,
-    row = math.floor(0.5 * (vim.o.lines - height)),
-    col = math.floor(0.5 * (vim.o.columns - width)),
+pick.setup({
+  window = {
+    config = function()
+      local height = math.floor(0.618 * vim.o.lines)
+      local width = math.floor(0.618 * vim.o.columns)
+      return {
+        anchor = 'NW',
+        height = height,
+        width = width,
+        row = math.floor(0.5 * (vim.o.lines - height)),
+        col = math.floor(0.5 * (vim.o.columns - width)),
+      }
+    end
   }
-end
-pick.setup({ window = { config = win_config } })
+})
 pick.registry.project = function()
   local projects = vim.fs.dir("$HOME/repos")
   local lst = {}
@@ -257,6 +260,18 @@ pick.registry.project = function()
     end
   end)
 end
+pick.registry.oldfiles = function()
+  local home = vim.env.HOME
+  local existing = {}
+  for _, file in ipairs(vim.v.oldfiles) do
+    if file:match('^' .. home) then
+      if vim.fn.filereadable(file) ~= 0 then
+        existing[#existing + 1] = file:gsub('^' .. home, "~")
+      end
+    end
+  end
+  pick.start({ source = { items = existing } })
+end
 --]]
 
 --[[ treesitter ]]
@@ -274,7 +289,8 @@ vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
 vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>fb', "<cmd>Pick buffers<CR>")
-vim.keymap.set('n', '<leader>fr', "<cmd>Pick resume<CR>")
+vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
+vim.keymap.set('n', '<leader>fR', "<cmd>Pick resume<CR>")
 vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
 vim.keymap.set('n', '<leader>cf', vim.lsp.buf.format)
