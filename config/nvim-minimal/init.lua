@@ -43,6 +43,7 @@ vim.pack.add({
   { src = "https://github.com/neovim/nvim-lspconfig" },
   { src = "https://github.com/akinsho/toggleterm.nvim" },
   { src = "https://github.com/wellle/targets.vim" },
+  { src = "https://github.com/stevearc/overseer.nvim" },
 })
 --]]
 
@@ -194,6 +195,28 @@ local function oil_setup()
 end
 
 oil_setup()
+--]]
+
+--[[ overseer ]]
+local overseer_options = {
+  task_list = {
+    direction = "bottom",
+    min_height = 15,
+    default_detail = 2,
+    dap = true,
+    bindings = {
+      ["<C-c>"] = "<cmd>OverseerQuickAction stop<cr>",
+      ["<C-r>"] = "<cmd>OverseerQuickAction restart<cr>",
+    }
+  },
+}
+require('overseer').setup(overseer_options)
+vim.keymap.set('n', '<leader>rt', '<cmd>OverseerRun<cr>')
+vim.keymap.set('n', '<leader>rT', function()
+  local win = vim.api.nvim_get_current_win()
+  vim.cmd('OverseerToggle')
+  vim.api.nvim_set_current_win(win)
+end)
 --]]
 
 --[[ pick ]]
