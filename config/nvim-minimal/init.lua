@@ -267,10 +267,15 @@ end
 pick.registry.oldfiles = function()
   local home = vim.env.HOME
   local existing = {}
+  local added = {}
   for _, file in ipairs(vim.v.oldfiles) do
     if file:match('^' .. home) then
       if vim.fn.filereadable(file) ~= 0 then
-        existing[#existing + 1] = file:gsub('^' .. home, "~")
+        file = vim.uv.fs_realpath(file)
+        if added[file] == nil then
+          added[file] = true
+          existing[#existing + 1] = file:gsub('^' .. home, "~")
+        end
       end
     end
   end
