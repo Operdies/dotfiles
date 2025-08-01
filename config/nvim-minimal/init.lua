@@ -1,5 +1,5 @@
 --[[ basic options ]]
-vim.o.autochdir = true
+vim.o.autochdir = false
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.signcolumn = "yes"
@@ -271,7 +271,7 @@ pick.registry.oldfiles = function()
   for _, file in ipairs(vim.v.oldfiles) do
     if file:match('^' .. home) then
       if vim.fn.filereadable(file) ~= 0 then
-        file = vim.uv.fs_realpath(file)
+        file = vim.fn.resolve(file)
         if added[file] == nil then
           added[file] = true
           existing[#existing + 1] = file:gsub('^' .. home, "~")
@@ -365,8 +365,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
     local bufpath = vim.fn.expand('%:p')
     if bufpath then
-      local err, realpath = pcall(vim.uv.fs_realpath, bufpath)
-      if not err then
+      local realpath = vim.fn.resolve(bufpath)
+      if realpath then
         local dirname = vim.fs.dirname(realpath)
         local root = vim.fs.root(dirname, ".git")
         vim.fn.chdir(root or dirname)
