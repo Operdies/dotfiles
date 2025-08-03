@@ -297,7 +297,18 @@ end)
 
 --[[ pick ]]
 local pick = require('mini.pick')
-pick.setup({
+local pick_options = {
+  mappings = {
+    choose_marked = '<C-q>',
+    scroll_down = '<C-e>',
+    scroll_up = '<C-y>',
+    refresh = {
+      char = '<C-r>',
+      func = function ()
+        pick.refresh()
+      end
+    },
+  },
   window = {
     config = function()
       local height = math.floor(0.618 * vim.o.lines)
@@ -311,7 +322,8 @@ pick.setup({
       }
     end
   }
-})
+}
+pick.setup(pick_options)
 pick.registry.project = function()
   local projects = vim.fs.dir("$HOME/repos")
   local lst = {}
@@ -368,7 +380,12 @@ vim.keymap.set('n', '<C-s>', "<cmd>update<cr>")  -- write buffer if it has unsav
 vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
 vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
-vim.keymap.set('n', '<leader>fb', "<cmd>Pick buffers<CR>")
+vim.keymap.set('n', '<leader>fb', function()
+  local pick_buffer_wipeout = function()
+    vim.api.nvim_buf_delete(pick.get_picker_matches().current.bufnr, {})
+  end
+  pick.builtin.buffers(pick_options, { mappings = { wipeout = { char = '<C-w>', func = pick_buffer_wipeout } } })
+end)
 vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
 vim.keymap.set('n', '<leader>fR', "<cmd>Pick resume<CR>")
 vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
@@ -377,7 +394,6 @@ vim.keymap.set('n', '<leader>cf', vim.lsp.buf.format)
 vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>")    -- close current buffer
 vim.keymap.set('n', "<esc>", "<esc><cmd>nohlsearch<cr>") -- clear search highlight on escape
 vim.keymap.set('n', "gp", "`[v`]")                       -- visually select last paste
-
 vim.keymap.set('n', "<M-j>", "<cmd>m .+1<cr>==")         -- swap current line with next line
 vim.keymap.set('n', "<M-k>", "<cmd>m .-2<cr>==")         -- swap current line with previous line
 
@@ -456,6 +472,7 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     end
   end,
 })
+
 --]]
 
 --[[ toggleterm ]]
