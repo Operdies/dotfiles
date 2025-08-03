@@ -44,6 +44,7 @@ vim.pack.add({
   { src = "https://github.com/akinsho/toggleterm.nvim" },
   { src = "https://github.com/wellle/targets.vim" },
   { src = "https://github.com/stevearc/overseer.nvim" },
+  { src = "https://github.com/stevearc/dressing.nvim" },
   { src = "https://github.com/tpope/vim-fugitive" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
@@ -363,6 +364,11 @@ pick.registry.oldfiles = function()
   end
   pick.start({ source = { items = existing } })
 end
+--]]
+
+--[[ dressing ]]
+require('dressing').setup({ select = { enabled = false }})
+vim.ui.select = pick.ui_select
 --]]
 
 --[[ treesitter ]]
