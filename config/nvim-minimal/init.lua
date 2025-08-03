@@ -162,11 +162,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
       client.server_capabilities.completionProvider.triggerCharacters = chars
       vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
     end
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover)
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
     vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
     vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float)
+    vim.keymap.set({'n','x'}, 'H', function() vim.lsp.buf.selection_range(1) end)
+    vim.keymap.set({'n','x'}, 'L', function() vim.lsp.buf.selection_range(-1) end)
 
     local function toggle_inline_diagnostics()
       local enabled = false
