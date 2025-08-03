@@ -190,10 +190,8 @@ vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = t
 vim.keymap.set('i', '<tab>', function()
   if vim.snippet.active({ direction = 1 }) then
     return '<cmd>lua vim.snippet.jump(1)<cr>'
-  elseif vim.fn.pumvisible() == 0 then
-    return '<C-n>'
   else
-    return '<C-x><C-o>'
+    return '<C-n>'
   end
 end, { expr = true })
 --]]
