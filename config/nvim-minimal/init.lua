@@ -104,7 +104,7 @@ local gitsigns_opts = {
     bufmap('n', '<leader>td', gs.toggle_deleted, { desc = 'toggle git show deleted' })
 
     -- Text object
-    bufmap({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
+    bufmap({ 'o', 'x' }, 'ah', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
   end
 }
 gs.setup(gitsigns_opts)
