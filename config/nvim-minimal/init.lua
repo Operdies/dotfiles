@@ -166,8 +166,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
     vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float)
-    vim.keymap.set({'n','x'}, 'H', function() vim.lsp.buf.selection_range(1) end)
-    vim.keymap.set({'n','x'}, 'L', function() vim.lsp.buf.selection_range(-1) end)
 
     local function toggle_inline_diagnostics()
       local enabled = false
@@ -370,7 +368,58 @@ end
 --[[ treesitter ]]
 require "nvim-treesitter.configs".setup({
   ensure_installed = { "c" },
-  highlight = { enable = true }
+  highlight = { enable = true },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      -- init_selection = 'vx',
+      init_selection = 'H',
+      node_incremental = 'H',
+      scope_incremental = 'K',
+      node_decremental = 'L',
+    },
+  },
+  textobjects = {
+    select = {
+      enable = true,
+      lookahead = true,         -- Automatically jump forward to textobj, similar to targets.vim
+      keymaps = {
+        -- You can use the capture groups defined in textobjects.scm
+        ['aa'] = '@parameter.outer',
+        ['ia'] = '@parameter.inner',
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+      },
+    },
+    move = {
+      enable = true,
+      set_jumps = true,         -- whether to set jumps in the jumplist
+      goto_next_start = {
+        [']]'] = '@function.outer',
+        [']p'] = '@parameter.inner',
+      },
+      goto_next_end = {
+        [']['] = '@function.outer',
+      },
+      goto_previous_start = {
+        ['[['] = '@function.outer',
+        ['[p'] = '@parameter.inner',
+      },
+      goto_previous_end = {
+        ['[]'] = '@function.outer',
+      },
+    },
+    swap = {
+      enable = true,
+      swap_next = {
+        ['<leader>a'] = '@parameter.inner',
+      },
+      swap_previous = {
+        ['<leader>A'] = '@parameter.inner',
+      },
+    },
+  },
+
 })
 --]]
 
@@ -392,7 +441,7 @@ vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
 vim.keymap.set('n', '<leader>fR', "<cmd>Pick resume<CR>")
 vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
-vim.keymap.set('n', '<leader>cf', vim.lsp.buf.format)
+vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
 vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>")    -- close current buffer
 vim.keymap.set('n', "<esc>", "<esc><cmd>nohlsearch<cr>") -- clear search highlight on escape
 vim.keymap.set('n', "gp", "`[v`]")                       -- visually select last paste
