@@ -179,13 +179,23 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- tab completion -- omnicomplete if popup is closed, otherwise next option
-vim.keymap.set('i', '<tab>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-n>'", { expr = true })
 -- Open popup if closed, otherwise accept selected option
-vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true })
+vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true, silent = true })
 -- Abort completion if popup menu is active, otherwise fallback to default <C-a> behavior
-vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = true })
-
+vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = true, silent = true })
+-- tab completion:
+-- snippet jump if snippet is active
+-- start omnicomplete if popup is closed
+-- pick next completion option if popup is open
+vim.keymap.set('i', '<tab>', function()
+  if vim.snippet.active({ direction = 1 }) then
+    return '<cmd>lua vim.snippet.jump(1)<cr>'
+  elseif vim.fn.pumvisible() == 0 then
+    return '<C-n>'
+  else
+    return '<C-x><C-o>'
+  end
+end, { expr = true })
 --]]
 
 --[[ oil ]]
