@@ -378,6 +378,7 @@ require "nvim-treesitter.configs".setup({
 vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
 vim.keymap.set({ 'n', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
 vim.keymap.set('n', '<C-s>', "<cmd>update<cr>")  -- write buffer if it has unsaved changes
+vim.keymap.set('n', '<leader>fh', "<cmd>Pick help<CR>")
 vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
 vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
