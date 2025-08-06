@@ -511,7 +511,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
       if realpath then
         local dirname = vim.fs.dirname(realpath)
         local root = vim.fs.root(dirname, ".git")
-        vim.fn.chdir(root or dirname)
+        pcall(vim.fn.chdir, root or dirname)
       end
     end
   end,
