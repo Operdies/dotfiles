@@ -459,7 +459,15 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('i', '<C-r>"', '<C-G>u<C-r>"<C-G>u')
 vim.keymap.set('i', '<C-r>+', '<C-G>u<C-r>+<C-G>u')
 
-vim.keymap.set('i', "<C-d>", "<del>")
+-- Navigate without leaving insert mode
+vim.keymap.set('i', "<C-j>", "<Down>")
+vim.keymap.set('i', "<C-k>", "<Up>")
+
+-- Shell style navigation in insert and command mode
+vim.keymap.set({'i', 'c'}, "<C-h>", "<bs>")
+vim.keymap.set({'i', 'c'}, "<C-d>", "<del>")
+vim.keymap.set({'i', 'c'}, "<C-b>", "<Left>")
+vim.keymap.set({'i', 'c'}, "<C-f>", "<Right>")
 
 -- keep visual selection when 'denting
 vim.keymap.set('x', "<", "<gv")
