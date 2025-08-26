@@ -1,7 +1,7 @@
 --[[ basic options ]]
 vim.o.autochdir = false
 vim.o.number = true
-vim.o.relativenumber = true
+vim.o.relativenumber = false
 vim.o.signcolumn = "yes"
 vim.o.termguicolors = true
 vim.o.wrap = false
