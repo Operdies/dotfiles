@@ -38,6 +38,7 @@ vim.opt.wildignore = { "*.o", "*.a" }
 vim.pack.add({
   { src = "https://github.com/vague2k/vague.nvim" },
   { src = "https://github.com/stevearc/oil.nvim" },
+  { src = "https://github.com/echasnovski/mini.nvim" },
   { src = "https://github.com/echasnovski/mini.pick" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
   { src = "https://github.com/neovim/nvim-lspconfig" },
@@ -294,6 +295,7 @@ end)
 --]]
 
 --[[ pick ]]
+
 local pick = require('mini.pick')
 local pick_options = {
   mappings = {
@@ -362,6 +364,10 @@ pick.registry.oldfiles = function()
   end
   pick.start({ source = { items = existing } })
 end
+
+-- Required for lsp pick
+require('mini.extra').setup()
+
 --]]
 
 --[[ dressing ]]
@@ -435,6 +441,9 @@ vim.keymap.set('n', '<leader>fh', "<cmd>Pick help<CR>")
 vim.keymap.set('n', '<leader>ff', "<cmd>Pick files tool=git<CR>")
 vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
+vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
+vim.keymap.set('n', '<leader>cS', "<cmd>Pick lsp scope='workspace_symbol'<cr>")
+
 vim.keymap.set('n', '<leader>fb', function()
   local pick_buffer_wipeout = function()
     vim.api.nvim_buf_delete(pick.get_picker_matches().current.bufnr, {})
