@@ -34,6 +34,11 @@ vim.o.wildoptions = "fuzzy,pum,tagfile"
 vim.opt.wildignore = { "*.o", "*.a" }
 --]]
 
+local is_windows = 'Windows_NT' == vim.loop.os_uname().sysname
+local path_separator = is_windows and '\\' or '/'
+local home_dir = vim.env.HOME .. path_separator
+local git_dir = is_windows and 'C:\\git\\' or home_dir .. "repos/"
+
 --[[ plugins ]]
 vim.pack.add({
   { src = "https://github.com/vague2k/vague.nvim" },
@@ -325,7 +330,7 @@ local pick_options = {
 }
 pick.setup(pick_options)
 pick.registry.project = function()
-  local projects = vim.fs.dir("$HOME/repos")
+  local projects = vim.fs.dir(git_dir, { depth = 1 })
   local lst = {}
   for project in projects do
     lst[#lst + 1] = project
@@ -337,7 +342,7 @@ pick.registry.project = function()
     end,
   }, function(choice)
     if choice then
-      local fullpath = vim.fn.expand("$HOME/repos/" .. choice)
+      local fullpath = vim.fn.expand(git_dir .. choice)
       -- we need to schedule this function because MiniPick refuses
       -- to open the selected file if the new picker is opened inside this handler.
       vim.schedule(function()
@@ -348,16 +353,18 @@ pick.registry.project = function()
   end)
 end
 pick.registry.oldfiles = function()
-  local home = vim.env.HOME
   local existing = {}
   local added = {}
+  local match_func = function(file)
+    return file:match('^' .. home_dir) or file:match('^' .. git_dir)
+  end
   for _, file in ipairs(vim.v.oldfiles) do
-    if file:match('^' .. home) then
+    if match_func(file) then
       if vim.fn.filereadable(file) ~= 0 then
         file = vim.fn.resolve(file)
         if added[file] == nil then
           added[file] = true
-          existing[#existing + 1] = file:gsub('^' .. home, "~")
+          existing[#existing + 1] = file:gsub('^' .. home_dir, " "):gsub('^' .. git_dir, '󰊢 ')
         end
       end
     end
@@ -548,7 +555,7 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 --]]
 
 --[[ toggleterm ]]
-if 'Windows_NT' == vim.loop.os_uname().sysname then
+if is_windows then
   vim.cmd [[
   let &shell = 'pwsh'
   let &shellcmdflag = '-NoLogo -Command'
