@@ -234,6 +234,12 @@ vim.lsp.enable({ "clangd", "roslyn" })
 -- vim.lsp.enable({ "lua_ls" })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
+    local function bufmap(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client:supports_method('textDocument/completion') then
       local triggers = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.>'
@@ -242,11 +248,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
       client.server_capabilities.completionProvider.triggerCharacters = chars
       vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
     end
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
-    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
-    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
-    vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float)
-    vim.keymap.set('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
+    bufmap('n', 'gd', vim.lsp.buf.definition)
+    bufmap('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
+    bufmap('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
+    bufmap('n', '<leader>cd', vim.diagnostic.open_float)
+    bufmap('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
 
     local function toggle_inline_diagnostics()
       local enabled = false
