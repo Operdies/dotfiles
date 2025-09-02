@@ -364,7 +364,7 @@ pick.registry.oldfiles = function()
         file = vim.fn.resolve(file)
         if added[file] == nil then
           added[file] = true
-          existing[#existing + 1] = file:gsub('^' .. home_dir, " "):gsub('^' .. git_dir, '󰊢 ')
+          existing[#existing + 1] = { path = file, text = file:gsub('^' .. home_dir, " "):gsub('^' .. git_dir, '󰊢 ') }
         end
       end
     end
