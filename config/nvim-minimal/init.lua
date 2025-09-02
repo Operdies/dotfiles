@@ -41,18 +41,29 @@ local git_dir = is_windows and 'C:\\git\\' or home_dir .. "repos/"
 
 --[[ plugins ]]
 vim.pack.add({
+  -- colorscheme
   { src = "https://github.com/vague2k/vague.nvim" },
+  -- file browser
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/echasnovski/mini.nvim" },
+  -- lightweight telescope alternative
   { src = "https://github.com/echasnovski/mini.pick" },
+  -- more text objects
+  { src = "https://github.com/echasnovski/mini.ai" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+  -- default configurations for most language servers
   { src = "https://github.com/neovim/nvim-lspconfig" },
+  -- floating terminal
   { src = "https://github.com/akinsho/toggleterm.nvim" },
-  { src = "https://github.com/wellle/targets.vim" },
+  -- awesome compile-and-run utility
   { src = "https://github.com/stevearc/overseer.nvim" },
+  -- vim.ui / vim.input replacement
   { src = "https://github.com/stevearc/dressing.nvim" },
+  -- git operations
   { src = "https://github.com/tpope/vim-fugitive" },
+  -- more git operations
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
+  -- C# lsp
   { src = "https://github.com/seblyng/roslyn.nvim" },
 })
 --]]
