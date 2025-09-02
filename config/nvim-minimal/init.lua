@@ -53,6 +53,7 @@ vim.pack.add({
   { src = "https://github.com/stevearc/dressing.nvim" },
   { src = "https://github.com/tpope/vim-fugitive" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
+  { src = "https://github.com/seblyng/roslyn.nvim" },
 })
 --]]
 
@@ -118,6 +119,66 @@ gs.setup(gitsigns_opts)
 
 --[[ lsp config ]]
 local lspconfig = require('lspconfig')
+--[[ roslyn config ]]
+-- prereqs: download roslyn lsp from:
+-- setup instructions at https://github.com/seblyng/roslyn.nvim
+-- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
+local roslyn_lsp_path = [[C:\tools\Microsoft.CodeAnalysis.LanguageServer.win-x64.5.0.0-2.25451.1\content\LanguageServer\win-x64\Microsoft.CodeAnalysis.LanguageServer.dll]]
+local roslyn = {
+  on_attach = function()
+    print("Roslyn attached!")
+  end,
+  cmd = {
+    "dotnet",
+    roslyn_lsp_path,
+    "--logLevel", -- this property is required by the server
+    "Information",
+    "--extensionLogDirectory", -- this property is required by the server
+    vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
+    "--stdio"
+  },
+  settings = {
+    ["csharp|inlay_hints"] = {
+      csharp_enable_inlay_hints_for_implicit_object_creation = true,
+      csharp_enable_inlay_hints_for_implicit_variable_types = true,
+    },
+    ["csharp|code_lens"] = {
+      dotnet_enable_references_code_lens = true,
+    },
+  },
+}
+local function setup_roslyn()
+  local roslyn = require('roslyn')
+
+  require('roslyn').setup()
+  vim.lsp.config("roslyn", {
+    on_attach = function()
+      print("Roslyn attached!")
+    end,
+    cmd = {
+      "dotnet",
+      lsp_path,
+      "--logLevel", -- this property is required by the server
+      "Information",
+      "--extensionLogDirectory", -- this property is required by the server
+      vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
+      "--stdio"
+    },
+    settings = {
+      ["csharp|inlay_hints"] = {
+        csharp_enable_inlay_hints_for_implicit_object_creation = true,
+        csharp_enable_inlay_hints_for_implicit_variable_types = true,
+      },
+      ["csharp|code_lens"] = {
+        dotnet_enable_references_code_lens = true,
+      },
+    },
+  })
+end
+vim.lsp.config("roslyn", roslyn)
+-- require('roslyn').setup()
+--]]
+
 --[[ clangd config ]]
 local clangd = {
   on_attach = function(_, bufnr)
@@ -158,7 +219,8 @@ local clangd = {
 }
 lspconfig.clangd.setup(clangd)
 --]]
-vim.lsp.enable({ --[["lua_ls",]] "clangd" })
+vim.lsp.enable({ "clangd", "roslyn" })
+-- vim.lsp.enable({ "lua_ls" })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
