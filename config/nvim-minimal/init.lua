@@ -235,6 +235,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
     vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float)
+    vim.keymap.set('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
 
     local function toggle_inline_diagnostics()
       local enabled = false
