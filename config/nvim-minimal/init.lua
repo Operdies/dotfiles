@@ -534,6 +534,7 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 -- create undo points around paste in insert mode
 vim.keymap.set('i', '<C-r>"', '<C-G>u<C-r>"<C-G>u')
 vim.keymap.set('i', '<C-r>+', '<C-G>u<C-r>+<C-G>u')
+vim.keymap.set('i', '<C-a>', '<C-G>u<C-a><C-G>u')
 
 -- Navigate without leaving insert mode
 vim.keymap.set('i', "<C-j>", "<Down>")
