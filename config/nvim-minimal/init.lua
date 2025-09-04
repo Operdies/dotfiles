@@ -68,6 +68,10 @@ vim.pack.add({
 })
 --]]
 
+--[[ mini.ai ]]
+require('mini.ai').setup()
+--]]
+
 --[[ gitsigns ]]
 -- Adds git related signs to the gutter, as well as utilities for managing changes
 local gs = require('gitsigns')
