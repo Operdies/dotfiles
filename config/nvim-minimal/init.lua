@@ -509,6 +509,7 @@ vim.keymap.set('n', '<leader>fF', "<cmd>Pick files tool=fd<CR>")
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', '<leader>cS', "<cmd>Pick lsp scope='workspace_symbol'<cr>")
+vim.keymap.set('n', 'grR', "<cmd>Pick lsp scope='references'<cr>")
 
 vim.keymap.set('n', '<leader>fb', function()
   local pick_buffer_wipeout = function()
