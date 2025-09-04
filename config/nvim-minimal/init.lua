@@ -580,6 +580,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
+-- Increase shiftwidth in .cs files
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup("CsIndent", { clear = true }),
+  pattern = { "*.cs"  },
+  callback = function()
+    vim.opt_local.shiftwidth = 4
+  end,
+})
+
 -- chdir to git root or file if not present (autochdir behavior)
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup("autochdir-to-git-or-file", { clear = true }),
