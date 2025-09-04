@@ -579,7 +579,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Treat C# files as xml
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup("XmlIndent", { clear = true }),
-  pattern = { "*.csproj", "*.props", "*.targets" },
+  pattern = { "*.csproj", "*.props", "*.targets", "*.xaml" },
   callback = function()
     vim.opt_local.filetype = "xml"
     vim.opt_local.shiftwidth = 4
