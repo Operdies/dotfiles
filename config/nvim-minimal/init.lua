@@ -1,4 +1,4 @@
---[[ basic options ]]
+--section: basic options
 vim.o.autochdir = false
 vim.o.number = true
 vim.o.relativenumber = false
@@ -32,14 +32,14 @@ vim.o.wildmenu = true
 vim.o.wildmode = "longest:full,full"
 vim.o.wildoptions = "fuzzy,pum,tagfile"
 vim.opt.wildignore = { "*.o", "*.a" }
---]]
+--endsection
 
 local is_windows = 'Windows_NT' == vim.loop.os_uname().sysname
 local path_separator = is_windows and '\\' or '/'
 local home_dir = vim.env.HOME .. path_separator
 local git_dir = is_windows and 'C:\\git\\' or home_dir .. "repos/"
 
---[[ plugins ]]
+--section: plugins
 vim.pack.add({
   -- colorscheme
   { src = "https://github.com/catppuccin/nvim" },
@@ -66,9 +66,9 @@ vim.pack.add({
   -- C# lsp
   { src = "https://github.com/seblyng/roslyn.nvim" },
 })
---]]
+--endsection
 
---[[ theming ]]
+--section: theming
 require("catppuccin").setup({
   no_italic = true, 
   background = { light = "latte", dark = "mocha" }, 
@@ -78,14 +78,14 @@ require("catppuccin").setup({
 })
 vim.cmd("colorscheme catppuccin")
 vim.cmd(":hi statusline guibg=NONE")
---]]
+--endsection
 
 
---[[ mini.ai ]]
+--section: mini.ai
 require('mini.ai').setup()
---]]
+--endsection
 
---[[ mini.hipatterns ]]
+--section: mini.hipatterns
 local hipatterns = require('mini.hipatterns')
 hipatterns.setup({
   highlighters = {
@@ -100,10 +100,10 @@ hipatterns.setup({
   },
 })
 vim.keymap.set('n', '<leader>ft', function () require('mini.extra').pickers.hipatterns({ scope = 'all'}) end)
---]]
+--endsection
 
 
---[[ gitsigns ]]
+--section: gitsigns
 -- Adds git related signs to the gutter, as well as utilities for managing changes
 local gs = require('gitsigns')
 local gitsigns_opts = {
@@ -161,11 +161,11 @@ local gitsigns_opts = {
   end
 }
 gs.setup(gitsigns_opts)
---]]
+--endsection
 
---[[ lsp config ]]
+--section: lsp config
 local lspconfig = require('lspconfig')
---[[ roslyn config ]]
+--section: roslyn config
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
 -- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
@@ -198,9 +198,9 @@ if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
   vim.lsp.enable({ "roslyn" })
 end
 -- require('roslyn').setup()
---]]
+--endsection
 
---[[ clangd config ]]
+--section: clangd config
 local clangd = {
   on_attach = function(_, bufnr)
     vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
@@ -239,7 +239,7 @@ local clangd = {
   },
 }
 lspconfig.clangd.setup(clangd)
---]]
+--endsection
 vim.lsp.enable({ "clangd" })
 -- vim.lsp.enable({ "lua_ls" })
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -290,9 +290,9 @@ vim.keymap.set('i', '<tab>', function()
     return '<C-n>'
   end
 end, { expr = true })
---]]
+--endsection
 
---[[ oil ]]
+--section: oil
 local function oil_setup()
   -- helper function to parse output
   local function parse_output(proc)
@@ -365,9 +365,9 @@ local function oil_setup()
 end
 
 oil_setup()
---]]
+--endsection
 
---[[ overseer ]]
+--section: overseer
 local overseer_options = {
   task_list = {
     direction = "bottom",
@@ -387,9 +387,9 @@ vim.keymap.set('n', '<leader>rT', function()
   vim.cmd('OverseerToggle')
   vim.api.nvim_set_current_win(win)
 end)
---]]
+--endsection
 
---[[ pick ]]
+--section: pick
 
 local pick = require('mini.pick')
 local pick_options = {
@@ -465,14 +465,14 @@ end
 -- Required for lsp pick
 require('mini.extra').setup()
 
---]]
+--endsection
 
---[[ dressing ]]
+--section: dressing
 require('dressing').setup({ select = { enabled = false }})
 vim.ui.select = pick.ui_select
---]]
+--endsection
 
---[[ treesitter ]]
+--section: treesitter
 require "nvim-treesitter.configs".setup({
   ensure_installed = { "c" },
   highlight = { enable = true },
@@ -528,9 +528,9 @@ require "nvim-treesitter.configs".setup({
   },
 
 })
---]]
+--endsection
 
---[[ keymap ]]
+--section: keymap
 vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
 vim.keymap.set({ 'n', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
 vim.keymap.set('n', '<C-s>', "<cmd>write<cr>")  -- write buffer if it has unsaved changes
@@ -589,9 +589,9 @@ vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
 -- Side scrolling is annoying
 vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelLeft>', '<nop>')
 vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
---]]
+--endsection
 
---[[ autocommands ]]
+--section: autocommands
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
@@ -647,9 +647,9 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   end,
 })
 
---]]
+--endsection
 
---[[ toggleterm ]]
+--section: toggleterm
 if is_windows then
   vim.cmd [[
   let &shell = 'pwsh'
@@ -690,6 +690,6 @@ local lazygit = require("toggleterm.terminal").Terminal:new({
   end,
 })
 vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
---]]
+--endsection
 
--- vim: foldmethod=marker foldmarker=--[[,--]]
+-- vim: foldmethod=marker foldmarker=--section\:,--endsection
