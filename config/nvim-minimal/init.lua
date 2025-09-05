@@ -171,7 +171,7 @@ local lspconfig = require('lspconfig')
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
 -- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
 local platform = is_windows and 'win-x64' or 'linux-x64'
-local roslyn_lsp_path = vim.fs.joinpath(tools_dir, 'Microsoft.CodeAnalysis.LanguageServer.' .. platform .. '.5.0.0-2.25451.1', 'content', 'LanguageServer', platform, 'Microsoft.CodeAnalysis.LanguageServer.dll')
+local roslyn_lsp_path = vim.fs.joinpath(tools_dir, 'roslyn-lsp', 'Microsoft.CodeAnalysis.LanguageServer.dll')
 if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
   local roslyn = {
     on_attach = function()
