@@ -37,7 +37,8 @@ vim.opt.wildignore = { "*.o", "*.a" }
 local is_windows = 'Windows_NT' == vim.loop.os_uname().sysname
 local path_separator = is_windows and '\\' or '/'
 local home_dir = vim.env.HOME .. path_separator
-local git_dir = is_windows and 'C:\\git\\' or home_dir .. "repos/"
+local git_dir = is_windows and [[C:\git\]] or home_dir .. "repos/"
+local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
 
 --section: plugins
 vim.pack.add({
@@ -169,7 +170,8 @@ local lspconfig = require('lspconfig')
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
 -- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
-local roslyn_lsp_path = [[C:\tools\Microsoft.CodeAnalysis.LanguageServer.win-x64.5.0.0-2.25451.1\content\LanguageServer\win-x64\Microsoft.CodeAnalysis.LanguageServer.dll]]
+local platform = is_windows and 'win-x64' or 'linux-x64'
+local roslyn_lsp_path = vim.fs.joinpath(tools_dir, 'Microsoft.CodeAnalysis.LanguageServer.' .. platform .. '.5.0.0-2.25451.1', 'content', 'LanguageServer', platform, 'Microsoft.CodeAnalysis.LanguageServer.dll')
 if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
   local roslyn = {
     on_attach = function()
