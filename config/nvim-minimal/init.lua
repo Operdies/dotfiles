@@ -66,6 +66,13 @@ vim.pack.add({
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
   -- C# lsp
   { src = "https://github.com/seblyng/roslyn.nvim" },
+  -- Debugging adapter
+  { src = "https://github.com/mfussenegger/nvim-dap" },
+  -- Debugging UI
+  -- { src = "https://github.com/igorlfs/nvim-dap-view" },
+  { src = "https://github.com/rcarriga/nvim-dap-ui" },
+  -- nio -- asynchronous io. Dependency of nvim-dap-ui
+  { src = "https://github.com/nvim-neotest/nvim-nio" },
 })
 --endsection
 
@@ -692,6 +699,66 @@ local lazygit = require("toggleterm.terminal").Terminal:new({
   end,
 })
 vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
+--endsection
+
+--section: nvim-dap
+--section: TODO:
+-- 1. Debug output goes to external console. Is this a:
+--   a. netcoredbg issue?
+--   b. DAP issue?
+--   c. .vscode issue?
+--   https://github.com/mfussenegger/nvim-dap/discussions/1006
+-- 2. Keybinds
+-- 3. dap-ui layouts -- different layouts depending on debugging granularity? (basic layout with only console / locals -> layout with stacks / watches -> layout with everything + repl)
+-- 4. Configurations for other languages (C)
+-- 5. Configuration provider which is not .vscode - Consider writing a handler for: 
+--   a. trivial C projects, 
+--   b. trivial C# projects, 
+--   c. trivial OpenTAP plugins 
+--   :help dap-providers-configs
+-- 6. Reliable way of selecting the appropriate debugging window (<leader>bw -> watches -> activating an appropriate layout if watches are not visible)
+--endsection
+local dap = require('dap')
+
+vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
+vim.fn.sign_define("DapBreakpointCondition", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
+vim.fn.sign_define("DapBreakpointRejected", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
+vim.fn.sign_define("DapLogPoint", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
+
+--section: C# Debug Adapter
+-- Download netcoredbg from: https://github.com/Samsung/netcoredbg/releases
+local netcoredbg = vim.fs.joinpath(tools_dir, 'netcoredbg', 'netcoredbg')
+dap.adapters.coreclr = {
+  type = 'executable',
+  command = netcoredbg,
+  args = { '--interpreter=vscode' }
+}
+--endsection
+
+--section: dap ui
+-- local dap_view = require('dap-view')
+local dap_ui = require('dapui')
+dap_ui.setup({
+  layouts = { {
+    elements = { {
+      id = "console",
+      size = 0.5
+    }, {
+      id = "stacks",
+      size = 0.25
+    }, {
+      id = "scopes",
+      size = 0.25
+    } },
+    position = "bottom",
+    size = 10
+  } },
+})
+dap.listeners.before.attach.dapui_config = function() dap_ui.open() end
+dap.listeners.before.launch.dapui_config = function() dap_ui.open() end
+dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() end
+dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
+--endsection
 --endsection
 
 -- vim: foldmethod=marker foldmarker=--section\:,--endsection
