@@ -42,7 +42,7 @@ local git_dir = is_windows and 'C:\\git\\' or home_dir .. "repos/"
 --[[ plugins ]]
 vim.pack.add({
   -- colorscheme
-  { src = "https://github.com/vague2k/vague.nvim" },
+  { src = "https://github.com/catppuccin/nvim" },
   -- file browser
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/echasnovski/mini.nvim" },
@@ -68,11 +68,23 @@ vim.pack.add({
 })
 --]]
 
+--[[ theming ]]
+require("catppuccin").setup({
+  no_italic = true, 
+  background = { light = "latte", dark = "mocha" }, 
+  highlight_overrides = {
+    mocha = function(_) return { WinSeparator = { fg = "#4E4E6E", } } end
+  },
+})
+vim.cmd("colorscheme catppuccin")
+vim.cmd(":hi statusline guibg=NONE")
+--]]
+
+
 --[[ mini.ai ]]
 require('mini.ai').setup()
 --]]
 
--- NOTE(#307090)
 --[[ mini.hipatterns ]]
 local hipatterns = require('mini.hipatterns')
 hipatterns.setup({
@@ -577,12 +589,6 @@ vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
 -- Side scrolling is annoying
 vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelLeft>', '<nop>')
 vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
---]]
-
---[[ theming ]]
-require "vague".setup({ transparent = true })
-vim.cmd("colorscheme vague")
-vim.cmd(":hi statusline guibg=NONE")
 --]]
 
 --[[ autocommands ]]
