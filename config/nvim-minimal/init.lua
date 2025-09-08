@@ -47,8 +47,8 @@ vim.pack.add({
   -- file browser
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/echasnovski/mini.nvim" },
-  -- lightweight telescope alternative
-  { src = "https://github.com/echasnovski/mini.pick" },
+  -- lightweight telescope alternative (with minor patch by me)
+  { src = "https://github.com/operdies/mini.pick" },
   -- more text objects
   { src = "https://github.com/echasnovski/mini.ai" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
