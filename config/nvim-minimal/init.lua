@@ -88,6 +88,10 @@ vim.cmd("colorscheme catppuccin")
 vim.cmd(":hi statusline guibg=NONE")
 --endsection
 
+--section: mini.align -- text alignment
+vim.pack.add({"https://github.com/nvim-mini/mini.align"})
+require('mini.align').setup()
+--endsection
 
 --section: mini.ai
 require('mini.ai').setup()
