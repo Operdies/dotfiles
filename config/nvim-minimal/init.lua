@@ -32,6 +32,10 @@ vim.o.wildmenu = true
 vim.o.wildmode = "longest:full,full"
 vim.o.wildoptions = "fuzzy,pum,tagfile"
 vim.opt.wildignore = { "*.o", "*.a" }
+
+vim.o.pumblend = 10
+vim.o.winblend = 10
+
 --endsection
 
 --section: machine/os specific settings
