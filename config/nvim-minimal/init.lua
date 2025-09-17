@@ -51,8 +51,6 @@ local os = (is_windows and "windows") or (is_osx and "osx") or "linux"
 
 --section: plugins
 vim.pack.add({
-  -- colorscheme
-  { src = "https://github.com/catppuccin/nvim" },
   -- file browser
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/echasnovski/mini.nvim" },
@@ -86,15 +84,94 @@ vim.pack.add({
 --endsection
 
 --section: theming
-require("catppuccin").setup({
-  no_italic = true, 
-  background = { light = "latte", dark = "mocha" }, 
-  highlight_overrides = {
-    mocha = function(_) return { WinSeparator = { fg = "#4E4E6E", } } end
-  },
-})
-vim.cmd("colorscheme catppuccin")
-vim.cmd(":hi statusline guibg=NONE")
+
+local function my_colorscheme()
+  vim.pack.add({'https://github.com/tjdevries/colorbuddy.nvim'})
+  local colorbuddy = require('colorbuddy')
+  colorbuddy.colorscheme("my-pending")
+  local Color = colorbuddy.Color
+  local Group = colorbuddy.Group
+  local c = colorbuddy.colors
+  local g = colorbuddy.groups
+  local s = colorbuddy.styles
+
+  local palettes = {
+    catppuccin_mocha = {
+      Rosewater = '#f5e0dc',
+      Flamingo  = '#f2cdcd',
+      Pink      = '#f5c2e7',
+      Mauve     = '#cba6f7',
+      Red       = '#f38ba8',
+      Maroon    = '#eba0ac',
+      Peach     = '#fab387',
+      Yellow    = '#f9e2af',
+      Green     = '#a6e3a1',
+      Teal      = '#94e2d5',
+      Sky       = '#89dceb',
+      Sapphire  = '#74c7ec',
+      Blue      = '#89b4fa',
+      Lavender  = '#b4befe',
+      Text      = '#cdd6f4',
+      Subtext1  = '#bac2de',
+      Subtext0  = '#a6adc8',
+      Overlay2  = '#9399b2',
+      Overlay1  = '#7f849c',
+      Overlay0  = '#6c7086',
+      Surface2  = '#585b70',
+      Surface1  = '#45475a',
+      Surface0  = '#313244',
+      Base      = '#1e1e2e',
+      Mantle    = '#181825',
+      Crust     = '#11111b'
+    }
+  }
+
+  local palette = palettes.catppuccin_mocha
+
+  for name, color in pairs(palette) do
+    Color.new(name, color)
+  end
+
+  --section: normal hl groups
+  Group.new("LineNr", c.Overlay1, c.Mantle, s.none)
+  Group.new("Normal", c.Text, c.Base)
+  Group.new('FloatBorder', c.Superwhite, c.Base, s.none)
+  Group.new('FloatTitle', c.Subtext1, c.Mantle, s.none)
+  Group.new('NormalFloat', c.Text, c.Base, s.none)
+  --endsection
+
+  --section: treesitter hl groups
+  Group.new("@comment", c.Subtext0, nil, s.none)
+  Group.new("@constant", c.Peach, nil, s.none)
+  Group.new("@constant.builtin", c.Red, nil, s.none)
+  Group.new("@constructor", c.Maroon, nil)
+  Group.new("@function", c.Yellow, nil, nil)
+  Group.new("@function.builtin", c.Red, nil, s.none)
+  Group.new("@function.call", c.Sapphire, nil, nil)
+  Group.new("@function.method.call", c.Sapphire, nil, nil)
+  Group.new("@keyword", c.Lavender, nil, s.none)
+  Group.new("@keyword.faded", c.Lavender:light(), nil, s.none)
+  Group.new("@punctuation", c.Text, nil)
+  Group.new("@string", c.Green, nil, s.none)
+  --endsection
+
+end
+
+function print_output_grp()
+  local ll = vim.fn.line('.')
+  local cc = vim.fn.col('.')
+  print("line: " .. ll .. ", col: " .. cc)
+  -- local s = vim.fn.synID(vim.fn.line('.'), vim.fn.col('.'), 1)
+  -- print(vim.inspect(s))
+  -- local attr = vim.fn.synIDattr(s, 'name')
+  -- local trns = vim.fn.synIDtrans(s)
+  -- local attr2 = vim.fn.synIDattr(trns, 'name')
+  -- print(attr .. ' -> ' .. attr2)
+end
+vim.keymap.set('n', 'gsp', print_output_grp)
+
+my_colorscheme()
+
 --endsection
 
 --section: mini.align -- text alignment
