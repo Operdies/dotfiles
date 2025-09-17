@@ -132,16 +132,24 @@ local function my_colorscheme()
     Color.new(name, color)
   end
 
-  --section: normal hl groups
   Group.new("LineNr", c.Overlay1, c.Mantle, s.none)
   Group.new("Normal", c.Text, c.Base)
   Group.new('FloatBorder', c.Superwhite, c.Base, s.none)
   Group.new('FloatTitle', c.Subtext1, c.Mantle, s.none)
-  Group.new('NormalFloat', c.Text, c.Base, s.none)
-  --endsection
+  Group.new('FloatFooter', c.Subtext1, c.Mantle, s.none)
+  Group.new('NormalFloat', c.Superwhite, c.Mantle, s.none)
+  Group.new("Special", c.Mauve:dark(), nil, s.none)
+  Group.new("PMenu", c.Text, c.Surface0, s.none)
+  Group.new("PMenuSel", c.Red, c.Surface1, s.none)
+  Group.new("CursorLine", c.Red, c.Surface1, s.none)
+  Group.new("Visual", nil, c.Surface1, s.none)
+  Group.new("StatusLine", c.Text, c.Mantle, s.none)
+  Group.new("StatusLineNC", c.Subtext0, c.Mantle, s.none)
+  Group.new("MsgArea", c.Text, c.Mantle, s.none)
 
   --section: treesitter hl groups
   Group.new("@comment", c.Subtext0, nil, s.none)
+  Group.new("Comment", c.Subtext0, nil, s.none)
   Group.new("@constant", c.Peach, nil, s.none)
   Group.new("@constant.builtin", c.Red, nil, s.none)
   Group.new("@constructor", c.Maroon, nil)
@@ -153,6 +161,8 @@ local function my_colorscheme()
   Group.new("@keyword.faded", c.Lavender:light(), nil, s.none)
   Group.new("@punctuation", c.Text, nil)
   Group.new("@string", c.Green, nil, s.none)
+  Group.new("@type", c.Mauve, nil, s.none)
+  Group.new("Type", c.Mauve, nil, s.none)
   --endsection
 
 end
@@ -650,6 +660,8 @@ end)
 vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
 vim.keymap.set('n', '<leader>fR', "<cmd>Pick resume<CR>")
 vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
+vim.keymap.set('n', "<leader>f'", "<cmd>Pick registers<CR>")
+
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
 -- TODO: Get out of the habit of formatting code!
 -- vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
