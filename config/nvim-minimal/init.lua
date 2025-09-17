@@ -570,7 +570,10 @@ vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
 vim.keymap.set('n', '<leader>fR', "<cmd>Pick resume<CR>")
 vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
-vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
+-- TODO: Get out of the habit of formatting code!
+-- vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
+vim.keymap.set('n', '<leader>cf', function() print("Don't format the whole buffer dingus") end)
+vim.keymap.set('x', '<leader>cf', vim.lsp.buf.format)
 vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>")    -- close current buffer
 vim.keymap.set('n', "<esc>", "<esc><cmd>nohlsearch<cr>") -- clear search highlight on escape
 vim.keymap.set('n', "gp", "`[v`]")                       -- visually select last paste
