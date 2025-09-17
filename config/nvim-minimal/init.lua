@@ -34,11 +34,16 @@ vim.o.wildoptions = "fuzzy,pum,tagfile"
 vim.opt.wildignore = { "*.o", "*.a" }
 --endsection
 
+--section: machine/os specific settings
 local is_windows = 'Windows_NT' == vim.loop.os_uname().sysname
+local is_osx = 'Darwin' == vim.loop.os_uname().sysname
 local path_separator = is_windows and '\\' or '/'
 local home_dir = vim.env.HOME .. path_separator
 local git_dir = is_windows and [[C:\git\]] or home_dir .. "repos/"
 local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
+local os = (is_windows and "windows") or (is_osx and "osx") or "linux"
+
+--endsection
 
 --section: plugins
 vim.pack.add({
