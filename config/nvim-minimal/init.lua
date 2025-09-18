@@ -122,7 +122,7 @@ local function my_colorscheme()
       Surface0  = '#313244',
       Base      = '#1e1e2e',
       Mantle    = '#181825',
-      Crust     = '#11111b'
+      Crust     = '#11111b',
     }
   }
 
@@ -157,8 +157,8 @@ local function my_colorscheme()
   Group.new("StatusLine", c.Text, c.Mantle, s.none)
   Group.new("StatusLineNC", c.Subtext0, c.Mantle, s.none)
   Group.new("MsgArea", c.Text, c.Mantle, s.none)
+  Group.new("Folded", c.Lavender, c.Surface0, s.none)
 
-  --section: treesitter hl groups
   Group.new("@comment", c.Subtext0, nil, s.none)
   Group.new("Comment", c.Subtext0, nil, s.none)
   Group.new("@constant", c.Peach, nil, s.none)
@@ -175,7 +175,6 @@ local function my_colorscheme()
   Group.new("@lsp.type.namespace", c.Blue, nil, s.none)
   Group.new("@type", c.Mauve, nil, s.none)
   Group.new("Type", c.Mauve, nil, s.none)
-  --endsection
 
 end
 
