@@ -142,6 +142,8 @@ local function my_colorscheme()
   -- the highlight color of a :s/a/b operation
   Group.new("Substitute", c.Base, c.Maroon,   s.none)
 
+  -- hide filler symbol '~' at end of buffer by setting fg=bg
+  Group.new("EndOfBuffer", c.Base, c.Base, s.none)
   Group.new("LineNr", c.Overlay1, c.Base, s.none)
   Group.new("WinSeparator", c.Overlay0, c.Base, s.none)
   Group.new("Normal", c.Text, c.Base)
@@ -158,6 +160,7 @@ local function my_colorscheme()
   Group.new("StatusLineNC", c.Subtext0, c.Mantle, s.none)
   Group.new("MsgArea", c.Text, c.Mantle, s.none)
   Group.new("Folded", c.Lavender, c.Surface0, s.none)
+  Group.new("Directory", c.Blue, nil, s.bold)
 
   Group.new("@comment", c.Subtext0, nil, s.none)
   Group.new("Comment", c.Subtext0, nil, s.none)
