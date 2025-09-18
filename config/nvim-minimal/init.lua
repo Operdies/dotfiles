@@ -179,19 +179,6 @@ local function my_colorscheme()
 
 end
 
-function print_output_grp()
-  local ll = vim.fn.line('.')
-  local cc = vim.fn.col('.')
-  print("line: " .. ll .. ", col: " .. cc)
-  -- local s = vim.fn.synID(vim.fn.line('.'), vim.fn.col('.'), 1)
-  -- print(vim.inspect(s))
-  -- local attr = vim.fn.synIDattr(s, 'name')
-  -- local trns = vim.fn.synIDtrans(s)
-  -- local attr2 = vim.fn.synIDattr(trns, 'name')
-  -- print(attr .. ' -> ' .. attr2)
-end
-vim.keymap.set('n', 'gsp', print_output_grp)
-
 my_colorscheme()
 
 --endsection
