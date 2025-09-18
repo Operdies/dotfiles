@@ -88,7 +88,7 @@ vim.pack.add({
 local function my_colorscheme()
   vim.pack.add({'https://github.com/tjdevries/colorbuddy.nvim'})
   local colorbuddy = require('colorbuddy')
-  colorbuddy.colorscheme("my-pending")
+  colorbuddy.colorscheme("my-colorscheme")
   local Color = colorbuddy.Color
   local Group = colorbuddy.Group
   local c = colorbuddy.colors
@@ -132,13 +132,24 @@ local function my_colorscheme()
     Color.new(name, color)
   end
 
-  Group.new("LineNr", c.Overlay1, c.Mantle, s.none)
+
+  -- the search term under the cursor
+  Group.new("CurSearch",  c.Base, c.Pink, s.none)
+  -- the search option which will be jumped to if a search is executed
+  Group.new("IncSearch",  c.Base, c.Pink, s.none)
+  -- the highlight color of the current hlsearch
+  Group.new("Search",     c.Base, c.Maroon,    s.none)
+  -- the highlight color of a :s/a/b operation
+  Group.new("Substitute", c.Base, c.Maroon,   s.none)
+
+  Group.new("LineNr", c.Overlay1, c.Base, s.none)
+  Group.new("WinSeparator", c.Overlay0, c.Base, s.none)
   Group.new("Normal", c.Text, c.Base)
   Group.new('FloatBorder', c.Superwhite, c.Base, s.none)
   Group.new('FloatTitle', c.Subtext1, c.Mantle, s.none)
   Group.new('FloatFooter', c.Subtext1, c.Mantle, s.none)
   Group.new('NormalFloat', c.Superwhite, c.Mantle, s.none)
-  Group.new("Special", c.Mauve:dark(), nil, s.none)
+  Group.new("Special", c.Mauve, nil, s.none)
   Group.new("PMenu", c.Text, c.Surface0, s.none)
   Group.new("PMenuSel", c.Red, c.Surface1, s.none)
   Group.new("CursorLine", c.Red, c.Surface1, s.none)
@@ -161,6 +172,7 @@ local function my_colorscheme()
   Group.new("@keyword.faded", c.Lavender:light(), nil, s.none)
   Group.new("@punctuation", c.Text, nil)
   Group.new("@string", c.Green, nil, s.none)
+  Group.new("@lsp.type.namespace", c.Blue, nil, s.none)
   Group.new("@type", c.Mauve, nil, s.none)
   Group.new("Type", c.Mauve, nil, s.none)
   --endsection
