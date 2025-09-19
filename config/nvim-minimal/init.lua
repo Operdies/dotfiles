@@ -143,6 +143,8 @@ local function my_colorscheme()
   -- get all highlight groups and colors:
   -- lua print(vim.inspect(vim.api.nvim_get_hl(0, {})))
 
+  Group.new("Normal", c.Text, c.Base)
+
   -- the search term under the cursor
   Group.new("CurSearch",  c.Base, c.Pink, s.none)
   -- the search option which will be jumped to if a search is executed
@@ -152,16 +154,12 @@ local function my_colorscheme()
   -- the highlight color of a :s/a/b operation
   Group.new("Substitute", c.Base, c.Maroon,   s.none)
 
-  -- hide filler symbol '~' at end of buffer by setting fg=bg
-  Group.new("EndOfBuffer", c.Base, c.Base, s.none)
-  Group.new("LineNr", c.Overlay1, c.Base, s.none)
-  Group.new("WinSeparator", c.Overlay0, c.Base, s.none)
-  Group.new("Normal", c.Text, c.Base)
+
+  -- Floating windows (mostly mini pick)
   Group.new('FloatBorder', c.Lavender, c.Mantle, s.none)
   Group.new('FloatTitle', c.Lavender, c.Mantle, s.none)
   Group.new('FloatFooter', c.Lavender, c.Mantle, s.none)
   Group.new('NormalFloat', c.Lavender, c.Mantle, s.none)
-  Group.new("Special", c.Mauve, nil, s.none)
 
   -- Diagnostic colors -- these colors are also used by Mini.Pick
   Group.new('DiagnosticFloatingHint', c.Lavender, nil, s.none)
@@ -169,19 +167,37 @@ local function my_colorscheme()
   Group.new('DiagnosticFloatingWarn', c.Peach, nil, s.none)
   Group.new('DiagnosticFloatingError', c.Red, nil, s.none)
 
+  -- Any special symbol (??)
+  Group.new("Special", c.Mauve, nil, s.none)
+
   -- popup menu styling
   Group.new("PMenu",      c.Lavender, c.Surface0, s.none)
   Group.new("PMenuSel",   nil,        c.Surface1, s.none)
   Group.new("PMenuThumb", nil,        c.Lavender, s.none)
   Group.new("PMenuSBar",  nil,        c.Surface0, s.none)
 
-  Group.new("CursorLine", nil, c.Surface1, s.none)
+  -- Cursorline is linked by MiniPick as well. Since this is used
+  -- for selection, keep this next to QuickFix config to keep consistent styling
+  Group.new("CursorLine",   nil,        c.Surface1, s.none)
+  Group.new("QuickFixLine", nil,        c.Surface1, s.none)
+  Group.new("qffilename",   c.Lavender, nil,        s.none)
+
   Group.new("Visual", nil, c.Surface1, s.none)
-  Group.new("StatusLine", c.Text, c.Mantle, s.none)
-  Group.new("StatusLineNC", c.Subtext0, c.Mantle, s.none)
-  Group.new("MsgArea", c.Text, c.Mantle, s.none)
   Group.new("Folded", c.Lavender, c.Surface0, s.none)
   Group.new("Directory", c.Blue, nil, s.bold)
+
+  -- status line
+  Group.new("StatusLine", c.Text, c.Mantle, s.bold)
+  Group.new("StatusLineNC", c.Surface2, c.Mantle, s.none)
+
+  -- hide filler symbol '~' at end of buffer by setting fg=bg
+  Group.new("EndOfBuffer", c.Base, c.Base, s.none)
+  Group.new("LineNr", c.Overlay1, c.Base, s.none)
+  Group.new("WinSeparator", c.Overlay0, nil, s.none)
+
+  -- msg area
+  Group.new("MsgArea", c.Text, c.Base, s.none)
+  Group.new("ModeMsg", c.Lavender, nil, s.none)
 
   -- e.g. escaped characters or raw bytes in a string (\x1b, \0)
   Group.new("SpecialChar", c.Red, nil, s.none)
