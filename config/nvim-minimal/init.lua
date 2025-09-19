@@ -22,6 +22,8 @@ vim.o.mouse = 'a'
 vim.o.compatible = false
 vim.o.ruler = false
 vim.o.cmdheight = 0
+-- show statusline only if there are multiple windows
+vim.o.laststatus = 1
 -- vim.o.updatetime = 250
 -- vim.o.timeoutlen = 300
 
