@@ -133,6 +133,12 @@ local function my_colorscheme()
   end
 
 
+  -- styles: bold, underline, undercurl, strikethrough, reverse, inverse, italic, standout, nocombine, none, 
+  --                                                             ~~~~~~~
+
+  -- get all highlight groups and colors:
+  -- lua print(vim.inspect(vim.api.nvim_get_hl(0, {})))
+
   -- the search term under the cursor
   Group.new("CurSearch",  c.Base, c.Pink, s.none)
   -- the search option which will be jumped to if a search is executed
@@ -147,14 +153,25 @@ local function my_colorscheme()
   Group.new("LineNr", c.Overlay1, c.Base, s.none)
   Group.new("WinSeparator", c.Overlay0, c.Base, s.none)
   Group.new("Normal", c.Text, c.Base)
-  Group.new('FloatBorder', c.Superwhite, c.Base, s.none)
-  Group.new('FloatTitle', c.Subtext1, c.Mantle, s.none)
-  Group.new('FloatFooter', c.Subtext1, c.Mantle, s.none)
-  Group.new('NormalFloat', c.Superwhite, c.Mantle, s.none)
+  Group.new('FloatBorder', c.Lavender, c.Mantle, s.none)
+  Group.new('FloatTitle', c.Lavender, c.Mantle, s.none)
+  Group.new('FloatFooter', c.Lavender, c.Mantle, s.none)
+  Group.new('NormalFloat', c.Lavender, c.Mantle, s.none)
   Group.new("Special", c.Mauve, nil, s.none)
-  Group.new("PMenu", c.Text, c.Surface0, s.none)
-  Group.new("PMenuSel", c.Red, c.Surface1, s.none)
-  Group.new("CursorLine", c.Red, c.Surface1, s.none)
+
+  -- Diagnostic colors -- these colors are also used by Mini.Pick
+  Group.new('DiagnosticFloatingHint', c.Lavender, nil, s.none)
+  Group.new('DiagnosticFloatingInfo', c.Blue, nil, s.none)
+  Group.new('DiagnosticFloatingWarn', c.Peach, nil, s.none)
+  Group.new('DiagnosticFloatingError', c.Red, nil, s.none)
+
+  -- popup menu styling
+  Group.new("PMenu",      c.Lavender, c.Surface0, s.none)
+  Group.new("PMenuSel",   nil,        c.Surface1, s.none)
+  Group.new("PMenuThumb", nil,        c.Lavender, s.none)
+  Group.new("PMenuSBar",  nil,        c.Surface0, s.none)
+
+  Group.new("CursorLine", nil, c.Surface1, s.none)
   Group.new("Visual", nil, c.Surface1, s.none)
   Group.new("StatusLine", c.Text, c.Mantle, s.none)
   Group.new("StatusLineNC", c.Subtext0, c.Mantle, s.none)
@@ -162,8 +179,12 @@ local function my_colorscheme()
   Group.new("Folded", c.Lavender, c.Surface0, s.none)
   Group.new("Directory", c.Blue, nil, s.bold)
 
+  -- e.g. escaped characters or raw bytes in a string (\x1b, \0)
+  Group.new("SpecialChar", c.Red, nil, s.none)
+
   Group.new("@comment", c.Subtext0, nil, s.none)
   Group.new("Comment", c.Subtext0, nil, s.none)
+  Group.new("@boolean", c.Peach, nil, s.none)
   Group.new("@constant", c.Peach, nil, s.none)
   Group.new("@constant.builtin", c.Red, nil, s.none)
   Group.new("@constructor", c.Maroon, nil)
@@ -178,6 +199,7 @@ local function my_colorscheme()
   Group.new("@lsp.type.namespace", c.Blue, nil, s.none)
   Group.new("@type", c.Mauve, nil, s.none)
   Group.new("Type", c.Mauve, nil, s.none)
+  Group.new("@property.yaml", c.Lavender, nil, s.none)
 
 end
 
