@@ -20,6 +20,7 @@ vim.o.smartcase = true
 vim.o.list = true
 vim.o.mouse = 'a'
 vim.o.compatible = false
+vim.o.ruler = false
 -- vim.o.updatetime = 250
 -- vim.o.timeoutlen = 300
 
