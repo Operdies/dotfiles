@@ -21,6 +21,7 @@ vim.o.list = true
 vim.o.mouse = 'a'
 vim.o.compatible = false
 vim.o.ruler = false
+vim.o.cmdheight = 0
 -- vim.o.updatetime = 250
 -- vim.o.timeoutlen = 300
 
