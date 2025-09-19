@@ -606,12 +606,11 @@ vim.ui.select = pick.ui_select
 
 --section: treesitter
 require "nvim-treesitter.configs".setup({
-  ensure_installed = { "c" },
+  ensure_installed = { "c", "json", "c_sharp", "yaml", "xml", "make" },
   highlight = { enable = true },
   incremental_selection = {
     enable = true,
     keymaps = {
-      -- init_selection = 'vx',
       init_selection = 'H',
       node_incremental = 'H',
       scope_incremental = 'K',
