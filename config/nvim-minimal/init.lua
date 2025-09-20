@@ -13,7 +13,6 @@ vim.o.winborder = "rounded"
 vim.g.mapleader = " "
 vim.o.undofile = true
 vim.g.autoformat = false
-vim.o.laststatus = 2
 vim.o.scrolloff = 3
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -21,9 +20,8 @@ vim.o.list = true
 vim.o.mouse = 'a'
 vim.o.compatible = false
 vim.o.ruler = false
-vim.o.cmdheight = 0
--- show statusline only if there are multiple windows
-vim.o.laststatus = 1
+vim.o.cmdheight = 1
+vim.o.laststatus = 2
 -- vim.o.updatetime = 250
 -- vim.o.timeoutlen = 300
 
