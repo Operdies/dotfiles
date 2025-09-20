@@ -313,7 +313,6 @@ gs.setup(gitsigns_opts)
 --endsection
 
 --section: lsp config
-local lspconfig = require('lspconfig')
 --section: roslyn config
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
@@ -351,24 +350,10 @@ end
 --endsection
 
 --section: clangd config
-local clangd = {
+vim.lsp.config('clangd', {
   on_attach = function(_, bufnr)
     vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
       { buffer = bufnr, desc = "Switch Source/Header" })
-  end,
-  root_dir = function(fname)
-    return vim.fs.dirname(vim.fs.find({
-      "Makefile",
-      "compile_commands.json",
-      "configure.ac",
-      "configure.in",
-      "config.h.in",
-      -- if meson.build exists in nested source directories, we get a separate clangd instance for each meson.build file
-      -- "meson.build",
-      -- I guess we just assume meson options will only be in the root
-      "meson_options.txt",
-      "build.ninja",
-      '.git' }, { path = fname, upward = true })[1])
   end,
   capabilities = {
     offsetEncoding = { "utf-16" },
@@ -387,10 +372,9 @@ local clangd = {
     completeUnimported = false,
     clangdFileStatus = true,
   },
-}
-lspconfig.clangd.setup(clangd)
---endsection
+})
 vim.lsp.enable({ "clangd" })
+--endsection
 -- vim.lsp.enable({ "lua_ls" })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
