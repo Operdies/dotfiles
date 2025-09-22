@@ -22,6 +22,8 @@ vim.o.compatible = false
 vim.o.ruler = false
 vim.o.cmdheight = 1
 vim.o.laststatus = 2
+vim.o.cursorline = true
+vim.o.cursorlineopt = 'number'
 -- vim.o.updatetime = 250
 -- vim.o.timeoutlen = 300
 
@@ -136,22 +138,23 @@ local function my_colorscheme()
 
 
   -- styles: bold, underline, undercurl, strikethrough, reverse, inverse, italic, standout, nocombine, none, 
-  --                                                             ~~~~~~~
+  --                                                             ~~~~~~~ <- not working
 
   -- get all highlight groups and colors:
   -- lua print(vim.inspect(vim.api.nvim_get_hl(0, {})))
 
   Group.new("Normal", c.Text, c.Base)
 
+  Group.new("MatchParen", c.Base, c.Yellow, s.bold)
+
   -- the search term under the cursor
   Group.new("CurSearch",  c.Base, c.Pink, s.none)
   -- the search option which will be jumped to if a search is executed
   Group.new("IncSearch",  c.Base, c.Pink, s.none)
   -- the highlight color of the current hlsearch
-  Group.new("Search",     c.Base, c.Maroon,    s.none)
+  Group.new("Search",     c.Base, c.Yellow,    s.none)
   -- the highlight color of a :s/a/b operation
-  Group.new("Substitute", c.Base, c.Maroon,   s.none)
-
+  Group.new("Substitute", c.Base, c.Yellow,   s.none)
 
   -- Floating windows (mostly mini pick)
   Group.new('FloatBorder', c.Lavender, c.Mantle, s.none)
@@ -177,7 +180,7 @@ local function my_colorscheme()
   -- Cursorline is linked by MiniPick as well. Since this is used
   -- for selection, keep this next to QuickFix config to keep consistent styling
   Group.new("CursorLine",   nil,        c.Surface1, s.none)
-  Group.new("QuickFixLine", nil,        c.Surface1, s.none)
+  Group.new("QuickFixLine", nil,        c.Surface1, s.bold)
   Group.new("qffilename",   c.Lavender, nil,        s.none)
 
   Group.new("Visual", nil, c.Surface1, s.none)
@@ -216,6 +219,7 @@ local function my_colorscheme()
   Group.new("@string", c.Green, nil, s.none)
   Group.new("@lsp.type.namespace", c.Blue, nil, s.none)
   Group.new("@type", c.Mauve, nil, s.none)
+  Group.new("@type.builtin", c.Mauve, nil, s.none)
   Group.new("Type", c.Mauve, nil, s.none)
   Group.new("@property.yaml", c.Lavender, nil, s.none)
 
