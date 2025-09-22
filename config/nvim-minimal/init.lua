@@ -145,7 +145,7 @@ local function my_colorscheme()
 
   Group.new("Normal", c.Text, c.Base)
 
-  Group.new("MatchParen", c.Base, c.Yellow, s.bold)
+  Group.new("MatchParen", c.Text, c.Surface1, s.bold)
 
   -- the search term under the cursor
   Group.new("CurSearch",  c.Base, c.Pink, s.none)
@@ -184,7 +184,7 @@ local function my_colorscheme()
   Group.new("qffilename",   c.Lavender, nil,        s.none)
 
   Group.new("Visual", nil, c.Surface1, s.none)
-  Group.new("Folded", c.Lavender, c.Surface0, s.none)
+  Group.new("Folded", c.Lavender, c.Surface0, s.bold)
   Group.new("Directory", c.Blue, nil, s.bold)
 
   -- status line
@@ -789,6 +789,15 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   end,
 })
 
+-- map gso to source current file in init.lua
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup("source-init-lua", { clear = true }),
+  pattern = { "init.lua" },
+  callback = function()
+    vim.keymap.set('n', 'gso', '<cmd>update<cr><cmd>so<cr>', { buffer = vim.fn.bufnr() })
+  end,
+})
+
 --endsection
 
 --section: toggleterm
@@ -904,5 +913,6 @@ vim.keymap.set('n', '<F12>', dap.step_out)
 --endsection
 
 --endsection
+
 
 -- vim: foldmethod=marker foldmarker=--section\:,--endsection
