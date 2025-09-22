@@ -223,6 +223,9 @@ local function my_colorscheme()
   Group.new("Type", c.Mauve, nil, s.none)
   Group.new("@property.yaml", c.Lavender, nil, s.none)
 
+  Group.new("@tag.xml", c.Blue, nil, s.none)
+  Group.new("@tag.delimiter.xml", c.Lavender, nil, s.none)
+  Group.new("@tag.attribute.xml", c.Red, nil, s.none)
 end
 
 my_colorscheme()
