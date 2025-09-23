@@ -679,6 +679,10 @@ vim.keymap.set('n', '<leader>ff', function() require('mini.pick').builtin.files(
 vim.keymap.set('n', 'gff', function() require('mini.pick').builtin.files({ tool = "git" }, nil) end)
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
+-- TODO: according to the documentation, calling vim.lsp.buf.workspace_symbol()
+-- without an argument should return all symbols in the workspace, but this is 
+-- not the case for roslyn at least (did not check others).
+-- Figure out if there is a workaround for this.
 vim.keymap.set('n', '<leader>cS', "<cmd>Pick lsp scope='workspace_symbol'<cr>")
 vim.keymap.set('n', 'grR', "<cmd>Pick lsp scope='references'<cr>")
 
