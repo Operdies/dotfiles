@@ -211,8 +211,8 @@ local function my_colorscheme()
   Group.new("@constructor", c.Maroon, nil)
   Group.new("@function", c.Yellow, nil, nil)
   Group.new("@function.builtin", c.Red, nil, s.none)
-  Group.new("@function.call", c.Sapphire, nil, nil)
-  Group.new("@function.method.call", c.Sapphire, nil, nil)
+  Group.new("@function.call", c.Blue, nil, nil)
+  Group.new("@function.method.call", c.Blue, nil, nil)
   Group.new("@keyword", c.Lavender, nil, s.none)
   Group.new("@keyword.faded", c.Lavender:light(), nil, s.none)
   Group.new("@punctuation", c.Text, nil)
@@ -614,7 +614,7 @@ vim.ui.select = pick.ui_select
 --endsection
 
 --section: treesitter
-require "nvim-treesitter.configs".setup({
+require("nvim-treesitter.configs").setup({
   ensure_installed = { "c", "json", "c_sharp", "yaml", "xml", "make" },
   highlight = { enable = true },
   incremental_selection = {
