@@ -684,10 +684,36 @@ vim.keymap.set('n', 'grR', "<cmd>Pick lsp scope='references'<cr>")
 
 vim.keymap.set('n', '<leader>fb', function()
   local pick_buffer_wipeout = function()
-    vim.api.nvim_buf_delete(pick.get_picker_matches().current.bufnr, {})
+    local m = pick.get_picker_matches()
+    local indices = m.all_inds
+    local rm_idx = 0
+
+    -- Find the index of the selected item
+    for i, v in ipairs(indices) do
+      if v == m.current_ind then
+        rm_idx = i
+        break
+      end
+    end
+
+    -- close the buffer of the selected item
+    vim.api.nvim_buf_delete(m.current.bufnr, { force = true })
+
+    -- remove the deleted buffer from the list of matches
+    table.remove(indices, rm_idx)
+
+    -- If the deleted item was the last element in the list,
+    -- the next selected element should be the previous element
+    if rm_idx > #indices then rm_idx = rm_idx - 1 end
+
+    pick.set_picker_match_inds(indices, "all")
+    if rm_idx > 0 then
+      pick.set_picker_match_inds({indices[rm_idx]}, "current")
+    end
   end
   pick.builtin.buffers(pick_options, { mappings = { wipeout = { char = '<C-w>', func = pick_buffer_wipeout } } })
 end)
+
 vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
 vim.keymap.set('n', '<leader>fR', "<cmd>Pick resume<CR>")
 vim.keymap.set('n', '<leader>fp', "<cmd>Pick project<CR>")
