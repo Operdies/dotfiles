@@ -49,6 +49,7 @@ local path_separator = is_windows and '\\' or '/'
 local home_dir = vim.env.HOME .. path_separator
 local git_dir = is_windows and [[C:\git\]] or home_dir .. "repos/"
 local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
+local config_dir = (is_windows and home_dir .. [[AppData\Local\]]) or (home_dir .. ".config/")
 local os = (is_windows and "windows") or (is_osx and "osx") or "linux"
 
 --endsection
@@ -864,8 +865,61 @@ require('toggleterm').setup({
   autochdir = true,
   shell = vim.o.shell,
 })
+
+local function lazygit_setup_windows_cfg()
+  -- windows + lazygit doesn't really mix due to the way lazygit, powershell and cmd.exe works in combination
+  -- Create a batch script for editing at specific lines, and a lazygit config for using that batch script
+  local edit_bat = [[
+@echo off
+
+set filename=%1
+set linenumber=%2
+
+REM hide the lazygit floating window
+nvim --server %NVIM% --remote-send "<C-q>"
+REM open the file
+nvim --server %NVIM% --remote-silent %filename%
+
+if "%linenumber%"=="" (
+  REM do nothing if no line number was specified
+) else (
+  REM go to the specified line if present and open any fold under the cursor
+  nvim --server %NVIM% --remote-send %linenumber%ggzo
+)
+]]
+
+  local bat = vim.fn.tempname() .. ".bat"
+  local batfile = io.open(bat, "w")
+  batfile:write(edit_bat)
+  batfile:close()
+
+  local yml = [[
+os:
+  edit: <BAT> "{{filename}}"
+  editAtLine: <BAT> "{{filename}}" "{{line}}"
+  editInTerminal: true
+gui:
+  skipDiscardChangeWarning: true
+notARepository: skip
+promptToReturnFromSubprocess: false
+keybinding:
+  universal:
+    quit: <disabled>
+    open: <disabled>
+]]
+
+  local tempcfg = vim.fn.tempname() .. ".yml"
+  yml = yml:gsub("<BAT>", bat)
+  local file = io.open(tempcfg, "w")
+  file:write(yml)
+  file:close()
+
+  local default_config = vim.fs.joinpath(config_dir, "lazygit", "config.yml")
+  return { default_config, tempcfg }
+end
+
 local lazygit = require("toggleterm.terminal").Terminal:new({
-  cmd = "lazygit",
+  cmd = is_windows and ('lazygit --use-config-file "' .. table.concat(lazygit_setup_windows_cfg(), ",") .. '"') or 'lazygit',
   hidden = true,
   direction = "float",
   on_open = function(term)
