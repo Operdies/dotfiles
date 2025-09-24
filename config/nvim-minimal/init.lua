@@ -63,7 +63,10 @@ vim.pack.add({
   { src = "https://github.com/operdies/mini.pick" },
   -- more text objects
   { src = "https://github.com/echasnovski/mini.ai" },
+  -- provides parsers for most languages
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+  -- provides additional functions for manipulating syntax elements
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" },
   -- default configurations for most language servers
   { src = "https://github.com/neovim/nvim-lspconfig" },
   -- floating terminal
