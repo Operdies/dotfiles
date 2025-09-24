@@ -837,6 +837,11 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     local line = vim.fn.line("'\"")
     if line > 0 and line <= vim.fn.line("$") then
       vim.fn.execute [[normal! g'"]]
+      -- open folds under the cursor.
+      -- note that this is scheduled because folds are not applied during BufReadPost,
+      -- but they appear to be applied after the next schedule()
+      -- use pcall() to suppress errors when no folds were found
+      vim.schedule(function() pcall(vim.cmd, "foldopen!") end)
     end
   end,
 })
