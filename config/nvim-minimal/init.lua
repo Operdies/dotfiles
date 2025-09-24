@@ -623,7 +623,7 @@ vim.ui.select = pick.ui_select
 
 --section: treesitter
 require("nvim-treesitter.configs").setup({
-  ensure_installed = { "c", "json", "c_sharp", "yaml", "xml", "make" },
+  ensure_installed = { "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", },
   highlight = { enable = true },
   incremental_selection = {
     enable = true,
