@@ -634,7 +634,7 @@ vim.ui.select = pick.ui_select
 
 --section: treesitter
 require("nvim-treesitter.configs").setup({
-  ensure_installed = { "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", },
+  ensure_installed = { "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", },
   highlight = { enable = true },
   incremental_selection = {
     enable = true,
@@ -932,7 +932,10 @@ keybinding:
   file:write(yml)
   file:close()
 
+  -- if a config file exists, include it before tempcfg so the required options
+  -- are overwritten
   local default_config = vim.fs.joinpath(config_dir, "lazygit", "config.yml")
+  if vim.fn.filereadable(default_config) == 0 then return { tempcfg } end
   return { default_config, tempcfg }
 end
 
