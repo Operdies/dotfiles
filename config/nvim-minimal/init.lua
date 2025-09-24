@@ -1,3 +1,14 @@
+--section: disable builtin plugins
+
+-- this probably affects startup time ?
+vim.g.loaded_tutor_mode_plugin = 1
+vim.g.loaded_spellfile_plugin = 1
+vim.g.loaded_zipPlugin = 1
+vim.g.loaded_gzip = 1
+vim.g.loaded_tarPlugin = 1
+
+--endsection
+
 --section: basic options
 vim.o.autochdir = false
 vim.o.number = true
