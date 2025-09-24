@@ -893,16 +893,13 @@ local function lazygit_setup_windows_cfg()
 set filename=%1
 set linenumber=%2
 
-REM hide the lazygit floating window
-nvim --server %NVIM% --remote-send "<C-q>"
-REM open the file
-nvim --server %NVIM% --remote-silent %filename%
-
 if "%linenumber%"=="" (
-  REM do nothing if no line number was specified
+  REM <C-q>: close the floating terminal
+  REM <cmd>edit: open the file
+  nvim --server %NVIM% --remote-send "<C-q><cmd>edit %filename%<cr>zO"
 ) else (
-  REM go to the specified line if present and open any fold under the cursor
-  nvim --server %NVIM% --remote-send %linenumber%ggzo
+  REM ggzO: go to the requested line number and open all fold under the cursor
+  nvim --server %NVIM% --remote-send "<C-q><cmd>edit %filename%<cr>%linenumber%ggzO"
 )
 ]]
 
