@@ -1,12 +1,18 @@
 format = """
+$hostname\
 $status\
-[](bg:#769ff0 fg:#F88379)\
+[](bg:#769ff0 fg:#eba0ac)\
 $directory\
 [](fg:#769ff0 bg:#394260)\
 $git_branch\
 $git_status\
 [ ](fg:#394260)\
 \n$character"""
+
+[hostname]
+ssh_only = true
+style = "fg:#1e1e2e bg:#eba0ac"
+format = "[$ssh_symbol$hostname]($style)"
 
 [directory]
 style = "fg:#e3e5e5 bg:#769ff0"
@@ -16,8 +22,8 @@ truncation_symbol = "…/"
 
 [status]
 disabled = false
-format = '[$symbol $status]($style)'
-style = "bg:#F88379 fg:000000"
+format = '[ $symbol $status]($style)'
+style = "bg:#eba0ac fg:#1e1e2e"
 pipestatus = true
 map_symbol = false
 pipestatus_format = '[$pipestatus => $symbol $status]($style)'
