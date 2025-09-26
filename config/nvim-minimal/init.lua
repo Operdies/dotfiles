@@ -245,6 +245,14 @@ local function my_colorscheme()
   Group.new("@tag.xml", c.Blue, nil, s.none)
   Group.new("@tag.delimiter.xml", c.Lavender, nil, s.none)
   Group.new("@tag.attribute.xml", c.Red, nil, s.none)
+
+  -- Markdown, man pages probably
+  Group.new("Title",                            c.Blue,   nil, s.bold)
+  -- Markdown
+  Group.new("@markup.link.label",               c.Peach, nil, s.bold)
+  Group.new("@markup.link",                     c.Text,   nil, s.none)
+  Group.new("@markup.link.url.markdown_inline", c.Blue,    nil, s.underline)
+
 end
 
 my_colorscheme()
