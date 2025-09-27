@@ -247,6 +247,7 @@ local function my_colorscheme()
   Group.new("@tag.attribute.xml", c.Red, nil, s.none)
 
   -- Markdown, man pages probably
+  Group.new("Keyword", c.Mauve, nil, s.none)
   Group.new("Title",                            c.Blue,   nil, s.bold)
   -- Markdown
   Group.new("@markup.link.label",               c.Peach, nil, s.bold)
