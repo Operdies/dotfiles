@@ -210,6 +210,7 @@ local function my_colorscheme()
   Group.new("EndOfBuffer", c.Base, c.Base, s.none)
   Group.new("LineNr", c.Overlay1, c.Base, s.none)
   Group.new("WinSeparator", c.Overlay0, nil, s.none)
+  Group.new("Delimiter", c.Overlay0, nil, s.none)
 
   -- msg area
   Group.new("MsgArea", c.Text, c.Base, s.none)
@@ -556,6 +557,18 @@ vim.keymap.set('n', '<leader>rT', function()
   vim.cmd('OverseerToggle')
   vim.api.nvim_set_current_win(win)
 end)
+--endsection
+
+--section: quicker -- cool quickfix improvements
+vim.pack.add({ "https://github.com/stevearc/quicker.nvim" })
+require('quicker').setup(
+  { 
+    follow = { enabled = false }, 
+    edit = { enabled = true, autosave = "unmodified" },
+    trim_leading_whitespace = 'all',
+    highlight = { treesitter = true, lsp = true, load_buffers = false },
+  }
+)
 --endsection
 
 --section: pick
