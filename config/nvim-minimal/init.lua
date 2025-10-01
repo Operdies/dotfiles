@@ -830,9 +830,10 @@ vim.api.nvim_create_autocmd('BufEnter', {
 -- Increase shiftwidth in .cs files
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup("CsIndent", { clear = true }),
-  pattern = { "*.cs"  },
+  pattern = { "*.csproj", "*.props", "*.targets", "*.cs" },
   callback = function()
     vim.opt_local.shiftwidth = 4
+    vim.opt_local.makeprg = "dotnet build -c Debug"
   end,
 })
 
