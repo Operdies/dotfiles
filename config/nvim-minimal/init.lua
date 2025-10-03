@@ -255,6 +255,18 @@ local function my_colorscheme()
   Group.new("@markup.link",                     c.Text,   nil, s.none)
   Group.new("@markup.link.url.markdown_inline", c.Blue,    nil, s.underline)
 
+  -- diffs
+  Group.new('diffFile',      c.Subtext2, nil, s.none)
+  Group.new('gitdiff',       c.Subtext1, nil, s.none)
+  Group.new('diffNoEOL',     c.Subtext0, nil, s.none)
+  Group.new('diffIndexLine', c.Subtext0, nil, s.none)
+  Group.new('diffSubName',   c.Mauve,    nil, s.none)
+  Group.new('diffLine',      c.Sapphire, nil, s.none)
+  Group.new('diffremoved',   c.Red,      nil, s.none)
+  Group.new('diffadded',     c.Green,    nil, s.none)
+  Group.new('diffNewFile',   c.Green,    nil, s.none)
+  Group.new('diffOldFile',   c.Red,      nil, s.none)
+
 end
 
 my_colorscheme()
