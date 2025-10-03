@@ -880,6 +880,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 --endsection
 
+--section: User Commands
+
+vim.api.nvim_create_user_command('Print', function(ctx) 
+  local result = vim.fn.luaeval(ctx.args)
+  print(vim.inspect(result))
+end, { nargs = '+', complete = "lua" })
+
+--endsection
+
 --section: toggleterm
 if is_windows then
   vim.cmd [[
