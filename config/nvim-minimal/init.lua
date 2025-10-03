@@ -808,18 +808,20 @@ vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
 --endsection
 
 --section: autocommands
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
+
+local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
+
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
     vim.highlight.on_yank()
   end,
-  group = highlight_group,
+  group = augroup,
   pattern = '*',
 })
 
 -- Treat C# files as xml
 vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup("XmlIndent", { clear = true }),
+  group = augroup,
   pattern = { "*.csproj", "*.props", "*.targets", "*.xaml" },
   callback = function()
     vim.opt_local.filetype = "xml"
@@ -829,7 +831,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 -- Increase shiftwidth in .cs files
 vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup("CsIndent", { clear = true }),
+  group = augroup,
   pattern = { "*.csproj", "*.props", "*.targets", "*.cs" },
   callback = function()
     vim.opt_local.shiftwidth = 4
@@ -839,7 +841,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 -- chdir to git root or file if not present (autochdir behavior)
 vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup("autochdir-to-git-or-file", { clear = true }),
+  group = augroup,
   callback = function()
     local bufpath = vim.fn.expand('%:p')
     if bufpath then
@@ -855,7 +857,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 -- Remember cursor position
 vim.api.nvim_create_autocmd('BufReadPost', {
-  group = vim.api.nvim_create_augroup("RestoreLastKnownCursorLine", { clear = true }),
+  group = augroup,
   callback = function()
     local line = vim.fn.line("'\"")
     if line > 0 and line <= vim.fn.line("$") then
@@ -871,7 +873,7 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 
 -- map gso to source current file in init.lua
 vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup("source-init-lua", { clear = true }),
+  group = augroup,
   pattern = { "init.lua" },
   callback = function()
     vim.keymap.set('n', 'gso', '<cmd>update<cr><cmd>so<cr>', { buffer = vim.fn.bufnr() })
