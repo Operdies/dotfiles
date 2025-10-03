@@ -237,7 +237,7 @@ local function my_colorscheme()
   Group.new("@type", c.Mauve, nil, s.none)
   Group.new("@type.builtin", c.Mauve, nil, s.none)
   Group.new("Type", c.Mauve, nil, s.none)
-  Group.new("@property.yaml", c.Lavender, nil, s.none)
+  Group.new("@module", c.Yellow, nil, s.none)
 
   Group.new("@tag.html", c.Blue, nil, s.none)
   Group.new("@tag.delimiter.html", c.Lavender, nil, s.none)
@@ -254,6 +254,9 @@ local function my_colorscheme()
   Group.new("@markup.link.label",               c.Peach, nil, s.bold)
   Group.new("@markup.link",                     c.Text,   nil, s.none)
   Group.new("@markup.link.url.markdown_inline", c.Blue,    nil, s.underline)
+
+  -- yaml
+  Group.new("@property.yaml", c.Lavender, nil, s.none)
 
   -- diffs
   Group.new('diffFile',      c.Subtext2, nil, s.none)
