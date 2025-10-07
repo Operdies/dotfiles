@@ -735,6 +735,24 @@ vim.keymap.set('n', '<leader>ff', function() require('mini.pick').builtin.files(
 vim.keymap.set('n', 'gff', function() require('mini.pick').builtin.files({ tool = "git" }, nil) end)
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
+
+-- TODO: Create custom picker so support cycling severity modes with e.g. <C-a> / <C-x>
+-- TODO: The 'all' option seems to only include open buffers. Custom implementation should include everything returned by `vim.diagnostic.get()`
+-- TODO: Add hotkey for cycling between current buffer / all buffers (tab?)
+local pick_diagnostics = require('mini.extra').pickers.diagnostic
+vim.keymap.set('n', 'gfd', function() 
+  pick_diagnostics({
+    scope = "current", 
+    sort_by = "severity",
+    get_opts = { severity = vim.diagnostic.severity.ERROR },
+  }) end)
+vim.keymap.set('n', 'gfD', function() 
+  pick_diagnostics({ 
+    scope = "all", 
+    sort_by = "path",
+    get_opts = { severity = vim.diagnostic.severity.ERROR },
+  }) end)
+
 -- TODO: according to the documentation, calling vim.lsp.buf.workspace_symbol()
 -- without an argument should return all symbols in the workspace, but this is 
 -- not the case for roslyn at least (did not check others).
