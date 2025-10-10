@@ -51,6 +51,11 @@ vim.opt.wildignore = { "*.o", "*.a" }
 vim.o.pumblend = 10
 vim.o.winblend = 10
 
+-- hides (partial) commands in the cmd windows.
+-- Unfortunately, this also hides information about visual selections.
+-- We avoid this by enabling it in visual mode, and disabling it otherwise.
+vim.o.showcmd = false
+
 --endsection
 
 --section: machine/os specific settings
@@ -910,6 +915,25 @@ vim.api.nvim_create_autocmd('BufEnter', {
   pattern = { "init.lua" },
   callback = function()
     vim.keymap.set('n', 'gso', '<cmd>update<cr><cmd>so<cr>', { buffer = vim.fn.bufnr() })
+  end,
+})
+
+-- set showcmd based on the current mode
+vim.api.nvim_create_autocmd('ModeChanged', {
+  group = augroup,
+  callback = function()
+    local mode = vim.fn.mode()
+    local showcmd = 
+    {
+      -- all visual mode strings. See :help mode()
+      ['v']       = true, -- Visual by character
+      ['vs']      = true, -- Visual by character using |v_CTRL-O| in Select mode
+      ['V']       = true, -- Visual by line
+      ['Vs']      = true, -- Visual by line using |v_CTRL-O| in Select mode
+      ['CTRL-V']  = true, -- Visual blockwise
+      ['CTRL-Vs'] = true, -- Visual blockwise using |v_CTRL-O| in Select mode
+    }
+    vim.o.showcmd = (showcmd[mode] and true) or false
   end,
 })
 
