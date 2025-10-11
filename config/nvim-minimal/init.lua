@@ -1075,7 +1075,112 @@ dap.adapters.coreclr = {
   type = 'executable',
   command = netcoredbg,
   args = { '--interpreter=vscode' }
+
+--section: C# Unittest debugging
+
+local function get_test_under_cursor()
+  local tree = vim.treesitter.get_parser():parse()[1]
+  local query = vim.treesitter.query.parse('c_sharp', [[
+    (method_declaration
+      (attribute_list
+        (attribute
+          name: (identifier) @_attr_name
+          (#any-of? @_attr_name "Test" "TestCase")
+        )
+      )
+      name: (identifier) @test.method.name
+    ) @test.method
+  ]])
+  local captures = query:iter_captures(tree:root(), 0)
+  local tbl = {}
+  local row = vim.fn.getcurpos()[2] - 1
+
+  for _, match, _ in query:iter_matches(tree:root(), 0, -1) do
+    local inside = false
+    local methodName = nil
+    for id, nodes in pairs(match) do
+      for _, node in ipairs(nodes) do
+        -- for id, node, metadata in captures do
+        local name = query.captures[id] -- capture name
+        if name == "test.method" then
+          local row1, col1, row2, col2 = vim.treesitter.get_node_range(node)
+          if row1 <= row and row2 >= row then
+            inside = true
+          end
+        elseif name == "test.method.name" then
+          methodName = vim.treesitter.get_node_text(node, 0)
+        end
+      end
+    end
+
+    if inside and methodName then
+      return methodName
+    end
+  end
+  return nil
+end
+
+local prev_test_name = nil
+local prev_test = {
+  project = nil,
+  name = nil,
 }
+
+local function debug_current_test()
+  local dap = require('dap')
+  local test = prev_test
+  local testname = get_test_under_cursor(bufnr)
+  if testname ~= nil then
+    test = { name = testname, project = vim.fn.expand('%:h') }
+  end
+  if test.name == nil then return end
+  prev_test = test
+  local attached = false
+  print("Debugging " .. test.project .. "/" .. test.name)
+  local job = vim.fn.jobstart({ "dotnet", "test", test.project, "--filter", test.name }, {
+    on_stdout = function(t, v) 
+      if attached then return end
+      for _, line in ipairs(v) do
+        local pid = line:match("Process Id: (%d+)")
+        if pid ~= nil then
+          local num = tonumber(pid)
+          if num ~= nil then
+            attached = true
+            dap.run({
+              type = 'coreclr',
+              request = 'attach',
+              processId = num,
+              name = test.name,
+            })
+            return
+          end
+        end
+      end
+    end,
+    stdout_buffered = false,
+    env = {
+      ["VSTEST_HOST_DEBUG"] = "1",
+    },
+  })
+
+  -- kill the task after a minute if we never attached
+  vim.uv.new_timer():start(10000, 0, vim.schedule_wrap(function()
+    if not attached then
+      vim.fn.jobstop(job)
+    end
+  end))
+end
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = augroup,
+  pattern = { "*.cs" },
+  callback = function()
+    vim.keymap.set('n', 'grt', function() debug_current_test() end, { buffer = vim.fn.bufnr(), desc = "Debug Test Under Cursor" })
+  end,
+})
+
+--endsection
+
 --endsection
 
 --section: dap ui
