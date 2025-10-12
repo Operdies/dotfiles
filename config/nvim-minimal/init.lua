@@ -1076,6 +1076,13 @@ dap.adapters.coreclr = {
   command = netcoredbg,
   args = { '--interpreter=vscode' }
 }
+
+--section: C# Unittest debugging
+
+require('csharp_unittest').setup({})
+
+--endsection
+
 --endsection
 
 --section: dap ui
