@@ -369,6 +369,7 @@ gs.setup(gitsigns_opts)
 --endsection
 
 --section: lsp config
+vim.lsp.set_log_level(vim.log.levels.OFF)
 --section: roslyn config
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
