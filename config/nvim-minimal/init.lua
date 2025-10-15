@@ -367,122 +367,6 @@ local gitsigns_opts = {
 }
 gs.setup(gitsigns_opts)
 --endsection
-
---section: lsp config
-vim.lsp.set_log_level(vim.log.levels.OFF)
---section: roslyn config
--- prereqs: download roslyn lsp from:
--- setup instructions at https://github.com/seblyng/roslyn.nvim
--- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
-local platform = is_windows and 'win-x64' or 'linux-x64'
-local roslyn_lsp_path = vim.fs.joinpath(tools_dir, 'roslyn-lsp', 'Microsoft.CodeAnalysis.LanguageServer.dll')
-if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
-  local roslyn = {
-    on_attach = function()
-      print("Roslyn attached!")
-    end,
-    cmd = {
-      "dotnet",
-      roslyn_lsp_path,
-      "--logLevel", -- this property is required by the server
-      "Information",
-      "--extensionLogDirectory", -- this property is required by the server
-      vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
-      "--stdio"
-    },
-    settings = {
-      ["csharp|inlay_hints"] = {
-        csharp_enable_inlay_hints_for_implicit_object_creation = true,
-        csharp_enable_inlay_hints_for_implicit_variable_types = true,
-      },
-      ["csharp|code_lens"] = {
-        dotnet_enable_references_code_lens = true,
-      },
-    },
-  }
-  vim.lsp.config("roslyn", roslyn)
-  vim.lsp.enable({ "roslyn" })
-end
--- require('roslyn').setup()
---endsection
-
---section: clangd config
-vim.lsp.config('clangd', {
-  on_attach = function(_, bufnr)
-    vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
-      { buffer = bufnr, desc = "Switch Source/Header" })
-  end,
-  capabilities = {
-    offsetEncoding = { "utf-16" },
-  },
-  cmd = {
-    "clangd",
-    "--background-index",
-    "--clang-tidy",
-    "--header-insertion=never",
-    "--completion-style=detailed",
-    "--function-arg-placeholders=0",
-    "--fallback-style=llvm",
-  },
-  init_options = {
-    usePlaceholders = false,
-    completeUnimported = false,
-    clangdFileStatus = true,
-  },
-})
-vim.lsp.enable({ "clangd" })
---endsection
--- vim.lsp.enable({ "lua_ls" })
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(ev)
-    local function bufmap(mode, l, r, opts)
-      opts = opts or {}
-      opts.buffer = bufnr
-      vim.keymap.set(mode, l, r, opts)
-    end
-
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    if client:supports_method('textDocument/completion') then
-      local triggers = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.>'
-
-      local chars = {}; triggers:gsub(".", function(c) table.insert(chars, c) end)
-      client.server_capabilities.completionProvider.triggerCharacters = chars
-      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-    end
-    bufmap('n', 'gd', vim.lsp.buf.definition)
-    bufmap('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
-    bufmap('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
-    bufmap('n', '<leader>cd', vim.diagnostic.open_float)
-    bufmap('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
-
-    local function toggle_inline_diagnostics()
-      local enabled = false
-      return function()
-        enabled = not enabled
-        vim.diagnostic.config({ virtual_text = enabled })
-      end
-    end
-    vim.keymap.set('n', '<leader>cD', toggle_inline_diagnostics())
-  end,
-})
-
--- Open popup if closed, otherwise accept selected option
-vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true, silent = true })
--- Abort completion if popup menu is active, otherwise fallback to default <C-a> behavior
-vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = true, silent = true })
--- tab completion:
--- snippet jump if snippet is active
--- start omnicomplete if popup is closed
--- pick next completion option if popup is open
-vim.keymap.set('i', '<tab>', function()
-  if vim.snippet.active({ direction = 1 }) then
-    return '<cmd>lua vim.snippet.jump(1)<cr>'
-  else
-    return '<C-n>'
-  end
-end, { expr = true })
---endsection
-
 --section: oil
 local function oil_setup()
   -- helper function to parse output
@@ -730,6 +614,121 @@ require("nvim-treesitter.configs").setup({
   },
 
 })
+--endsection
+
+--section: lsp config
+vim.lsp.set_log_level(vim.log.levels.OFF)
+--section: roslyn config
+-- prereqs: download roslyn lsp from:
+-- setup instructions at https://github.com/seblyng/roslyn.nvim
+-- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
+local platform = is_windows and 'win-x64' or 'linux-x64'
+local roslyn_lsp_path = vim.fs.joinpath(tools_dir, 'roslyn-lsp', 'Microsoft.CodeAnalysis.LanguageServer.dll')
+if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
+  local roslyn = {
+    on_attach = function()
+      print("Roslyn attached!")
+    end,
+    cmd = {
+      "dotnet",
+      roslyn_lsp_path,
+      "--logLevel", -- this property is required by the server
+      "Information",
+      "--extensionLogDirectory", -- this property is required by the server
+      vim.fs.joinpath(vim.uv.os_tmpdir(), "roslyn_ls/logs"),
+      "--stdio"
+    },
+    settings = {
+      ["csharp|inlay_hints"] = {
+        csharp_enable_inlay_hints_for_implicit_object_creation = true,
+        csharp_enable_inlay_hints_for_implicit_variable_types = true,
+      },
+      ["csharp|code_lens"] = {
+        dotnet_enable_references_code_lens = true,
+      },
+    },
+  }
+  vim.lsp.config("roslyn", roslyn)
+  vim.lsp.enable({ "roslyn" })
+end
+-- require('roslyn').setup()
+--endsection
+
+--section: clangd config
+vim.lsp.config('clangd', {
+  on_attach = function(_, bufnr)
+    vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
+      { buffer = bufnr, desc = "Switch Source/Header" })
+  end,
+  capabilities = {
+    offsetEncoding = { "utf-16" },
+  },
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=never",
+    "--completion-style=detailed",
+    "--function-arg-placeholders=0",
+    "--fallback-style=llvm",
+  },
+  init_options = {
+    usePlaceholders = false,
+    completeUnimported = false,
+    clangdFileStatus = true,
+  },
+})
+vim.lsp.enable({ "clangd" })
+--endsection
+-- vim.lsp.enable({ "lua_ls" })
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(ev)
+    local function bufmap(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client:supports_method('textDocument/completion') then
+      local triggers = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.>'
+
+      local chars = {}; triggers:gsub(".", function(c) table.insert(chars, c) end)
+      client.server_capabilities.completionProvider.triggerCharacters = chars
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+    end
+    bufmap('n', 'gd', vim.lsp.buf.definition)
+    bufmap('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
+    bufmap('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
+    bufmap('n', '<leader>cd', vim.diagnostic.open_float)
+    bufmap('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
+
+    local function toggle_inline_diagnostics()
+      local enabled = false
+      return function()
+        enabled = not enabled
+        vim.diagnostic.config({ virtual_text = enabled })
+      end
+    end
+    vim.keymap.set('n', '<leader>cD', toggle_inline_diagnostics())
+  end,
+})
+
+-- Open popup if closed, otherwise accept selected option
+vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true, silent = true })
+-- Abort completion if popup menu is active, otherwise fallback to default <C-a> behavior
+vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = true, silent = true })
+-- tab completion:
+-- snippet jump if snippet is active
+-- start omnicomplete if popup is closed
+-- pick next completion option if popup is open
+vim.keymap.set('i', '<tab>', function()
+  if vim.snippet.active({ direction = 1 }) then
+    return '<cmd>lua vim.snippet.jump(1)<cr>'
+  else
+    return '<C-n>'
+  end
+end, { expr = true })
 --endsection
 
 --section: keymap
@@ -1071,12 +1070,22 @@ vim.fn.sign_define("DapLogPoint", { text = "", texthl = "ErrorMsg", linehl = 
 
 --section: C# Debug Adapter
 -- Download netcoredbg from: https://github.com/Samsung/netcoredbg/releases
-local netcoredbg = vim.fs.joinpath(tools_dir, 'netcoredbg', 'netcoredbg')
-dap.adapters.coreclr = {
-  type = 'executable',
-  command = netcoredbg,
-  args = { '--interpreter=vscode' }
-}
+if is_osx then
+  vim.pack.add({
+    { src = "https://github.com/Cliffback/netcoredbg-macOS-arm64.nvim" },
+  })
+
+  local dap = require('dap')
+  require('netcoredbg-macOS-arm64').setup(dap)
+  dap.configurations.cs = {}
+else
+  local netcoredbg = vim.fs.joinpath(tools_dir, 'netcoredbg', 'netcoredbg')
+  dap.adapters.coreclr = {
+    type = 'executable',
+    command = netcoredbg,
+    args = { '--interpreter=vscode' }
+  }
+end
 
 --section: C# Unittest debugging
 
@@ -1092,17 +1101,20 @@ local dap_ui = require('dapui')
 dap_ui.setup({
   layouts = { {
     elements = { {
-      id = "console",
-      size = 0.5
+      id = "scopes",
+      size = 0.25
+    }, {
+      id = "breakpoints",
+      size = 0.25
     }, {
       id = "stacks",
       size = 0.25
     }, {
-      id = "scopes",
+      id = "watches",
       size = 0.25
     } },
-    position = "bottom",
-    size = 10
+    position = "left",
+    size = 40
   } },
 })
 dap.listeners.before.attach.dapui_config = function() dap_ui.open() end
