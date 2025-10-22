@@ -618,6 +618,10 @@ require("nvim-treesitter.configs").setup({
 
 --section: lsp config
 vim.lsp.set_log_level(vim.log.levels.OFF)
+vim.diagnostic.config({ 
+  signs = false, -- I prefer dedicating the gutter to gitsigns. Diagnostics are distracting here.
+  virtual_text = { severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN } },
+})
 --section: roslyn config
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
@@ -679,6 +683,14 @@ vim.lsp.config('clangd', {
   },
 })
 vim.lsp.enable({ "clangd" })
+
+-- "deprecated" bindings. Used for keybinds I would like to stop using
+local prefer = function(preferred)
+  return function()
+    print("Prefer " .. preferred .. " instead.")
+  end
+end
+
 --endsection
 -- vim.lsp.enable({ "lua_ls" })
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -700,17 +712,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
     bufmap('n', 'gd', vim.lsp.buf.definition)
     bufmap('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     bufmap('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
-    bufmap('n', '<leader>cd', vim.diagnostic.open_float)
+    bufmap('n', '<leader>cd', prefer("<C-w>d"))
     bufmap('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
-
-    local function toggle_inline_diagnostics()
-      local enabled = false
-      return function()
-        enabled = not enabled
-        vim.diagnostic.config({ virtual_text = enabled })
-      end
-    end
-    vim.keymap.set('n', '<leader>cD', toggle_inline_diagnostics())
   end,
 })
 
@@ -805,7 +808,7 @@ vim.keymap.set('n', "<leader>f'", "<cmd>Pick registers<CR>")
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
 -- TODO: Get out of the habit of formatting code!
 -- vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
-vim.keymap.set('n', '<leader>cf', function() print("Don't format the whole buffer dingus") end)
+vim.keymap.set('n', '<leader>cf', prefer("formatting ranges"))
 vim.keymap.set('x', '<leader>cf', vim.lsp.buf.format)
 vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>")    -- close current buffer
 vim.keymap.set('n', "<esc>", "<esc><cmd>nohlsearch<cr>") -- clear search highlight on escape
