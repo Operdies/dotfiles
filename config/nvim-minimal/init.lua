@@ -56,6 +56,9 @@ vim.o.winblend = 10
 -- We avoid this by enabling it in visual mode, and disabling it otherwise.
 vim.o.showcmd = false
 
+-- treat .h files as c files. Default is cpp
+vim.g.c_syntax_for_h = "c"
+
 --endsection
 
 --section: machine/os specific settings
