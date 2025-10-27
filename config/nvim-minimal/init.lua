@@ -986,10 +986,12 @@ require('toggleterm').setup({
   shell = vim.o.shell,
 })
 
-local function lazygit_setup_windows_cfg()
-  -- windows + lazygit doesn't really mix due to the way lazygit, powershell and cmd.exe works in combination
-  -- Create a batch script for editing at specific lines, and a lazygit config for using that batch script
-  local edit_bat = [[
+local function lazygit_setup_cfg()
+  local yml_os = ""
+  if is_windows then
+    -- windows + lazygit doesn't really mix due to the way lazygit, powershell and cmd.exe works in combination
+    -- Create a batch script for editing at specific lines, and a lazygit config for using that batch script
+    local edit_bat = [[
 @echo off
 
 set filename=%1
@@ -997,26 +999,67 @@ set linenumber=%2
 
 if "%linenumber%"=="" (
   REM <C-q>: close the floating terminal
-  REM <cmd>edit: open the file
-  nvim --server %NVIM% --remote-send "<C-q><cmd>edit %filename%<cr>zO"
+  REM <cmd>drop: open the file in a window if possible, otherwise open it
+  nvim --server %NVIM% --remote-send "<C-q><cmd>drop %filename%<cr>zO"
 ) else (
   REM ggzO: go to the requested line number and open all fold under the cursor
-  nvim --server %NVIM% --remote-send "<C-q><cmd>edit %filename%<cr>%linenumber%ggzO"
+  nvim --server %NVIM% --remote-send "<C-q><cmd>drop %filename%<cr>%linenumber%ggzO"
 )
 ]]
 
-  local bat = vim.fn.tempname() .. ".bat"
-  local batfile = io.open(bat, "w")
-  batfile:write(edit_bat)
-  batfile:close()
+    local bat = vim.fn.tempname() .. ".bat"
+    local batfile = io.open(bat, "w")
+    batfile:write(edit_bat)
+    batfile:close()
 
-  local yml = [[
+    yml_os = ([[
 os:
   edit: <BAT> "{{filename}}"
   editAtLine: <BAT> "{{filename}}" "{{line}}"
   editInTerminal: true
+]]):gsub("<BAT>", bat)
+  else
+    -- on linux/mac we can just make specify the commands directly
+    yml_os = [[
+os:
+  # <C-q> is my mapping to hide the floating terminal hosting lazygit without closing it.
+  edit: 'nvim --server "$NVIM" --remote-send "<C-q><cmd>drop {{filename}}<cr>zO"'
+  # nvim does not yet support the '+{cmd}' syntax supported by vim. As a hack, we can instead send the keystroke to go to a specific line after opening.
+  editAtLine: 'nvim --server "$NVIM" --remote-send "<C-q><cmd>drop {{filename}}<cr>{{line}}ggzO"'
+  editInTerminal: true
+]]
+  end
+
+  local yml_gui = [[
 gui:
+  theme:
+    activeBorderColor:
+      - '#a6e3a1'
+      - bold
+    inactiveBorderColor:
+      - '#a6adc8'
+    optionsTextColor:
+      - '#89b4fa'
+    selectedLineBgColor:
+      - '#313244'
+    cherryPickedCommitBgColor:
+      - '#45475a'
+    cherryPickedCommitFgColor:
+      - '#a6e3a1'
+    unstagedChangesColor:
+      - '#f38ba8'
+    defaultFgColor:
+      - '#cdd6f4'
+    searchingActiveBorderColor:
+      - '#f9e2af'
+
+  authorColors:
+    '*': '#b4befe'
+
   skipDiscardChangeWarning: true
+]]
+
+  local yml_base = [[
 notARepository: skip
 promptToReturnFromSubprocess: false
 keybinding:
@@ -1025,21 +1068,17 @@ keybinding:
     open: <disabled>
 ]]
 
+
+  local yml = yml_os .. yml_gui .. yml_base
   local tempcfg = vim.fn.tempname() .. ".yml"
-  yml = yml:gsub("<BAT>", bat)
   local file = io.open(tempcfg, "w")
   file:write(yml)
   file:close()
-
-  -- if a config file exists, include it before tempcfg so the required options
-  -- are overwritten
-  local default_config = vim.fs.joinpath(config_dir, "lazygit", "config.yml")
-  if vim.fn.filereadable(default_config) == 0 then return { tempcfg } end
-  return { default_config, tempcfg }
+  return tempcfg
 end
 
 local lazygit = require("toggleterm.terminal").Terminal:new({
-  cmd = is_windows and ('lazygit --use-config-file "' .. table.concat(lazygit_setup_windows_cfg(), ",") .. '"') or 'lazygit',
+  cmd = 'lazygit --use-config-file "' .. lazygit_setup_cfg() .. '"',
   hidden = true,
   direction = "float",
   on_open = function(term)
