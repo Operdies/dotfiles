@@ -513,20 +513,23 @@ pick.registry.project = function()
   local projects = vim.fs.dir(git_dir, { depth = 1 })
   local lst = {}
   for project in projects do
-    lst[#lst + 1] = project
+    local project_dir = vim.fs.joinpath(git_dir, project)
+    local git_dir = vim.fs.joinpath(project_dir, ".git")
+    if vim.fn.isdirectory(git_dir) == 1 then
+      lst[#lst + 1] = { name = project, dir = project_dir }
+    end
   end
   pick.ui_select(lst, {
     prompt = 'Pick a Project',
     format_item = function(item)
-      return item
+      return item.name
     end,
   }, function(choice)
     if choice then
-      local fullpath = vim.fn.expand(git_dir .. choice)
       -- we need to schedule this function because MiniPick refuses
       -- to open the selected file if the new picker is opened inside this handler.
       vim.schedule(function()
-        vim.fn.chdir(fullpath)
+        vim.fn.chdir(choice.dir)
         pick.builtin.files({ tool = 'git' })
       end)
     end
