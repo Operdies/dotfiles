@@ -990,51 +990,44 @@ require('toggleterm').setup({
 })
 
 local function lazygit_setup_cfg()
-  local yml_os = ""
+  local bat_path = is_windows and (vim.fn.tempname() .. ".bat") or nil
+
+  -- lazygit makes it impossible to properly format a <CMD> commands because it naively escapes < to ^<
+  -- as a workaround, create a bat file and invoke that instead
   if is_windows then
-    -- windows + lazygit doesn't really mix due to the way lazygit, powershell and cmd.exe works in combination
-    -- Create a batch script for editing at specific lines, and a lazygit config for using that batch script
-    local edit_bat = [[
+    local edit_bat = [=[
 @echo off
 
 set filename=%1
 set linenumber=%2
 
 if "%linenumber%"=="" (
-  REM <C-q>: close the floating terminal
-  REM <cmd>drop: open the file in a window if possible, otherwise open it
-  nvim --server %NVIM% --remote-send "<C-q><cmd>drop %filename%<cr>zO"
+  nvim --server %NVIM% --remote-send "<CMD>lua lazygit_edit_file([[%filename%]])<CR>"
 ) else (
-  REM ggzO: go to the requested line number and open all fold under the cursor
-  nvim --server %NVIM% --remote-send "<C-q><cmd>drop %filename%<cr>%linenumber%ggzO"
+  nvim --server %NVIM% --remote-send "<CMD>lua lazygit_edit_file([[%filename%]], %linenumber%)<CR>"
 )
-]]
+]=]
 
-    local bat = vim.fn.tempname() .. ".bat"
-    local batfile = io.open(bat, "w")
+    -- windows + lazygit doesn't really mix due to the way lazygit, powershell and cmd.exe works in combination
+    -- Create a batch script for editing at specific lines, and a lazygit config for using that batch script
+
+    local batfile = io.open(bat_path, "w")
     batfile:write(edit_bat)
     batfile:close()
-
-    yml_os = ([[
-os:
-  edit: <BAT> "{{filename}}"
-  editAtLine: <BAT> "{{filename}}" "{{line}}"
-  editInTerminal: true
-]]):gsub("<BAT>", bat)
-  else
-    -- on linux/mac we can just make specify the commands directly
-    yml_os = [[
-os:
-  # <C-q> is my mapping to hide the floating terminal hosting lazygit without closing it.
-  edit: 'nvim --server "$NVIM" --remote-send "<C-q><cmd>drop {{filename}}<cr>zO"'
-  # nvim does not yet support the '+{cmd}' syntax supported by vim. As a hack, we can instead send the keystroke to go to a specific line after opening.
-  editAtLine: 'nvim --server "$NVIM" --remote-send "<C-q><cmd>drop {{filename}}<cr>{{line}}ggzO"'
-  editInTerminal: true
-]]
   end
 
-  local yml_gui = [[
+  local edit = {
+    file = is_windows and (bat_path .. " {{filename}}") or ([=[nvim --server "$NVIM" --remote-send "<CMD>lua lazygit_edit_file([[{{filename}}]])<CR>"]=]),
+    line = is_windows and (bat_path .. " {{filename}} {{line}}") or ([=[nvim --server "$NVIM" --remote-send "<CMD>lua lazygit_edit_file([[{{filename}}]], {{line}})<CR>"]=])
+  }
+
+  local yml = ([[
+os:
+  edit: <FILE_EDIT>
+  editAtLine: <LINE_EDIT>
+  editInTerminal: true
 gui:
+  skipDiscardChangeWarning: true
   theme:
     activeBorderColor:
       - '#a6e3a1'
@@ -1058,21 +1051,15 @@ gui:
 
   authorColors:
     '*': '#b4befe'
-
-  skipDiscardChangeWarning: true
-]]
-
-  local yml_base = [[
 notARepository: skip
 promptToReturnFromSubprocess: false
 keybinding:
   universal:
     quit: <disabled>
     open: <disabled>
-]]
+]]):gsub("<FILE_EDIT>", edit.file)
+  :gsub("<LINE_EDIT>", edit.line)
 
-
-  local yml = yml_os .. yml_gui .. yml_base
   local tempcfg = vim.fn.tempname() .. ".yml"
   local file = io.open(tempcfg, "w")
   file:write(yml)
@@ -1090,6 +1077,23 @@ local lazygit = require("toggleterm.terminal").Terminal:new({
   end,
 })
 vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
+
+-- called from the lazygit Edit command via nvim --remote-send
+function lazygit_edit_file(file, line)
+  if lazygit:is_open() then lazygit:close() end
+  -- drop: If the file is open in a window, change to that window. Otherwise
+  -- open it in the current buffer. See :help drop
+  vim.cmd("drop " .. file)
+  local cmd = "normal! "
+  if line then
+    cmd = cmd .. line .. "gg"
+  end
+  cmd = cmd .. "zO"
+  -- pcall: ignore errors from zO if there are no folds.
+  pcall(vim.cmd, cmd)
+end
+
+
 --endsection
 
 --section: nvim-dap
