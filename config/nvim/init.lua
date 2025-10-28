@@ -171,13 +171,13 @@ local function my_colorscheme()
   Group.new("MatchParen", c.Text, c.Surface1, s.bold)
 
   -- the search term under the cursor
-  Group.new("CurSearch",  c.Base, c.Pink, s.none)
+  Group.new("CurSearch",  c.Base, c.Pink:dark(),    s.bold)
   -- the search option which will be jumped to if a search is executed
-  Group.new("IncSearch",  c.Base, c.Pink, s.none)
+  Group.new("IncSearch",  c.Base, c.Pink:dark(),    s.bold)
   -- the highlight color of the current hlsearch
-  Group.new("Search",     c.Base, c.Yellow,    s.none)
+  Group.new("Search",     c.Base, c.Pink,    s.none)
   -- the highlight color of a :s/a/b operation
-  Group.new("Substitute", c.Base, c.Yellow,   s.none)
+  Group.new("Substitute", c.Base, c.Pink,   s.none)
 
   -- Floating windows (mostly mini pick)
   Group.new('FloatBorder', c.Lavender, c.Mantle, s.none)
