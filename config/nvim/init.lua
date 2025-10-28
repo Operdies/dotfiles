@@ -526,12 +526,10 @@ pick.registry.project = function()
     end,
   }, function(choice)
     if choice then
-      -- we need to schedule this function because MiniPick refuses
-      -- to open the selected file if the new picker is opened inside this handler.
-      vim.schedule(function()
-        vim.fn.chdir(choice.dir)
-        pick.builtin.files({ tool = 'git' })
-      end)
+      -- open the project directory in an oil buffer
+      vim.cmd("edit " .. choice.dir)
+      -- change work directories to allow grep/find actions from this directory
+      vim.cmd("cd " .. choice.dir)
     end
   end)
 end
