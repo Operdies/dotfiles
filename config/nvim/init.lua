@@ -549,6 +549,7 @@ vim.ui.select = pick.ui_select
 -- Treesitter {{{1
 require("nvim-treesitter.configs").setup({
   ensure_installed = { "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", },
+  indent = { enable = true, disable = { --[[ see :help nvim-treesitter-indentation-mod ]] }},
   highlight = { enable = true },
   incremental_selection = {
     enable = true,
