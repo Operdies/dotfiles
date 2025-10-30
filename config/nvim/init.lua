@@ -1,4 +1,4 @@
---section: disable builtin plugins
+-- Disable Builtin Plugins {{{1
 
 -- this probably affects startup time ?
 vim.g.loaded_tutor_mode_plugin = 1
@@ -7,9 +7,7 @@ vim.g.loaded_zipPlugin = 1
 vim.g.loaded_gzip = 1
 vim.g.loaded_tarPlugin = 1
 
---endsection
-
---section: basic options
+-- Basic Options {{{1
 vim.o.autochdir = false
 vim.o.number = true
 vim.o.relativenumber = false
@@ -59,9 +57,7 @@ vim.o.showcmd = false
 -- treat .h files as c files. Default is cpp
 vim.g.c_syntax_for_h = "c"
 
---endsection
-
---section: machine/os specific settings
+-- OS specific settings {{{1
 local is_windows = 'Windows_NT' == vim.loop.os_uname().sysname
 local is_osx = 'Darwin' == vim.loop.os_uname().sysname
 local path_separator = is_windows and '\\' or '/'
@@ -71,9 +67,7 @@ local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
 local config_dir = (is_windows and home_dir .. [[AppData\Local\]]) or (home_dir .. ".config/")
 local os = (is_windows and "windows") or (is_osx and "osx") or "linux"
 
---endsection
-
---section: plugins
+-- Plugins {{{1
 vim.pack.add({
   -- file browser
   { src = "https://github.com/stevearc/oil.nvim" },
@@ -108,9 +102,8 @@ vim.pack.add({
   -- nio -- asynchronous io. Dependency of nvim-dap-ui
   { src = "https://github.com/nvim-neotest/nvim-nio" },
 })
---endsection
 
---section: theming
+-- Theming {{{1
 
 local function my_colorscheme()
   vim.pack.add({'https://github.com/tjdevries/colorbuddy.nvim'})
@@ -282,18 +275,14 @@ end
 
 my_colorscheme()
 
---endsection
-
---section: mini.align -- text alignment
+-- mini.align -- text alignment {{{1
 vim.pack.add({"https://github.com/nvim-mini/mini.align"})
 require('mini.align').setup()
---endsection
 
---section: mini.ai
+-- mini.ai {{{1
 require('mini.ai').setup()
---endsection
 
---section: mini.hipatterns
+-- mini.hipatterns {{{1
 local hipatterns = require('mini.hipatterns')
 hipatterns.setup({
   highlighters = {
@@ -308,10 +297,9 @@ hipatterns.setup({
   },
 })
 vim.keymap.set('n', '<leader>ft', function () require('mini.extra').pickers.hipatterns({ scope = 'all'}) end)
---endsection
 
 
---section: gitsigns
+-- gitsigns {{{1
 -- Adds git related signs to the gutter, as well as utilities for managing changes
 local gs = require('gitsigns')
 local gitsigns_opts = {
@@ -369,8 +357,8 @@ local gitsigns_opts = {
   end
 }
 gs.setup(gitsigns_opts)
---endsection
---section: oil
+
+-- oil {{{1
 local function oil_setup()
   -- helper function to parse output
   local function parse_output(proc)
@@ -443,9 +431,8 @@ local function oil_setup()
 end
 
 oil_setup()
---endsection
 
---section: overseer
+-- overseer {{{1
 local overseer_options = {
   task_list = {
     direction = "bottom",
@@ -465,9 +452,8 @@ vim.keymap.set('n', '<leader>rT', function()
   vim.cmd('OverseerToggle')
   vim.api.nvim_set_current_win(win)
 end)
---endsection
 
---section: quicker -- cool quickfix improvements
+-- quicker {{{1
 vim.pack.add({ "https://github.com/stevearc/quicker.nvim" })
 require('quicker').setup(
   { 
@@ -477,9 +463,8 @@ require('quicker').setup(
     highlight = { treesitter = true, lsp = true, load_buffers = false },
   }
 )
---endsection
 
---section: pick
+-- Mini.Pick {{{1
 
 local pick = require('mini.pick')
 local pick_options = {
@@ -556,14 +541,12 @@ end
 -- Required for lsp pick
 require('mini.extra').setup()
 
---endsection
 
---section: dressing
+-- Dressing {{{1
 require('dressing').setup({ select = { enabled = false }})
 vim.ui.select = pick.ui_select
---endsection
 
---section: treesitter
+-- Treesitter {{{1
 require("nvim-treesitter.configs").setup({
   ensure_installed = { "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", },
   highlight = { enable = true },
@@ -618,15 +601,14 @@ require("nvim-treesitter.configs").setup({
   },
 
 })
---endsection
 
---section: lsp config
+-- LSP {{{1
 vim.lsp.set_log_level(vim.log.levels.OFF)
 vim.diagnostic.config({ 
   signs = false, -- I prefer dedicating the gutter to gitsigns. Diagnostics are distracting here.
   virtual_text = { severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN } },
 })
---section: roslyn config
+-- roslyn config {{{2
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
 -- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
@@ -660,9 +642,8 @@ if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
   vim.lsp.enable({ "roslyn" })
 end
 -- require('roslyn').setup()
---endsection
 
---section: clangd config
+-- clangd config {{{2
 vim.lsp.config('clangd', {
   on_attach = function(_, bufnr)
     vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
@@ -695,7 +676,6 @@ local prefer = function(preferred)
   end
 end
 
---endsection
 -- vim.lsp.enable({ "lua_ls" })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
@@ -736,9 +716,8 @@ vim.keymap.set('i', '<tab>', function()
     return '<C-n>'
   end
 end, { expr = true })
---endsection
 
---section: keymap
+-- Keybindings {{{1
 vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
 vim.keymap.set({ 'n', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
 vim.keymap.set('n', '<C-s>', "<cmd>write<cr>")  -- write buffer if it has unsaved changes
@@ -850,9 +829,8 @@ vim.keymap.set("t", "<C-o><C-o>", "<C-\\><C-n>")
 -- Side scrolling is annoying
 vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelLeft>', '<nop>')
 vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
---endsection
 
---section: autocommands
+-- Autocommands {{{1
 
 local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
 
@@ -944,18 +922,14 @@ vim.api.nvim_create_autocmd('ModeChanged', {
   end,
 })
 
---endsection
-
---section: User Commands
+-- User Commands {{{1
 
 vim.api.nvim_create_user_command('Print', function(ctx) 
   local result = vim.fn.luaeval(ctx.args)
   print(vim.inspect(result))
 end, { nargs = '+', complete = "lua" })
 
---endsection
-
---section: toggleterm
+-- toggleterm {{{1
 if is_windows then
   vim.cmd [[
   let &shell = 'pwsh'
@@ -1092,10 +1066,8 @@ function lazygit_edit_file(file, line)
 end
 
 
---endsection
-
---section: nvim-dap
---section: TODO:
+-- dap {{{1
+-- TODO: {{{2
 -- 1. Debug output goes to external console. Is this a:
 --   a. netcoredbg issue?
 --   b. DAP issue?
@@ -1118,7 +1090,7 @@ vim.fn.sign_define("DapBreakpointCondition", { text = "", texthl = "ErrorMsg"
 vim.fn.sign_define("DapBreakpointRejected", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
 vim.fn.sign_define("DapLogPoint", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
 
---section: C# Debug Adapter
+-- C# Debug Adapter {{{2
 -- Download netcoredbg from: https://github.com/Samsung/netcoredbg/releases
 if is_osx then
   vim.pack.add({
@@ -1137,15 +1109,11 @@ else
   }
 end
 
---section: C# Unittest debugging
+-- C# Unittest debugging {{{2
 
 require('csharp_unittest').setup({})
 
---endsection
-
---endsection
-
---section: dap ui
+-- dap ui {{{2
 -- local dap_view = require('dap-view')
 local dap_ui = require('dapui')
 dap_ui.setup({
@@ -1172,7 +1140,7 @@ dap.listeners.before.launch.dapui_config = function() dap_ui.open() end
 dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() end
 dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
 
---section: keybinds
+-- dap keybinds {{{2
 vim.keymap.set('n', '<F2>', dap.terminate)
 vim.keymap.set('n', '<F4>', dap.up)
 vim.keymap.set('n', '<F5>', dap.continue)
@@ -1181,9 +1149,6 @@ vim.keymap.set('n', '<F9>', dap.toggle_breakpoint)
 vim.keymap.set('n', '<F10>', dap.step_over)
 vim.keymap.set('n', '<F11>', dap.step_into)
 vim.keymap.set('n', '<F12>', dap.step_out)
---endsection
 
---endsection
---endsection
-
--- vim: foldmethod=marker foldmarker=--section\:,--endsection
+-- Modeline {{{1
+-- vim: fdm=marker
