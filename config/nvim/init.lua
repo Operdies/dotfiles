@@ -1068,6 +1068,29 @@ end
 
 
 -- dap {{{1
+
+local dap = require('dap')
+
+-- DAP External Terminal {{{2
+-- If this is a tmux session, host 'external terminal' in a split
+if vim.fn.getenv("TMUX") ~= vim.NIL then
+  dap.defaults.fallback.external_terminal = {
+    command = vim.fn.exepath('tmux'),
+    args = { 
+      'split-window', -- create split in the same view
+      '-d',  -- don't focus the new split
+      '-h',  -- split horizontally
+      '-l', '80' -- the new split should take x columns
+    }
+  }
+  -- Otherwise host 'external terminal' in alacritty
+elseif vim.fn.executable('alacritty') == 1 then
+  dap.defaults.fallback.external_terminal = {
+    command = vim.fn.exepath('alacritty'),
+    args = { '-e' }
+  }
+end
+
 -- TODO: {{{2
 -- 1. Debug output goes to external console. Is this a:
 --   a. netcoredbg issue?
@@ -1084,8 +1107,6 @@ end
 --   :help dap-providers-configs
 -- 6. Reliable way of selecting the appropriate debugging window (<leader>bw -> watches -> activating an appropriate layout if watches are not visible)
 --endsection
-local dap = require('dap')
-
 vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
 vim.fn.sign_define("DapBreakpointCondition", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
 vim.fn.sign_define("DapBreakpointRejected", { text = "", texthl = "ErrorMsg", linehl = "", numhl = "" })
@@ -1119,7 +1140,8 @@ require('csharp_unittest').setup({})
 do
   local c_adapter = {
     type = 'executable',
-    command = 'lldb-dap',
+    -- lldb-dap is distributed with LLVM, so it should be in path if clang is installed.
+    command = vim.fn.exepath('lldb-dap'),
     name = "lldb",
   }
   dap.adapters.lldb = c_adapter
