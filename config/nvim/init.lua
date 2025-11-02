@@ -1114,8 +1114,21 @@ end
 
 require('csharp_unittest').setup({})
 
+-- C Debug Adapter {{{2
+
+do
+  local c_adapter = {
+    type = 'executable',
+    command = 'lldb-dap',
+    name = "lldb",
+  }
+  dap.adapters.lldb = c_adapter
+  dap.adapters.codelldb = c_adapter
+  dap.adapters.cppvsdbg = c_adapter
+  dap.adapters.cppdbg = c_adapter
+end
+
 -- dap ui {{{2
--- local dap_view = require('dap-view')
 local dap_ui = require('dapui')
 dap_ui.setup({
   layouts = { {
