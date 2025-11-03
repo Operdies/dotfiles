@@ -1185,7 +1185,68 @@ vim.keymap.set('n', '<F9>', dap.toggle_breakpoint)
 vim.keymap.set('n', '<F10>', dap.step_over)
 vim.keymap.set('n', '<F11>', dap.step_into)
 vim.keymap.set('n', '<F12>', dap.step_out)
-vim.keymap.set('n', 'L', require('dap.ui.widgets').hover)
+
+-- dap hover {{{2
+do
+  local dap_widgets = require('dap.ui.widgets')
+  local hover_winid = nil
+
+  local function hover_peek()
+    -- if hover_winid is not set, we should open the hover window.
+    -- remember the initial window
+    local initial_win = vim.fn.winnr()
+    -- open the hover window
+    dap_widgets.hover()
+    -- check the new window
+    local win = vim.fn.winnr()
+    -- if the window did not change, we shouldn't do anything
+    if win == initial_win then 
+      return nil
+    end
+    local winid = vim.fn.win_getid(win)
+    -- leave the hover window
+    vim.cmd[[wincmd p]]
+    return winid
+  end
+
+  local function hover_close()
+    if hover_winid then
+      local winid = hover_winid
+      hover_winid = nil
+      vim.api.nvim_win_close(winid, false)
+    end
+  end
+
+  -- if the hover window is open, enter it
+  -- otherwise 'peek' it by opening without entering
+  local function hover_peek_or_enter()
+    if hover_winid then
+      -- enter the hover window
+      local did_enter = vim.fn.win_gotoid(hover_winid) == 1
+      -- map q/esc to close and leave the window
+      vim.keymap.set('n', 'q', hover_close, { buffer = vim.fn.bufnr() })
+      vim.keymap.set('n', '<esc>', hover_close, { buffer = vim.fn.bufnr() })
+    else
+      hover_winid = hover_peek()
+      if hover_winid then
+        -- configure autocommand to close the hover_winid on cursor move
+        local augroup = vim.api.nvim_create_augroup('dap-peek-hover-group', { clear = true })
+        vim.api.nvim_create_autocmd('CursorMoved', {
+          group = augroup,
+          callback = function() 
+            -- allow cursor movement inside the hover window
+            local thiswin = vim.fn.win_getid(vim.fn.winnr())
+            if thiswin == hover_winid then return end
+            vim.api.nvim_del_augroup_by_id(augroup)
+            hover_close()
+          end,
+        })
+      end
+    end
+  end
+
+  vim.keymap.set('n', 'L', hover_peek_or_enter)
+end
 
 -- Modeline {{{1
 -- vim: fdm=marker
