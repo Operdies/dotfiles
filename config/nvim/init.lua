@@ -1175,6 +1175,8 @@ dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() e
 dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
 
 -- dap keybinds {{{2
+
+vim.keymap.set('n', '<F1>', dap.run_last)
 vim.keymap.set('n', '<F2>', dap.terminate)
 vim.keymap.set('n', '<F4>', dap.up)
 vim.keymap.set('n', '<F5>', dap.continue)
@@ -1183,6 +1185,7 @@ vim.keymap.set('n', '<F9>', dap.toggle_breakpoint)
 vim.keymap.set('n', '<F10>', dap.step_over)
 vim.keymap.set('n', '<F11>', dap.step_into)
 vim.keymap.set('n', '<F12>', dap.step_out)
+vim.keymap.set('n', 'L', require('dap.ui.widgets').hover)
 
 -- Modeline {{{1
 -- vim: fdm=marker
