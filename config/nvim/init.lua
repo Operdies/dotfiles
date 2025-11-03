@@ -1154,22 +1154,20 @@ end
 local dap_ui = require('dapui')
 dap_ui.setup({
   layouts = { {
-    elements = { {
-      id = "scopes",
-      size = 0.25
+      elements = {
+        { id = "watches", size = 0.10, },
+        { id = "breakpoints", size = 0.10, },
+        { id = "stacks", size = 0.10, },
+        { id = "scopes", size = 0.70, }, 
+      },
+      position = "left",
+      size = 40,
     }, {
-      id = "breakpoints",
-      size = 0.25
-    }, {
-      id = "stacks",
-      size = 0.25
-    }, {
-      id = "watches",
-      size = 0.25
-    } },
-    position = "left",
-    size = 40
-  } },
+      elements = { { id = "console", size = 1.0 }, },
+      position = "bottom",
+      size = 10,
+    }
+  },
 })
 dap.listeners.before.attach.dapui_config = function() dap_ui.open() end
 dap.listeners.before.launch.dapui_config = function() dap_ui.open() end
