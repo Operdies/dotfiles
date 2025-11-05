@@ -84,8 +84,8 @@ vim.pack.add({
   { src = "https://github.com/neovim/nvim-lspconfig" },
   -- floating terminal
   { src = "https://github.com/akinsho/toggleterm.nvim" },
-  -- awesome compile-and-run utility
-  { src = "https://github.com/stevearc/overseer.nvim" },
+  -- incredible task runner
+  { src = "https://github.com/stevearc/overseer.nvim", version = "v1.6.0", rev = "2c23513" },
   -- vim.ui / vim.input replacement
   { src = "https://github.com/stevearc/dressing.nvim" },
   -- git operations
