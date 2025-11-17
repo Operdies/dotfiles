@@ -61,7 +61,7 @@ vim.g.c_syntax_for_h = "c"
 local is_windows = 'Windows_NT' == vim.loop.os_uname().sysname
 local is_osx = 'Darwin' == vim.loop.os_uname().sysname
 local path_separator = is_windows and '\\' or '/'
-local home_dir = vim.env.HOME .. path_separator
+local home_dir = vim.fn.resolve(vim.env.HOME) .. path_separator
 local git_dir = is_windows and [[C:\git\]] or home_dir .. "repos/"
 local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
 local config_dir = (is_windows and home_dir .. [[AppData\Local\]]) or (home_dir .. ".config/")
