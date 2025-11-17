@@ -940,6 +940,11 @@ if is_windows then
   let &shellpipe  = '2>&1 | %%{ "$_" } | Tee-Object %s; exit $LastExitCode'
   set shellquote= shellxquote=
   ]]
+else
+  local zsh_path = vim.fn.exepath('zsh')
+  if zsh_path ~= '' then
+    vim.opt.shell = zsh_path
+  end
 end
 
 require('toggleterm').setup({
