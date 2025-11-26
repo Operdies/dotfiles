@@ -85,7 +85,7 @@ vim.pack.add({
   -- floating terminal
   { src = "https://github.com/akinsho/toggleterm.nvim" },
   -- incredible task runner
-  { src = "https://github.com/stevearc/overseer.nvim", version = "v1.6.0", rev = "2c23513" },
+  { src = "https://github.com/stevearc/overseer.nvim" },
   -- vim.ui / vim.input replacement
   { src = "https://github.com/stevearc/dressing.nvim" },
   -- git operations
@@ -437,12 +437,7 @@ local overseer_options = {
   task_list = {
     direction = "bottom",
     min_height = 15,
-    default_detail = 2,
-    dap = true,
-    bindings = {
-      ["<C-c>"] = "<cmd>OverseerQuickAction stop<cr>",
-      ["<C-r>"] = "<cmd>OverseerQuickAction restart<cr>",
-    }
+    dap = true
   },
 }
 require('overseer').setup(overseer_options)
