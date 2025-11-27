@@ -73,7 +73,7 @@ vim.pack.add({
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/echasnovski/mini.nvim" },
   -- lightweight telescope alternative (with minor patch by me)
-  { src = "https://github.com/operdies/mini.pick" },
+  { src = "https://github.com/nvim-mini/mini.pick" },
   -- more text objects
   { src = "https://github.com/echasnovski/mini.ai" },
   -- provides parsers for most languages
