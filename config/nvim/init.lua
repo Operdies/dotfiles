@@ -642,7 +642,28 @@ end
 -- clangd config {{{2
 vim.lsp.config('clangd', {
   on_attach = function(_, bufnr)
-    vim.keymap.set("n", "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>",
+    -- Stolen from:
+    -- https://github.com/neovim/nvim-lspconfig/blob/07f4e93de92e8d4ea7ab99602e3a8c9ac0fb778a/lua/lspconfig/configs/clangd.lua#L11
+    local function switch_source_header(bufnr)
+      local method_name = 'textDocument/switchSourceHeader'
+      local client = vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1]
+      if not client then
+        return vim.notify(('method %s is not supported by any servers active on the current buffer'):format(method_name))
+      end
+      local params = vim.lsp.util.make_text_document_params(bufnr)
+      client.request(method_name, params, function(err, result)
+        if err then
+          error(tostring(err))
+        end
+        if not result then
+          vim.notify('corresponding file cannot be determined')
+          return
+        end
+        vim.cmd.edit(vim.uri_to_fname(result))
+      end, bufnr)
+    end
+
+    vim.keymap.set("n", "<leader>ch", function() switch_source_header(bufnr) end,
       { buffer = bufnr, desc = "Switch Source/Header" })
   end,
   capabilities = {
@@ -1145,6 +1166,7 @@ do
     name = "lldb",
   }
   dap.adapters.lldb = c_adapter
+  dap.adapters['lldb-dap'] = c_adapter
   dap.adapters.codelldb = c_adapter
   dap.adapters.cppvsdbg = c_adapter
   dap.adapters.cppdbg = c_adapter
