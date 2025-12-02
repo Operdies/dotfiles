@@ -39,7 +39,7 @@ vim.o.cursorlineopt = 'number'
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal",
   "localoptions" }
-vim.opt.completeopt = { "menu", "menuone", "popup", "noinsert", "fuzzy" }
+vim.opt.completeopt = { "menu", "menuone", "popup", "noinsert", "noselect", "fuzzy" }
 
 vim.o.wildmenu = true
 vim.o.wildmode = "longest:full,full"
