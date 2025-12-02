@@ -1020,6 +1020,11 @@ os:
   edit: <FILE_EDIT>
   editAtLine: <LINE_EDIT>
   editInTerminal: true
+customCommands:
+  - key: 'F'
+    command: 'git pull --rebase --autostash'
+    context: 'localBranches'
+    stream: true
 gui:
   skipDiscardChangeWarning: true
   theme:
