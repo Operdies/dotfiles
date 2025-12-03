@@ -844,9 +844,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- Open popup if closed, otherwise accept selected option
-vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true, silent = true })
+vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true, silent = true, noremap = true })
 -- Abort completion if popup menu is active, otherwise fallback to default <C-a> behavior
-vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-a>' : '<C-e>'", { expr = true, silent = true })
+vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-G>u<C-a><C-G>u' : '<C-e>'", { expr = true, silent = true, noremap = true })
+
 -- tab completion:
 -- snippet jump if snippet is active
 -- start omnicomplete if popup is closed
@@ -955,7 +956,6 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 -- create undo points around paste in insert mode
 vim.keymap.set('i', '<C-r>"', '<C-G>u<C-r>"<C-G>u')
 vim.keymap.set('i', '<C-r>+', '<C-G>u<C-r>+<C-G>u')
-vim.keymap.set('i', '<C-a>', '<C-G>u<C-a><C-G>u')
 
 -- Navigate without leaving insert mode
 vim.keymap.set('i', "<C-j>", "<Down>")
