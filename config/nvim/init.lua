@@ -558,35 +558,76 @@ end
 pick.registry.pick_changelist = function()
   local changelist = vim.fn.getchangelist()
   local changes = changelist[1]
+  local position = changelist[2]
+  local position_index = 0
 
   local items = {}
-  local added = {}
   for i, change in ipairs(changes) do 
-    local ok, lines = pcall(vim.api.nvim_buf_get_lines, vim.fn.bufnr(), change.lnum - 1, change.lnum, true)
+    local bufnr = vim.fn.bufnr()
+    local bufname = vim.fn.bufname(bufnr)
+    local ok, lines = pcall(vim.api.nvim_buf_get_lines, bufnr, change.lnum - 1, change.lnum, true)
+    local text = bufname
     if ok and lines[1] then 
-      if not added[change.lnum] then
-        added[change.lnum] = true
-        where = ":" .. change.lnum
-        items[#items + 1] = { path = vim.fn.bufname(), where= where, lnum = change.lnum, col = change.col, text = lines[1] }
-      end
+      text = lines[1]
     end
+    local offset = position - i + 1
+    local where = "" .. change.lnum
+    items[#items + 1] = { path = bufname, lnum = change.lnum, col = change.col, text = text, offset = offset, where = where }
   end
 
   for i = 1, #items/2, 1 do
     items[i], items[#items-i+1] = items[#items-i+1], items[i]
   end
 
-  local linewidth = 0
-  for _, item in ipairs(items) do
-    if #item.where > linewidth then linewidth = #item.where end
+  local columns = { 0, 0 }
+  for i, item in ipairs(items) do
+    if item.offset == 0 then position_index = i end
+    local index = "" .. item.offset
+    local i_width = vim.fn.strwidth(index)
+    if columns[1] < i_width then columns[1] = i_width end
+    local path = item.where
+    local p_width = vim.fn.strwidth(path)
+    if columns[2] < p_width then columns[2] = p_width end
   end
 
   for _, item in ipairs(items) do
-    item.text = rpad("" .. item.lnum, linewidth, " ") .. " │ " .. item.text
+    item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
   end
 
-  pick.start({ source = { items = items } })
+  local choice = function(item)
+    if item.offset == 0 then return end
+    vim.api.nvim_win_call(pick.get_picker_state().windows.target,
+      function()
+        local old = 'g;'
+        local new = 'g,'
+        local dir = old
+        if item.offset < 0 then dir = new end
+        local cmd = item.offset .. dir
+        vim.cmd("normal! " .. cmd)
+      end)
+  end
 
+  -- I was not able to find a good way to set the default picker index,
+  -- so instead we define a custom 'show' function which sets the index 
+  -- the first time it is called.
+  local did_set = false
+  local pick_set_index_hack = function(buf, items, query)
+    if position_index > 0 and not did_set then
+      did_set = true 
+      local m = pick.get_picker_matches()
+      local indices = m.all_inds
+      pick.set_picker_match_inds({indices[position_index]}, "current")
+    end
+    local lines = vim.tbl_map(function(x) return x.text end, items)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  end
+
+  local pick_opts = { options = { content_from_bottom = true } }
+  local opts = {
+    options = { content_from_bottom = true },
+    source = { name = "change", items = items, choose = choice, show = pick_set_index_hack } 
+  }
+  pick.start(opts)
 end
 
 -- Pick Jumplist {{{2
@@ -904,7 +945,7 @@ vim.keymap.set('n', 'gff', function() require('mini.pick').builtin.files({ tool 
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
-vim.keymap.set('n', 'gfx', "<cmd>Pick pick_changelist<CR>")
+vim.keymap.set('n', 'gf;', "<cmd>Pick pick_changelist<CR>")
 
 -- TODO: Create custom picker so support cycling severity modes with e.g. <C-a> / <C-x>
 -- TODO: The 'all' option seems to only include open buffers. Custom implementation should include everything returned by `vim.diagnostic.get()`
