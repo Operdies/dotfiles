@@ -67,6 +67,22 @@ local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
 local config_dir = (is_windows and home_dir .. [[AppData\Local\]]) or (home_dir .. ".config/")
 local os = (is_windows and "windows") or (is_osx and "osx") or "linux"
 
+-- Helper functions {{{1
+local function rpad(str, len, char)
+  if char == nil then char = ' ' end
+  local width = vim.fn.strwidth(str)
+  return string.rep(char, len - width) .. str
+end
+local function lpad(str, len, char)
+  if char == nil then char = ' ' end
+  local width = vim.fn.strwidth(str)
+  return str .. string.rep(char, len - width)
+end
+local function friendly_path(file)
+  return file:gsub('^' .. git_dir, '󰊢 '):gsub('^' .. home_dir, " ")
+end
+
+
 -- Plugins {{{1
 vim.pack.add({
   -- file browser
@@ -488,7 +504,10 @@ local pick_options = {
     end
   }
 }
+
 pick.setup(pick_options)
+
+-- Pick Project {{{2
 pick.registry.project = function()
   local projects = vim.fs.dir(git_dir, { depth = 1 })
   local lst = {}
@@ -513,6 +532,8 @@ pick.registry.project = function()
     end
   end)
 end
+
+-- Pick OldFiles {{{2
 pick.registry.oldfiles = function()
   local existing = {}
   local added = {}
@@ -525,13 +546,82 @@ pick.registry.oldfiles = function()
         file = vim.fn.resolve(file)
         if added[file] == nil then
           added[file] = true
-          existing[#existing + 1] = { path = file, text = file:gsub('^' .. home_dir, " "):gsub('^' .. git_dir, '󰊢 ') }
+          existing[#existing + 1] = { path = file, text = friendly_path(file) }
         end
       end
     end
   end
   pick.start({ source = { items = existing } })
 end
+
+-- Pick Jumplist {{{2
+
+-- navigate the jump list
+pick.registry.pick_jumplist = function()
+  local jumplist = vim.fn.getjumplist()
+  local jumps = jumplist[1]
+  local position = jumplist[2]
+
+  local items = {}
+  for i, jump in ipairs(jumps) do 
+    if vim.fn.bufexists(jump.bufnr) then
+      local bufname = vim.fn.bufname(jump.bufnr)
+      if bufname and bufname ~= "" then
+        local ok, lines = pcall(vim.api.nvim_buf_get_lines, jump.bufnr, jump.lnum - 1, jump.lnum, true)
+        local text = bufname
+        if ok and lines[1] then 
+          text = lines[1]
+        end
+        local offset = position - i + 1
+        local where = friendly_path(bufname) .. ":" .. jump.lnum
+        local maxlen = 50
+        if #where > maxlen then
+          local cutoff = maxlen
+          for i = 0, maxlen do
+            -- break on first non-continuation character
+            -- this check is really lazy and will really fail all utf8 characters, but it's good enough
+            local index = #where - maxlen + i
+            local chr = where:sub(index, index)
+            -- print(vim.inspect({ path = where, iteration = i, index = index, char = chr }))
+            -- print(chr)
+            if string.byte(chr) < 128 then
+              cutoff = index
+              break
+            end
+          end
+          where = "…" .. where:sub(cutoff) 
+        end
+        items[#items + 1] = { index = i, offset = offset, path = bufname, where = where, lnum = jump.lnum, col = jump.col, summary = text, offset = offset, text = text }
+      end
+    end
+  end
+
+  for i = 1, #items/2, 1 do
+    items[i], items[#items-i+1] = items[#items-i+1], items[i]
+  end
+
+  local columns = { 0, 0 }
+  for _, item in ipairs(items) do
+    local index = "" .. item.offset
+    local i_width = vim.fn.strwidth(index)
+    if columns[1] < i_width then columns[1] = i_width end
+    local path = item.where
+    local p_width = vim.fn.strwidth(path)
+    if columns[2] < p_width then columns[2] = p_width end
+  end
+
+  for _, item in ipairs(items) do
+    item.text = lpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
+  end
+
+  pick.start({ source = { items = items } })
+
+end
+
+-- TOOD: Pick Tabs {{{2
+pick.registry.custom_tabs = function()
+end
+vim.keymap.set('n', 'gfT', function() require('mini.pick').builtin.files({ tool = "git" }, nil) end)
 
 -- Required for lsp pick
 require('mini.extra').setup()
@@ -743,6 +833,7 @@ vim.keymap.set('n', '<leader>ff', function() require('mini.pick').builtin.files(
 vim.keymap.set('n', 'gff', function() require('mini.pick').builtin.files({ tool = "git" }, nil) end)
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
+vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
 
 -- TODO: Create custom picker so support cycling severity modes with e.g. <C-a> / <C-x>
 -- TODO: The 'all' option seems to only include open buffers. Custom implementation should include everything returned by `vim.diagnostic.get()`
@@ -753,6 +844,12 @@ vim.keymap.set('n', 'gfd', function()
     scope = "current", 
     sort_by = "severity",
     get_opts = { severity = vim.diagnostic.severity.ERROR },
+  }) end)
+vim.keymap.set('n', 'gfw', function() 
+  pick_diagnostics({
+    scope = "current", 
+    sort_by = "severity",
+    get_opts = { severity = { vim.diagnostic.severity.WARN, vim.diagnostic.severity.ERROR } },
   }) end)
 vim.keymap.set('n', 'gfD', function() 
   pick_diagnostics({ 
