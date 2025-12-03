@@ -554,6 +554,41 @@ pick.registry.oldfiles = function()
   pick.start({ source = { items = existing } })
 end
 
+-- Pick Changelist
+pick.registry.pick_changelist = function()
+  local changelist = vim.fn.getchangelist()
+  local changes = changelist[1]
+
+  local items = {}
+  local added = {}
+  for i, change in ipairs(changes) do 
+    local ok, lines = pcall(vim.api.nvim_buf_get_lines, vim.fn.bufnr(), change.lnum - 1, change.lnum, true)
+    if ok and lines[1] then 
+      if not added[change.lnum] then
+        added[change.lnum] = true
+        where = ":" .. change.lnum
+        items[#items + 1] = { path = vim.fn.bufname(), where= where, lnum = change.lnum, col = change.col, text = lines[1] }
+      end
+    end
+  end
+
+  for i = 1, #items/2, 1 do
+    items[i], items[#items-i+1] = items[#items-i+1], items[i]
+  end
+
+  local linewidth = 0
+  for _, item in ipairs(items) do
+    if #item.where > linewidth then linewidth = #item.where end
+  end
+
+  for _, item in ipairs(items) do
+    item.text = rpad("" .. item.lnum, linewidth, " ") .. " │ " .. item.text
+  end
+
+  pick.start({ source = { items = items } })
+
+end
+
 -- Pick Jumplist {{{2
 
 -- navigate the jump list
@@ -611,7 +646,7 @@ pick.registry.pick_jumplist = function()
   end
 
   for _, item in ipairs(items) do
-    item.text = lpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
+    item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
   end
 
   pick.start({ source = { items = items } })
@@ -834,6 +869,7 @@ vim.keymap.set('n', 'gff', function() require('mini.pick').builtin.files({ tool 
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
+vim.keymap.set('n', 'gfx', "<cmd>Pick pick_changelist<CR>")
 
 -- TODO: Create custom picker so support cycling severity modes with e.g. <C-a> / <C-x>
 -- TODO: The 'all' option seems to only include open buffers. Custom implementation should include everything returned by `vim.diagnostic.get()`
