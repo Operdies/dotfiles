@@ -554,7 +554,7 @@ pick.registry.oldfiles = function()
   pick.start({ source = { items = existing } })
 end
 
--- Pick Changelist
+-- Pick Changelist {{{2
 pick.registry.pick_changelist = function()
   local changelist = vim.fn.getchangelist()
   local changes = changelist[1]
@@ -596,6 +596,7 @@ pick.registry.pick_jumplist = function()
   local jumplist = vim.fn.getjumplist()
   local jumps = jumplist[1]
   local position = jumplist[2]
+  local position_index = 0
 
   local items = {}
   for i, jump in ipairs(jumps) do 
@@ -626,7 +627,7 @@ pick.registry.pick_jumplist = function()
           end
           where = "…" .. where:sub(cutoff) 
         end
-        items[#items + 1] = { index = i, offset = offset, path = bufname, where = where, lnum = jump.lnum, col = jump.col, summary = text, offset = offset, text = text }
+        items[#items + 1] = { path = bufname, lnum = jump.lnum, col = jump.col, text = text, offset = offset, where = where }
       end
     end
   end
@@ -636,7 +637,8 @@ pick.registry.pick_jumplist = function()
   end
 
   local columns = { 0, 0 }
-  for _, item in ipairs(items) do
+  for i, item in ipairs(items) do
+    if item.offset == 0 then position_index = i end
     local index = "" .. item.offset
     local i_width = vim.fn.strwidth(index)
     if columns[1] < i_width then columns[1] = i_width end
@@ -649,8 +651,40 @@ pick.registry.pick_jumplist = function()
     item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
   end
 
-  pick.start({ source = { items = items } })
+  local choice = function(item)
+    if item.offset == 0 then return end
+    vim.api.nvim_win_call(pick.get_picker_state().windows.target,
+      function()
+        local old = string.char(string.byte('O') - 64)
+        local new = string.char(string.byte('I') - 64)
+        local dir = old
+        if item.offset < 0 then dir = new end
+        local cmd = item.offset .. dir
+        vim.cmd("normal! " .. cmd)
+      end)
+  end
 
+  -- I was not able to find a good way to set the default picker index,
+  -- so instead we define a custom 'show' function which sets the index 
+  -- the first time it is called.
+  local did_set = false
+  local pick_set_index_hack = function(buf, items, query)
+    if position_index > 0 and not did_set then
+      did_set = true 
+      local m = pick.get_picker_matches()
+      local indices = m.all_inds
+      pick.set_picker_match_inds({indices[position_index]}, "current")
+    end
+    local lines = vim.tbl_map(function(x) return x.text end, items)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  end
+
+  local pick_opts = { options = { content_from_bottom = true } }
+  local opts = {
+    options = { content_from_bottom = true },
+    source = { name = "Jump", items = items, choose = choice, show = pick_set_index_hack } 
+  }
+  pick.start(opts)
 end
 
 -- TOOD: Pick Tabs {{{2
