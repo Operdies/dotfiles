@@ -551,7 +551,7 @@ pick.registry.oldfiles = function()
       end
     end
   end
-  pick.start({ source = { items = existing } })
+  pick.start({ source = { items = existing, name = "Old Files" } })
 end
 
 -- Pick Changelist {{{2
@@ -624,7 +624,7 @@ pick.registry.pick_changelist = function()
 
   local opts = {
     options = { content_from_bottom = false },
-    source = { name = "change", items = items, choose = choice, show = pick_set_index_hack } 
+    source = { name = "Change", items = items, choose = choice, show = pick_set_index_hack } 
   }
   pick.start(opts)
 end
@@ -725,11 +725,6 @@ pick.registry.pick_jumplist = function()
   }
   pick.start(opts)
 end
-
--- TOOD: Pick Tabs {{{2
-pick.registry.custom_tabs = function()
-end
-vim.keymap.set('n', 'gfT', function() require('mini.pick').builtin.files({ tool = "git" }, nil) end)
 
 -- Required for lsp pick
 require('mini.extra').setup()
