@@ -1275,7 +1275,7 @@ local lazygit = require("toggleterm.terminal").Terminal:new({
   direction = "float",
   on_open = function(term)
     vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-q>", '<cmd>close<cr>', { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-'>", '<cmd>close<cr>', { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-\\>", '<cmd>close<cr>', { noremap = true, silent = true })
   end,
 })
 vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "lazygit" })
