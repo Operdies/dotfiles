@@ -1386,9 +1386,9 @@ dap_ui.setup({
   layouts = { {
       elements = {
         -- { id = "watches", size = 0.10, },
-        -- { id = "breakpoints", size = 0.15, },
-        { id = "stacks", size = 0.50, },
-        { id = "scopes", size = 0.50, }, 
+        { id = "breakpoints", size = 0.20, },
+        { id = "stacks", size = 0.40, },
+        { id = "scopes", size = 0.40, }, 
       },
       position = "left",
       size = 40,
@@ -1413,10 +1413,16 @@ local function dap_toggle_layout(layout)
   dap_ui.open(layout)
 end
 
-dap.listeners.before.attach.dapui_config = function() dap_ui.open(dap_layouts) end
-dap.listeners.before.launch.dapui_config = function() dap_ui.open(dap_layouts) end
-dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close(dap_layouts) end
-dap.listeners.before.event_exited.dapui_config = function() dap_ui.close(dap_layouts) end
+local function dap_open() 
+  for _, l in ipairs(dap_layouts) 
+    do dap_ui.open(l) 
+  end
+end
+
+dap.listeners.before.attach.dapui_config = dap_open
+dap.listeners.before.launch.dapui_config = dap_open
+dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() end
+dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
 
 -- dap keybinds {{{2
 
