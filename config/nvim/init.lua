@@ -1398,7 +1398,7 @@ dap_ui.setup({
       position = "left",
       size = 40,
     }, {
-      elements = { { id = "console", size = 1.0 }, },
+      elements = { { id = "repl", size = 0.5 }, { id = "console", size = 0.5 }, },
       position = "bottom",
       size = 10,
     }
