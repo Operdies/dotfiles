@@ -622,9 +622,8 @@ pick.registry.pick_changelist = function()
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   end
 
-  local pick_opts = { options = { content_from_bottom = true } }
   local opts = {
-    options = { content_from_bottom = true },
+    options = { content_from_bottom = false },
     source = { name = "change", items = items, choose = choice, show = pick_set_index_hack } 
   }
   pick.start(opts)
@@ -720,9 +719,8 @@ pick.registry.pick_jumplist = function()
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   end
 
-  local pick_opts = { options = { content_from_bottom = true } }
   local opts = {
-    options = { content_from_bottom = true },
+    options = { content_from_bottom = false },
     source = { name = "Jump", items = items, choose = choice, show = pick_set_index_hack } 
   }
   pick.start(opts)
