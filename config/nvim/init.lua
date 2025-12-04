@@ -944,6 +944,8 @@ vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
 vim.keymap.set('n', 'gf;', "<cmd>Pick pick_changelist<CR>")
+vim.keymap.set('n', '[t', '<cmd>tabp<cr>')
+vim.keymap.set('n', ']t', '<cmd>tabn<cr>')
 
 -- TODO: Create custom picker so support cycling severity modes with e.g. <C-a> / <C-x>
 -- TODO: The 'all' option seems to only include open buffers. Custom implementation should include everything returned by `vim.diagnostic.get()`
