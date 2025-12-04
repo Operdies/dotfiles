@@ -1391,9 +1391,9 @@ dap_ui.setup({
   layouts = { {
       elements = {
         { id = "watches", size = 0.10, },
-        { id = "breakpoints", size = 0.10, },
-        { id = "stacks", size = 0.10, },
-        { id = "scopes", size = 0.70, }, 
+        { id = "breakpoints", size = 0.15, },
+        { id = "stacks", size = 0.35, },
+        { id = "scopes", size = 0.40, }, 
       },
       position = "left",
       size = 40,
