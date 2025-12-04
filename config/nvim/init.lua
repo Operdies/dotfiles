@@ -1388,10 +1388,10 @@ local dap_ui = require('dapui')
 dap_ui.setup({
   layouts = { {
       elements = {
-        { id = "watches", size = 0.10, },
-        { id = "breakpoints", size = 0.15, },
-        { id = "stacks", size = 0.35, },
-        { id = "scopes", size = 0.40, }, 
+        -- { id = "watches", size = 0.10, },
+        -- { id = "breakpoints", size = 0.15, },
+        { id = "stacks", size = 0.50, },
+        { id = "scopes", size = 0.50, }, 
       },
       position = "left",
       size = 40,
@@ -1402,13 +1402,29 @@ dap_ui.setup({
     }
   },
 })
-dap.listeners.before.attach.dapui_config = function() dap_ui.open() end
-dap.listeners.before.launch.dapui_config = function() dap_ui.open() end
-dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() end
-dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
+
+local dap_layouts = { 1, 2 }
+local function dap_toggle_layout(layout)
+  for i, l in ipairs(dap_layouts) do
+    if l == layout then
+      dap_ui.close(layout)
+      table.remove(dap_layouts, i)
+      return
+    end
+  end
+  dap_layouts[#dap_layouts+1] = layout
+  dap_ui.open(layout)
+end
+
+dap.listeners.before.attach.dapui_config = function() dap_ui.open(dap_layouts) end
+dap.listeners.before.launch.dapui_config = function() dap_ui.open(dap_layouts) end
+dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close(dap_layouts) end
+dap.listeners.before.event_exited.dapui_config = function() dap_ui.close(dap_layouts) end
 
 -- dap keybinds {{{2
 
+vim.keymap.set('n', 'gt1', function() dap_toggle_layout(1) end)
+vim.keymap.set('n', 'gt2', function() dap_toggle_layout(2) end)
 vim.keymap.set('n', '<F1>', dap.run_last)
 vim.keymap.set('n', '<F2>', dap.terminate)
 vim.keymap.set('n', '<F4>', dap.up)
