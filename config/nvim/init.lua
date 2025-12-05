@@ -1314,23 +1314,26 @@ end
 local dap = require('dap')
 
 -- DAP External Terminal {{{2
--- If this is a tmux session, host 'external terminal' in a split
-if vim.fn.getenv("TMUX") ~= vim.NIL then
-  dap.defaults.fallback.external_terminal = {
-    command = vim.fn.exepath('tmux'),
-    args = { 
-      'split-window', -- create split in the same view
-      '-d',  -- don't focus the new split
-      '-h',  -- split horizontally
-      '-l', '80' -- the new split should take x columns
-    }
-  }
-  -- Otherwise host 'external terminal' in alacritty
-elseif vim.fn.executable('alacritty') == 1 then
-  dap.defaults.fallback.external_terminal = {
-    command = vim.fn.exepath('alacritty'),
-    args = { '-e' }
-  }
+local external_terminals = {
+  {
+    command = 'tmux', 
+    cond = function() return vim.fn.getenv("TMUX") ~= vim.NIL end, 
+    args = { 'split-window', '-d', '-h', '-l', '80' }
+  }, 
+  { command = 'alacritty', args = { '-e' } }, 
+  { command = 'ghostty', args = { '-e' } }, 
+}
+
+for _, term in ipairs(external_terminals) do
+  if term.cond == nil or term.cond() then
+    if vim.fn.executable(term.command) == 1 then
+      dap.defaults.fallback.external_terminal = {
+        command = term.command,
+        args = term.args,
+      }
+      break
+    end
+  end
 end
 
 -- TODO: {{{2
