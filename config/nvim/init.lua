@@ -915,10 +915,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- Open popup if closed, otherwise accept selected option
-vim.keymap.set('i', '<C-e>', "pumvisible() == 0 ? '<C-x><C-o>' : '<C-y>'", { expr = true, silent = true, noremap = true })
--- Abort completion if popup menu is active, otherwise fallback to default <C-a> behavior
-vim.keymap.set('i', '<C-a>', "pumvisible() == 0 ? '<C-G>u<C-a><C-G>u' : '<C-e>'", { expr = true, silent = true, noremap = true })
+-- set undo point before inserting text
+vim.keymap.set('i', '<C-a>', '<C-G>u<C-a><C-G>u', { silent = true, noremap = true })
 
 -- tab completion:
 -- snippet jump if snippet is active
