@@ -559,6 +559,8 @@ pick.registry.oldfiles = function()
 end
 
 -- Pick Changelist {{{2
+
+-- navigate the change list
 pick.registry.pick_changelist = function()
   local changelist = vim.fn.getchangelist()
   local changes = changelist[1]
@@ -602,6 +604,10 @@ pick.registry.pick_changelist = function()
     if item.offset == 0 then return end
     vim.api.nvim_win_call(pick.get_picker_state().windows.target,
       function()
+        if item.offset == 0 then
+          vim.cmd("normal! " .. item.lnum .. 'gg' .. item.col .. '|')
+          return
+        end
         local old = 'g;'
         local new = 'g,'
         local dir = old
@@ -671,7 +677,7 @@ pick.registry.pick_jumplist = function()
           end
           where = "…" .. where:sub(cutoff) 
         end
-        items[#items + 1] = { path = bufname, lnum = jump.lnum, col = jump.col, text = text, offset = offset, where = where }
+        items[#items + 1] = { path = bufname, lnum = jump.lnum, col = jump.col, text = text, offset = offset, where = where, bufnr = jump.bufnr }
       end
     end
   end
@@ -696,9 +702,14 @@ pick.registry.pick_jumplist = function()
   end
 
   local choice = function(item)
-    if item.offset == 0 then return end
     vim.api.nvim_win_call(pick.get_picker_state().windows.target,
       function()
+        if item.offset == 0 then 
+          vim.api.nvim_win_set_buf(0, item.bufnr)
+          vim.cmd("normal! " .. item.lnum .. 'gg' .. item.col .. '|')
+          return 
+        end
+
         local old = string.char(string.byte('O') - 64)
         local new = string.char(string.byte('I') - 64)
         local dir = old
