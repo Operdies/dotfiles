@@ -51,4 +51,4 @@ setopt HIST_SAVE_NO_DUPS
 # Save history immediately instead of waiting for session to end
 setopt INC_APPEND_HISTORY
 
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH:$HOME/.local/bin"
