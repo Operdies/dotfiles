@@ -92,6 +92,8 @@ vim.pack.add({
   { src = "https://github.com/nvim-mini/mini.pick" },
   -- more text objects
   { src = "https://github.com/echasnovski/mini.ai" },
+  -- multiline and repeatable fFtT
+  { src = "https://github.com/echasnovski/mini.jump" },
   -- provides parsers for most languages
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
   -- provides additional functions for manipulating syntax elements
@@ -475,6 +477,8 @@ require('quicker').setup(
   }
 )
 
+-- Mini.Jump {{{1
+require('mini.jump').setup({})
 -- Mini.Pick {{{1
 
 local pick = require('mini.pick')
