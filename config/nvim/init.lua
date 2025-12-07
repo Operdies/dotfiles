@@ -1394,6 +1394,23 @@ do
   dap.adapters.codelldb = c_adapter
   dap.adapters.cppvsdbg = c_adapter
   dap.adapters.cppdbg = c_adapter
+
+  local attach_pid = "Attach to Process"
+  dap.configurations.c = {{
+    name = attach_pid,
+    type = "cppdbg",
+    request = "attach",
+    pid = "${command:pickProcess}"
+  }}
+
+  dap.listeners.on_config[attach_pid] = function(config) 
+    if type(config.pid) == "string" then
+      local pid = tonumber(config.pid)
+      if pid then config.pid = pid end
+    end
+    return config
+  end
+
 end
 
 -- dap ui {{{2
