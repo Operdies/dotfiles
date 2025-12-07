@@ -660,12 +660,12 @@ pick.registry.pick_jumplist = function()
       local bufname = vim.fn.bufname(jump.bufnr)
       if bufname and bufname ~= "" then
         local ok, lines = pcall(vim.api.nvim_buf_get_lines, jump.bufnr, jump.lnum - 1, jump.lnum, true)
-        local text = bufname
+        local text = "<not loaded>"
         if ok and lines[1] then 
           text = lines[1]
         end
         local offset = position - i + 1
-        local where = friendly_path(bufname) .. ":" .. jump.lnum
+        local where = vim.fn.fnamemodify(bufname, ":t")
         local maxlen = 50
         if #where > maxlen then
           local cutoff = maxlen
@@ -674,8 +674,6 @@ pick.registry.pick_jumplist = function()
             -- this check is really lazy and will really fail all utf8 characters, but it's good enough
             local index = #where - maxlen + i
             local chr = where:sub(index, index)
-            -- print(vim.inspect({ path = where, iteration = i, index = index, char = chr }))
-            -- print(chr)
             if string.byte(chr) < 128 then
               cutoff = index
               break
@@ -692,7 +690,7 @@ pick.registry.pick_jumplist = function()
     items[i], items[#items-i+1] = items[#items-i+1], items[i]
   end
 
-  local columns = { 0, 0 }
+  local columns = { 0, 0, 0 }
   for i, item in ipairs(items) do
     if item.offset == 0 then position_index = i end
     local index = "" .. item.offset
@@ -701,10 +699,15 @@ pick.registry.pick_jumplist = function()
     local path = item.where
     local p_width = vim.fn.strwidth(path)
     if columns[2] < p_width then columns[2] = p_width end
+    local lnum = "" .. item.lnum
+    local l_width = vim.fn.strwidth(lnum)
+    if columns[3] < l_width then columns[3] = l_width end
   end
 
   for _, item in ipairs(items) do
-    item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
+    item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " 
+    .. lpad(item.where, columns[2], " ") .. rpad("" .. item.lnum, columns[3], " ") .. " │ "
+    .. item.text
   end
 
   -- Navigate directly to the specified location, creating a new entry in the jump stack
