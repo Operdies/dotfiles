@@ -968,6 +968,8 @@ vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
 vim.keymap.set('n', 'gf;', "<cmd>Pick pick_changelist<CR>")
+vim.keymap.set('n', 'gfc', "<cmd>Pick git_hunks<CR>")
+vim.keymap.set('n', 'gfb', "<cmd>Pick git_branches<CR>")
 vim.keymap.set('n', '[t', '<cmd>tabp<cr>')
 vim.keymap.set('n', ']t', '<cmd>tabn<cr>')
 
