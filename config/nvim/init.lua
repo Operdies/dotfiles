@@ -969,7 +969,6 @@ vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
 vim.keymap.set('n', 'gf;', "<cmd>Pick pick_changelist<CR>")
 vim.keymap.set('n', 'gfc', "<cmd>Pick git_hunks<CR>")
-vim.keymap.set('n', 'gfb', "<cmd>Pick git_branches<CR>")
 vim.keymap.set('n', '[t', '<cmd>tabp<cr>')
 vim.keymap.set('n', ']t', '<cmd>tabn<cr>')
 
@@ -1033,6 +1032,25 @@ vim.keymap.set('n', '<leader>fb', function()
     end
   end
   pick.builtin.buffers(pick_options, { mappings = { wipeout = { char = '<C-w>', func = pick_buffer_wipeout } } })
+end)
+
+-- vim.keymap.set('n', 'gfb', "<cmd>Pick git_branches<CR>")
+vim.keymap.set('n', 'gfb', function()
+  local switch_branch = function() 
+    local m = pick.get_picker_matches()
+    local parts = vim.split(m.current, " ", { plain = true, trimempty = true })
+    local branch = parts[1]
+    if branch == '*' then return true end
+    local origin = "remotes/origin/"
+    if vim.startswith(branch, origin) then
+      branch = branch:sub(#origin + 1)
+    end
+    if branch == 'HEAD' then return true end
+    vim.cmd("G switch " .. branch)
+    return true
+  end
+
+  require('mini.extra').pickers.git_branches(pick_options, { mappings = { switch = { char = '<CR>', func = switch_branch }}})
 end)
 
 vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
