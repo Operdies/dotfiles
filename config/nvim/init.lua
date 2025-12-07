@@ -600,21 +600,27 @@ pick.registry.pick_changelist = function()
     item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
   end
 
+  local jump_direct = function(item)
+    vim.cmd("normal! " .. item.lnum .. 'gg' .. item.col .. '|')
+  end
+
+  local jump_relative = function(item)
+    if item.offset == 0 then 
+      jump_direct(item) 
+      return 
+    end
+    local old = 'g;'
+    local new = 'g,'
+    local dir = old
+    if item.offset < 0 then dir = new end
+    local cmd = item.offset .. dir
+    vim.cmd("normal! " .. cmd)
+  end
+
+
   local choice = function(item)
     if item.offset == 0 then return end
-    vim.api.nvim_win_call(pick.get_picker_state().windows.target,
-      function()
-        if item.offset == 0 then
-          vim.cmd("normal! " .. item.lnum .. 'gg' .. item.col .. '|')
-          return
-        end
-        local old = 'g;'
-        local new = 'g,'
-        local dir = old
-        if item.offset < 0 then dir = new end
-        local cmd = item.offset .. dir
-        vim.cmd("normal! " .. cmd)
-      end)
+    vim.api.nvim_win_call(pick.get_picker_state().windows.target, function() jump_direct(item) end)
   end
 
   -- I was not able to find a good way to set the default picker index,
@@ -701,22 +707,29 @@ pick.registry.pick_jumplist = function()
     item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " .. lpad(item.where, columns[2], " ") .. " │ " .. item.text
   end
 
-  local choice = function(item)
-    vim.api.nvim_win_call(pick.get_picker_state().windows.target,
-      function()
-        if item.offset == 0 then 
-          vim.api.nvim_win_set_buf(0, item.bufnr)
-          vim.cmd("normal! " .. item.lnum .. 'gg' .. item.col .. '|')
-          return 
-        end
+  -- Navigate directly to the specified location, creating a new entry in the jump stack
+  local jump_direct = function(item)
+    vim.api.nvim_win_set_buf(0, item.bufnr)
+    vim.cmd("normal! " .. item.lnum .. 'gg' .. item.col .. '|')
+  end
 
-        local old = string.char(string.byte('O') - 64)
-        local new = string.char(string.byte('I') - 64)
-        local dir = old
-        if item.offset < 0 then dir = new end
-        local cmd = item.offset .. dir
-        vim.cmd("normal! " .. cmd)
-      end)
+  -- Navigate to the specified location by un- or re-winding the jump stack,
+  -- making the offset the current location
+  local jump_relative = function(item)
+    if item.offset == 0 then 
+      jump_direct(item)
+      return
+    end
+    local old = string.char(string.byte('O') - 64)
+    local new = string.char(string.byte('I') - 64)
+    local dir = old
+    if item.offset < 0 then dir = new end
+    local cmd = item.offset .. dir
+    vim.cmd("normal! " .. cmd)
+  end
+
+  local choice = function(item)
+    vim.api.nvim_win_call(pick.get_picker_state().windows.target, function() jump_direct(item) end)
   end
 
   -- I was not able to find a good way to set the default picker index,
