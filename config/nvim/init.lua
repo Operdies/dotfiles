@@ -1034,7 +1034,6 @@ vim.keymap.set('n', '<leader>fb', function()
   pick.builtin.buffers(pick_options, { mappings = { wipeout = { char = '<C-w>', func = pick_buffer_wipeout } } })
 end)
 
--- vim.keymap.set('n', 'gfb', "<cmd>Pick git_branches<CR>")
 vim.keymap.set('n', 'gfb', function()
   local switch_branch = function() 
     local m = pick.get_picker_matches()
@@ -1050,7 +1049,10 @@ vim.keymap.set('n', 'gfb', function()
     return true
   end
 
-  require('mini.extra').pickers.git_branches(pick_options, { mappings = { switch = { char = '<CR>', func = switch_branch }}})
+  require('mini.extra').pickers.git_branches(pick_options, 
+  { 
+    mappings = { switch = { char = '<CR>', func = switch_branch }}
+  })
 end)
 
 vim.keymap.set('n', '<leader>fr', "<cmd>Pick oldfiles<CR>")
@@ -1570,4 +1572,4 @@ do
 end
 
 -- Modeline {{{1
--- vim: fdm=marker
+-- vim: fdm=marker shiftwidth=2
