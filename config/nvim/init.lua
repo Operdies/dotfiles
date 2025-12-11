@@ -567,18 +567,22 @@ pick.registry.pick_changelist = function()
   local position = changelist[2]
   local position_index = 0
 
+  local duplicates = {}
   local items = {}
   for i, change in ipairs(changes) do 
-    local bufnr = vim.fn.bufnr()
-    local bufname = vim.fn.bufname(bufnr)
-    local ok, lines = pcall(vim.api.nvim_buf_get_lines, bufnr, change.lnum - 1, change.lnum, true)
-    local text = bufname
-    if ok and lines[1] then 
-      text = lines[1]
+    if not duplicates[change.lnum] then 
+      duplicates[change.lnum] = true
+      local bufnr = vim.fn.bufnr()
+      local bufname = vim.fn.bufname(bufnr)
+      local ok, lines = pcall(vim.api.nvim_buf_get_lines, bufnr, change.lnum - 1, change.lnum, true)
+      local text = bufname
+      if ok and lines[1] then 
+        text = lines[1]
+      end
+      local offset = position - i + 1
+      local where = "" .. change.lnum
+      items[#items + 1] = { path = bufname, lnum = change.lnum, col = change.col, text = text, offset = offset, where = where }
     end
-    local offset = position - i + 1
-    local where = "" .. change.lnum
-    items[#items + 1] = { path = bufname, lnum = change.lnum, col = change.col, text = text, offset = offset, where = where }
   end
 
   for i = 1, #items/2, 1 do
