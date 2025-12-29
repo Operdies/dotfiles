@@ -458,7 +458,40 @@ local overseer_options = {
     dap = true
   },
 }
-require('overseer').setup(overseer_options)
+
+local overseer = require('overseer')
+overseer.setup(overseer_options)
+overseer.register_template({
+  name = "shell",
+  generator = function(opts)
+    local files = require("overseer.files")
+    local base_dir = vim.fn.getcwd()
+    local scripts = vim.tbl_filter(function(filename)
+      return filename:match("%.sh$")
+    end, files.list_files(base_dir))
+    local ret = {}
+    for _, filename in ipairs(scripts) do
+      local task_name = vim.fn.fnamemodify(filename, ':t:r') .. " in " .. friendly_path(base_dir)
+      local fullpath = vim.fn.resolve(vim.fn.fnamemodify(filename, ':p'))
+      table.insert(ret, {
+        name = task_name,
+        builder = function(params)
+          return {
+            name = task_name,
+            cmd = { fullpath },
+            cwd = base_dir,
+            components = { 
+              { "restart_on_save", delay = 50, interrupt = true, mode = "autocmd", paths = { base_dir } },
+              "default"
+            }
+          }
+        end,
+      })
+    end
+    return ret
+  end,
+})
+
 vim.keymap.set('n', '<leader>rt', '<cmd>OverseerRun<cr>')
 vim.keymap.set('n', '<leader>rT', function()
   local win = vim.api.nvim_get_current_win()
