@@ -954,7 +954,28 @@ local prefer = function(preferred)
   end
 end
 
--- vim.lsp.enable({ "lua_ls" })
+vim.lsp.config('lua_ls', {
+  cmd = { 'lua-language-server' },
+  filetypes = { 'lua' },
+  -- Sets the "workspace" to the directory where any of these files is found.
+  root_markers = {
+    ".luarc.json",
+    ".luarc.jsonc",
+    ".luacheckrc",
+    ".stylua.toml",
+    ".git",
+  },
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      }
+    }
+  }
+})
+
+vim.lsp.enable({ "lua_ls" })
+
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local function bufmap(mode, l, r, opts)
@@ -964,7 +985,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
 
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    if client:supports_method('textDocument/completion') then
+    if client and client:supports_method('textDocument/completion') then
       local triggers = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.>'
 
       local chars = {}; triggers:gsub(".", function(c) table.insert(chars, c) end)
@@ -1395,6 +1416,12 @@ local external_terminals = {
     cond = function() return vim.fn.getenv("TMUX") ~= vim.NIL end, 
     args = { 'split-window', '-d', '-h', '-l', '80' }
   }, 
+  {
+    command = 'vv', 
+    cond = function() return vim.fn.getenv("VELVET") ~= vim.NIL end, 
+    args = { '--socket', vim.fn.getenv("VELVET"), 'notify', '--title', 'DAP External Terminal' }
+  },
+  { command = 'kitty', args = { '-e' } }, 
   { command = 'alacritty', args = { '-e' } }, 
   { command = 'ghostty', args = { '-e' } }, 
 }
@@ -1410,6 +1437,27 @@ for _, term in ipairs(external_terminals) do
     end
   end
 end
+
+local terminal_by_command = {}
+local function DapSetExternalTerminalComplete(arglead, cmdline, cursorpos)
+  local words = {}
+  for i, term in ipairs(external_terminals) do
+    if vim.startswith(term.command, arglead) then
+      if term.cond == nil or term.cond() then
+        if vim.fn.executable(term.command) == 1 then
+          table.insert(words, term.command)
+          terminal_by_command[term.command] = term
+        end
+      end
+    end
+  end
+  return words
+end
+
+vim.api.nvim_create_user_command('DapSetExternalTerminal', function(ctx) 
+  local term = terminal_by_command[ctx.args]
+  dap.defaults.fallback.external_terminal = { command = term.command, args = term.args }
+end, { nargs = 1, complete = DapSetExternalTerminalComplete })
 
 -- TODO: {{{2
 -- 1. Debug output goes to external console. Is this a:
