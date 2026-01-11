@@ -230,3 +230,81 @@ rmap("<C-x>g", zoom)
 o.display_damage = false
 o.focus_follows_mouse = true
 
+local function round(x)
+  if x >= 0 then
+    return math.floor(x + 0.5)
+  else
+    return math.ceil(x - 0.5)
+  end
+end
+
+local function animate(id, target, duration, done)
+  local start_time = vv.api.get_current_tick()
+  local geom = vv.api.get_window_geometry(id)
+  print(vv.inspect(geom))
+  local delta_x = target.left - geom.left
+  local delta_y = target.top - geom.top
+  local delta_w = target.width - geom.width
+  local delta_h = target.height - geom.height
+
+  local f = function() end
+  f = function() 
+    if not vv.api.is_window_valid(id) then return end
+    local elapsed = vv.api.get_current_tick() - start_time
+    if elapsed >= duration then 
+      vv.api.set_window_geometry(id, target)
+      if done then done() end
+      return 
+    end
+    local pct = elapsed / duration
+    local frame_geom = {
+      left = round(geom.left + delta_x * pct),
+      top = round(geom.top + delta_y * pct),
+      width = round(geom.width + delta_w * pct),
+      height = round(geom.height + delta_h * pct),
+    }
+    vv.api.set_window_geometry(id, frame_geom)
+    vv.api.schedule_after(5, f)
+  end
+  f()
+end
+
+local function translate(geom, x, y)
+  local new_geom = { width = geom.width, height = geom.height, left = geom.left + x, top = geom.top + y }
+  return new_geom
+end
+
+local function juggle()
+  local function func(win, initial_geometry, restore)
+    animate(win, { width = 50, height = 20, left = 100, top = 100 }, 1000, function()
+      animate(win, translate(vv.api.get_window_geometry(win), -100, -100), 1000, function()
+        animate(win, translate(vv.api.get_window_geometry(win), 100, 0), 1000, function()
+          animate(win, translate(vv.api.get_window_geometry(win), -100, 0), 1000, function()
+            animate(win, translate(vv.api.get_window_geometry(win), 50, 20), 1000, function()
+              animate(win, initial_geometry, 1000, function()
+                if restore then restore() end
+              end)
+            end)
+          end)
+        end)
+      end)
+    end)
+  end
+
+  local windows = vv.api.list_windows()
+  local delay = 0
+  for _, id in ipairs(windows) do
+    local initial_geom = vv.api.get_window_geometry(id)
+    local initial_layer = vv.api.get_layer(id)
+    vv.api.schedule_after(delay, function()
+      func(id, initial_geom, function()
+        vv.api.set_window_geometry(id, initial_geom)
+        vv.api.set_layer(id, initial_layer)
+      end)
+    end)
+    delay = delay + 500
+  end
+end
+
+vv.api.keymap_set("<C-x>ffff", juggle)
+vv.options.key_repeat_timeout = 500
