@@ -1,4 +1,5 @@
 local vv = require('velvet')
+local default_shell = os.getenv("SHELL") or "bash"
 local o = vv.options
 local home = os.getenv("HOME"):gsub("/$", "")
 local map = vv.api.keymap_set
@@ -19,6 +20,12 @@ local function set_view(view)
   end
   prev_view = o.view
   vv.api.set_view(bits)
+end
+
+local function enable_view(num)
+  local bits = num_to_tags(num)
+  prev_view = o.view
+  o.view = o.view | bits
 end
 
 local function restore_view()
@@ -51,10 +58,10 @@ local function toggle_tag(num)
   vv.api.set_tags(tags, 0)
 end
 
-
-map("<C-x>c", function() vv.api.spawn("zsh") end)
+rmap("<C-x>b", function() vv.api.spawn("bash") end)
+map("<C-x>c", function() vv.api.spawn(default_shell) end)
 map("<C-x>d", vv.api.detach)
-map("<C-x>K", vv.api.close_window)
+map("<C-x>K", function() vv.api.close_window(vv.api.get_focused_window()) end)
 map("<C-x>r", function() dofile(home .. "/.config/velvet/init.lua") end)
 
 rmap("<C-x>j", function() vv.api.spawn("bash") end)
@@ -274,14 +281,14 @@ local function translate(geom, x, y)
   return new_geom
 end
 
-local function juggle()
+local function juggle(duration)
   local function func(win, initial_geometry, restore)
-    animate(win, { width = 50, height = 20, left = 100, top = 100 }, 1000, function()
-      animate(win, translate(vv.api.get_window_geometry(win), -100, -100), 1000, function()
-        animate(win, translate(vv.api.get_window_geometry(win), 100, 0), 1000, function()
-          animate(win, translate(vv.api.get_window_geometry(win), -100, 0), 1000, function()
-            animate(win, translate(vv.api.get_window_geometry(win), 50, 20), 1000, function()
-              animate(win, initial_geometry, 1000, function()
+    animate(win, { width = 50, height = 20, left = 100, top = 100 }, duration, function()
+      animate(win, translate(vv.api.get_window_geometry(win), -100, -100), duration, function()
+        animate(win, translate(vv.api.get_window_geometry(win), 100, 0), duration, function()
+          animate(win, translate(vv.api.get_window_geometry(win), -100, 0), duration, function()
+            animate(win, translate(vv.api.get_window_geometry(win), 50, 20), duration, function()
+              animate(win, initial_geometry, duration, function()
                 if restore then restore() end
               end)
             end)
@@ -302,9 +309,38 @@ local function juggle()
         vv.api.set_layer(id, initial_layer)
       end)
     end)
-    delay = delay + 500
+    delay = delay + 100
   end
 end
 
-vv.api.keymap_set("<C-x>ffff", juggle)
+vv.api.keymap_set("<C-x>ffff", function() juggle(2000) end)
 vv.options.key_repeat_timeout = 500
+
+local function set_geom_as_title(id)
+  local geom = vv.api.get_window_geometry(id)
+  vv.api.window_set_title(id, ("%dx%d+%d+%d"):format(geom.width, geom.height, geom.left, geom.top))
+end
+
+local grp = vv.events.create_group("stuff", true)
+local ev = vv.events
+ev.subscribe(grp, ev.window.moved, set_geom_as_title)
+ev.subscribe(grp, ev.window.resized, set_geom_as_title)
+ev.subscribe(grp, ev.screen.resized, function() 
+  local geom = vv.api.get_terminal_geometry()
+  print(vv.inspect({ screen_size = geom }))
+end)
+ev.subscribe(grp, ev.window.created, function(id) 
+  local title = vv.api.window_get_title(id)
+  if title == 'DAP External Terminal' then 
+    local tags = num_to_tags(9)
+    vv.api.set_tags(tags, id)
+    enable_view(9)
+  end
+end)
+
+
+-- vv.subscribe(vv.events.window.created, function(id)
+--   vv.api.set_layer(id, "floating")
+--   local geom = { width = 100, height = 7, left = 9, top = 3 }
+--   vv.api.set_window_geometry(id, geom)
+-- end)

@@ -1419,7 +1419,7 @@ local external_terminals = {
   {
     command = 'vv', 
     cond = function() return vim.fn.getenv("VELVET") ~= vim.NIL end, 
-    args = { '--socket', vim.fn.getenv("VELVET"), 'notify', '--title', 'DAP External Terminal' }
+    args = { '--socket', vim.fn.getenv("VELVET"), 'spawn', '--title', 'DAP External Terminal' }
   },
   { command = 'kitty', args = { '-e' } }, 
   { command = 'alacritty', args = { '-e' } }, 
