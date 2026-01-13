@@ -148,8 +148,22 @@ local function round(x)
   end
 end
 
+local easing = {
+  overshoot = function(t)
+    local s = 1.70158
+    return 1 + (((t - 1) * (t - 1)) * ((s + 1) * (t - 1) + s))
+  end,
+  linear = function(t) return t end,
+  spring = function(t)
+    local w = 8
+    local x = 1.0 - (1.0 + w * t) * math.exp(-w * t)
+    local norm = 1.0 - (1.0 + w) * math.exp(-w)
+    return x / norm
+  end,
+}
+
 local animating = {}
-local function animate(id, target, duration, done)
+local function animate(id, target, duration, opts)
   if animating[id] then return end
   animating[id] = true
 
@@ -159,6 +173,8 @@ local function animate(id, target, duration, done)
   local delta_y = target.top - geom.top
   local delta_w = target.width - geom.width
   local delta_h = target.height - geom.height
+
+  local ease = opts.easing_function or easing.linear
 
   local f = function() end
   f = function()
@@ -170,10 +186,10 @@ local function animate(id, target, duration, done)
     if elapsed >= duration then
       animating[id] = nil
       vv.api.window_set_geometry(id, target)
-      if done then done() end
+      if opts.done then opts.done() end
       return
     end
-    local pct = elapsed / duration
+    local pct = ease(elapsed / duration)
     local frame_geom = {
       left = round(geom.left + delta_x * pct),
       top = round(geom.top + delta_y * pct),
@@ -263,8 +279,8 @@ local function swap(a, b)
         vv.api.window_set_layer(b, l1)
       end
     end
-    animate(a, g2, 1000, done)
-    animate(b, g1, 1000, done)
+    animate(a, g2, 200, { easing_function = easing.spring, done = done })
+    animate(b, g1, 200, { easing_function = easing.spring, done = done })
     vv.api.swap_windows(a, b)
   end
 end
@@ -303,25 +319,45 @@ o.display_damage = false
 o.focus_follows_mouse = true
 
 local function translate(geom, x, y)
-  local new_geom = { width = geom.width, height = geom.height, left = geom.left + x, top = geom.top + y }
+  local new_geom = { width = geom.width, height = geom.height, left = geom.left + round(x), top = geom.top + round(y) }
+  return new_geom
+end
+local function scale(geom, x, y)
+  local new_geom = { width = round(geom.width * x), height = round(geom.height * y), left = geom.left, top = geom.top }
   return new_geom
 end
 
 local function juggle(duration)
+  local geom = vv.api.get_terminal_geometry()
   local function func(win, initial_geometry, restore)
-    animate(win, { width = 50, height = 20, left = 100, top = 100 }, duration, function()
-      animate(win, translate(vv.api.window_get_geometry(win), -100, -100), duration, function()
-        animate(win, translate(vv.api.window_get_geometry(win), 200, 0), duration, function()
-          animate(win, translate(vv.api.window_get_geometry(win), -200, 0), duration, function()
-            animate(win, translate(vv.api.window_get_geometry(win), 500, 50), duration, function()
-              animate(win, initial_geometry, duration, function()
-                if restore then restore() end
-              end)
-            end)
-          end)
-        end)
-      end)
-    end)
+    animate(win, { width = round(geom.width * 0.3), height = round(geom.height * 0.3), left = 10, top = 10 }, duration, {
+      easing_function = easing.overshoot,
+      done = function()
+        animate(win, translate(vv.api.window_get_geometry(win), geom.width * 0.5, 0), duration, {
+          easing_function = easing.spring,
+          done = function()
+            animate(win, scale(vv.api.window_get_geometry(win), 3, 3), duration, {
+              easing_function = easing.overshoot,
+              done = function()
+                animate(win,
+                  translate(scale(vv.api.window_get_geometry(win), 0.7, 0.7), -geom.width * 0.3, -geom.height * 0.3),
+                  duration, {
+                  easing_function = easing.linear,
+                  done = function()
+                    animate(win, initial_geometry, duration, {
+                      easing_function = easing.spring,
+                      done = function()
+                        if restore then restore() end
+                      end
+                    })
+                  end
+                })
+              end
+            })
+          end
+        })
+      end
+    })
   end
 
   local windows = vv.api.get_windows()
@@ -335,11 +371,11 @@ local function juggle(duration)
         vv.api.window_set_layer(id, initial_layer)
       end)
     end)
-    delay = delay + 100
+    delay = delay + 200
   end
 end
 
-vv.api.keymap_set("<C-x>ffff", function() juggle(2000) end)
+vv.api.keymap_set("<C-x>ffff", function() juggle(1700) end)
 vv.options.key_repeat_timeout = 500
 
 local function set_geom_as_title(id)
