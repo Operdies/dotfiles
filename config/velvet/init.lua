@@ -42,7 +42,7 @@ local function set_tags(tags)
   for _, num in ipairs(tags) do
     bits = bits | num_to_tags(num)
   end
-  vv.api.set_tags(bits, 0)
+  vv.api.window_set_tags(vv.api.get_focused_window(), bits)
 end
 
 local function toggle_view(num)
@@ -53,18 +53,20 @@ local function toggle_view(num)
 end
 
 local function toggle_tag(num)
-  local tags = vv.api.get_tags(0)
+  local tags = vv.api.window_get_tags(vv.api.get_focused_window())
   tags = tags ~ num_to_tags(num)
-  vv.api.set_tags(tags, 0)
+  vv.api.window_set_tags(0, tags)
 end
 
-rmap("<C-x>b", function() vv.api.spawn("bash") end)
-map("<C-x>c", function() vv.api.spawn(default_shell) end)
-map("<C-x>d", vv.api.detach)
-map("<C-x>K", function() vv.api.close_window(vv.api.get_focused_window()) end)
+local function spawn(cmd) return vv.api.window_create_process(cmd) end
+
+rmap("<C-x>b", function() spawn("bash") end)
+map("<C-x>c", function() vv.api.window_create_process(default_shell) end)
+map("<C-x>d", function() vv.api.session_detach(vv.api.get_active_session()) end)
+map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 map("<C-x>r", function() dofile(home .. "/.config/velvet/init.lua") end)
 
-rmap("<C-x>j", function() vv.api.spawn("bash") end)
+rmap("<C-x>j", function() spawn("bash") end)
 
 for i = 1, 9 do
   map(("<C-x>%d"):format(i), function() toggle_tag(i) end)
@@ -81,11 +83,11 @@ map("<M-`>", restore_view)
 local function resize_focus(x, y)
   local id = vv.api.get_focused_window()
   if id then
-    local geom = vv.api.get_window_geometry(id)
+    local geom = vv.api.window_get_geometry(id)
     if geom then
       geom.width = geom.width + x
       geom.height = geom.height + y
-      vv.api.set_window_geometry(id, geom)
+      vv.api.window_set_geometry(id, geom)
     end
   end
 end
@@ -93,11 +95,11 @@ end
 local function move_focus(x, y)
   local id = vv.api.get_focused_window()
   if id then
-    local geom = vv.api.get_window_geometry(id)
+    local geom = vv.api.window_get_geometry(id)
     if geom then
       geom.left = geom.left + x
       geom.top = geom.top + y
-      vv.api.set_window_geometry(id, geom)
+      vv.api.window_set_geometry(id, geom)
     end
   end
 end
@@ -134,20 +136,66 @@ map("<M-down>", function()
   move_focus(0, 1)
 end)
 
-map("<C-x>t", function() vv.api.set_layer(vv.api.get_focused_window(), "tiled") end)
-map("<C-x>f", function() vv.api.set_layer(vv.api.get_focused_window(), "floating") end)
+map("<C-x>t", function() vv.api.window_set_layer(vv.api.get_focused_window(), "tiled") end)
+map("<C-x>f", function() vv.api.window_set_layer(vv.api.get_focused_window(), "floating") end)
 map("<C-x><C-x>", function() vv.api.window_send_keys(vv.api.get_focused_window(), "<C-x>") end)
 
+local function round(x)
+  if x >= 0 then
+    return math.floor(x + 0.5)
+  else
+    return math.ceil(x - 0.5)
+  end
+end
+
+local animating = {}
+local function animate(id, target, duration, done)
+  if animating[id] then return end
+  animating[id] = true
+
+  local start_time = vv.api.get_current_tick()
+  local geom = vv.api.window_get_geometry(id)
+  local delta_x = target.left - geom.left
+  local delta_y = target.top - geom.top
+  local delta_w = target.width - geom.width
+  local delta_h = target.height - geom.height
+
+  local f = function() end
+  f = function()
+    if not vv.api.window_is_valid(id) then
+      animating[id] = nil
+      return
+    end
+    local elapsed = vv.api.get_current_tick() - start_time
+    if elapsed >= duration then
+      animating[id] = nil
+      vv.api.window_set_geometry(id, target)
+      if done then done() end
+      return
+    end
+    local pct = elapsed / duration
+    local frame_geom = {
+      left = round(geom.left + delta_x * pct),
+      top = round(geom.top + delta_y * pct),
+      width = round(geom.width + delta_w * pct),
+      height = round(geom.height + delta_h * pct),
+    }
+    vv.api.window_set_geometry(id, frame_geom)
+    vv.api.schedule_after(5, f)
+  end
+  f()
+end
+
 local function window_visible(id)
-  return (vv.api.get_tags(id) & o.view) > 0
+  return (vv.api.window_get_tags(id) & o.view) > 0
 end
 
 local function window_tiled(id)
-  return vv.api.get_layer(id) == "tiled"
+  return vv.api.window_get_layer(id) == "tiled"
 end
 
 local function get_prev_matching(id, match)
-  local windows = vv.api.list_windows()
+  local windows = vv.api.get_windows()
   local pivot = -1
   for i, win in ipairs(windows) do
     if win == id then
@@ -155,7 +203,7 @@ local function get_prev_matching(id, match)
       break
     end
   end
-  for i=#windows-1,0,-1 do 
+  for i=#windows-1,0,-1 do
     local index = 1 + ((i + pivot) % (#windows))
     if match(windows[index]) then return windows[index] end
   end
@@ -163,7 +211,7 @@ local function get_prev_matching(id, match)
 end
 
 local function get_first_matching(match)
-  local windows = vv.api.list_windows()
+  local windows = vv.api.get_windows()
   for _, id in ipairs(windows) do 
     if match(id) then return id end
   end
@@ -171,7 +219,7 @@ local function get_first_matching(match)
 end
 
 local function get_next_matching(id, match)
-  local windows = vv.api.list_windows()
+  local windows = vv.api.get_windows()
   local pivot = -1
   for i, win in ipairs(windows) do
     if win == id then
@@ -179,40 +227,50 @@ local function get_next_matching(id, match)
       break
     end
   end
-  for i=1,#windows do 
+  for i=1,#windows do
     local index = 1 + ((i + pivot) % (#windows))
     if match(windows[index]) then return windows[index] end
   end
   return nil
 end
 
-local function focus_next() 
+local function focus_next()
   local current = vv.api.get_focused_window()
   local next = get_next_matching(current, window_visible)
   if next then vv.api.set_focused_window(next) end
 end
 
-local function focus_prev() 
+local function focus_prev()
   local current = vv.api.get_focused_window()
   local prev = get_prev_matching(current, window_visible)
   if prev then vv.api.set_focused_window(prev) end
 end
 
 local function swap(a, b)
-  if a and b and a ~= b then 
+  if animating[a] or animating[b] then return end
+  if a and b and a ~= b then
+    local l1 = vv.api.window_get_layer(a)
+    local l2 = vv.api.window_get_layer(b)
+    local g1 = vv.api.window_get_geometry(a)
+    local g2 = vv.api.window_get_geometry(b)
+    animate(a, g2, 200, nil)
+    animate(b, g1, 200, function()
+      vv.api.window_set_layer(a, l2)
+      vv.api.window_set_layer(b, l1)
+    end)
     vv.api.swap_windows(a, b)
   end
 end
 
 local function swap_prev()
   local current = vv.api.get_focused_window()
-  local prev = get_prev_matching(current, function(w) return window_visible(w) and window_tiled(w) end)
+  local prev = get_prev_matching(current, function(w) return window_visible(w) end)
   swap(current, prev)
 end
 
 local function swap_next()
   local current = vv.api.get_focused_window()
-  local next = get_next_matching(current, function(w) return window_visible(w) and window_tiled(w) end)
+  local next = get_next_matching(current, function(w) return window_visible(w) end)
   swap(current, next)
 end
 
@@ -222,7 +280,7 @@ local function zoom()
     return window_visible(w) and window_tiled(w) and w ~= current
   end)
   swap(current, next)
-  local first_tiled = get_first_matching(function(w) return window_visible(w) and window_tiled(w) end)
+  local first_tiled = get_first_matching(function(w) return w == current or w == next end)
   if first_tiled then
     vv.api.set_focused_window(first_tiled)
   end
@@ -237,45 +295,6 @@ rmap("<C-x>g", zoom)
 o.display_damage = false
 o.focus_follows_mouse = true
 
-local function round(x)
-  if x >= 0 then
-    return math.floor(x + 0.5)
-  else
-    return math.ceil(x - 0.5)
-  end
-end
-
-local function animate(id, target, duration, done)
-  local start_time = vv.api.get_current_tick()
-  local geom = vv.api.get_window_geometry(id)
-  print(vv.inspect(geom))
-  local delta_x = target.left - geom.left
-  local delta_y = target.top - geom.top
-  local delta_w = target.width - geom.width
-  local delta_h = target.height - geom.height
-
-  local f = function() end
-  f = function() 
-    if not vv.api.is_window_valid(id) then return end
-    local elapsed = vv.api.get_current_tick() - start_time
-    if elapsed >= duration then 
-      vv.api.set_window_geometry(id, target)
-      if done then done() end
-      return 
-    end
-    local pct = elapsed / duration
-    local frame_geom = {
-      left = round(geom.left + delta_x * pct),
-      top = round(geom.top + delta_y * pct),
-      width = round(geom.width + delta_w * pct),
-      height = round(geom.height + delta_h * pct),
-    }
-    vv.api.set_window_geometry(id, frame_geom)
-    vv.api.schedule_after(5, f)
-  end
-  f()
-end
-
 local function translate(geom, x, y)
   local new_geom = { width = geom.width, height = geom.height, left = geom.left + x, top = geom.top + y }
   return new_geom
@@ -284,10 +303,10 @@ end
 local function juggle(duration)
   local function func(win, initial_geometry, restore)
     animate(win, { width = 50, height = 20, left = 100, top = 100 }, duration, function()
-      animate(win, translate(vv.api.get_window_geometry(win), -100, -100), duration, function()
-        animate(win, translate(vv.api.get_window_geometry(win), 100, 0), duration, function()
-          animate(win, translate(vv.api.get_window_geometry(win), -100, 0), duration, function()
-            animate(win, translate(vv.api.get_window_geometry(win), 50, 20), duration, function()
+      animate(win, translate(vv.api.window_get_geometry(win), -100, -100), duration, function()
+        animate(win, translate(vv.api.window_get_geometry(win), 200, 0), duration, function()
+          animate(win, translate(vv.api.window_get_geometry(win), -200, 0), duration, function()
+            animate(win, translate(vv.api.window_get_geometry(win), 500, 50), duration, function()
               animate(win, initial_geometry, duration, function()
                 if restore then restore() end
               end)
@@ -298,15 +317,15 @@ local function juggle(duration)
     end)
   end
 
-  local windows = vv.api.list_windows()
+  local windows = vv.api.get_windows()
   local delay = 0
   for _, id in ipairs(windows) do
-    local initial_geom = vv.api.get_window_geometry(id)
-    local initial_layer = vv.api.get_layer(id)
+    local initial_geom = vv.api.window_get_geometry(id)
+    local initial_layer = vv.api.window_get_layer(id)
     vv.api.schedule_after(delay, function()
       func(id, initial_geom, function()
-        vv.api.set_window_geometry(id, initial_geom)
-        vv.api.set_layer(id, initial_layer)
+        vv.api.window_set_geometry(id, initial_geom)
+        vv.api.window_set_layer(id, initial_layer)
       end)
     end)
     delay = delay + 100
@@ -317,14 +336,14 @@ vv.api.keymap_set("<C-x>ffff", function() juggle(2000) end)
 vv.options.key_repeat_timeout = 500
 
 local function set_geom_as_title(id)
-  local geom = vv.api.get_window_geometry(id)
-  vv.api.window_set_title(id, ("%dx%d+%d+%d"):format(geom.width, geom.height, geom.left, geom.top))
+  local geom = vv.api.window_get_geometry(id)
+  -- vv.api.window_set_title(id, ("%dx%d+%d+%d"):format(geom.width, geom.height, geom.left, geom.top))
 end
 
 local grp = vv.events.create_group("stuff", true)
 local ev = vv.events
-ev.subscribe(grp, ev.window.moved, set_geom_as_title)
-ev.subscribe(grp, ev.window.resized, set_geom_as_title)
+-- ev.subscribe(grp, ev.window.moved, set_geom_as_title)
+-- ev.subscribe(grp, ev.window.resized, set_geom_as_title)
 ev.subscribe(grp, ev.screen.resized, function() 
   local geom = vv.api.get_terminal_geometry()
   print(vv.inspect({ screen_size = geom }))
@@ -333,14 +352,14 @@ ev.subscribe(grp, ev.window.created, function(id)
   local title = vv.api.window_get_title(id)
   if title == 'DAP External Terminal' then 
     local tags = num_to_tags(9)
-    vv.api.set_tags(tags, id)
+    vv.api.window_set_tags(id, tags)
     enable_view(9)
   end
 end)
 
 
 -- vv.subscribe(vv.events.window.created, function(id)
---   vv.api.set_layer(id, "floating")
+--   vv.api.window_set_layer(id, "floating")
 --   local geom = { width = 100, height = 7, left = 9, top = 3 }
---   vv.api.set_window_geometry(id, geom)
+--   vv.api.window_set_geometry(id, geom)
 -- end)
