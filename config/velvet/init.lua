@@ -253,11 +253,18 @@ local function swap(a, b)
     local l2 = vv.api.window_get_layer(b)
     local g1 = vv.api.window_get_geometry(a)
     local g2 = vv.api.window_get_geometry(b)
-    animate(a, g2, 200, nil)
-    animate(b, g1, 200, function()
-      vv.api.window_set_layer(a, l2)
-      vv.api.window_set_layer(b, l1)
-    end)
+
+    local i = 2
+    -- only set window layers after both windows were fully moved
+    local done = function()
+      i = i - 1
+      if i == 0 then
+        vv.api.window_set_layer(a, l2)
+        vv.api.window_set_layer(b, l1)
+      end
+    end
+    animate(a, g2, 1000, done)
+    animate(b, g1, 1000, done)
     vv.api.swap_windows(a, b)
   end
 end
