@@ -11,6 +11,8 @@ map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 
 map("<C-x>r", function() 
   package.loaded['velvet.default_config'] = nil
+  package.loaded['velvet.events'] = nil
+  vv.events = require('velvet.events')
   dofile(home .. "/.config/velvet/init.lua") 
 end)
 
