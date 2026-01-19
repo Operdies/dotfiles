@@ -12,108 +12,128 @@ map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 map("<C-x>r", function() 
   package.loaded['velvet.default_config'] = nil
   package.loaded['velvet.events'] = nil
+  package.loaded['velvet.window'] = nil
+  package.loaded['velvet.layout.dwm'] = nil
   vv.events = require('velvet.events')
+
+  for _, id in ipairs(vv.api.get_windows()) do
+    if vv.api.window_is_lua(id) then pcall(vv.api.window_close, id) end
+  end
   dofile(home .. "/.config/velvet/init.lua") 
 end)
 
-local function round(x)
-  if x >= 0 then
-    return math.floor(x + 0.5)
-  else
-    return math.ceil(x - 0.5)
+-- Found at https://emojicombos.com/coffee-ascii-art
+local coffee_frames = {[[
+                  ⢀
+                  ⡼
+                 ⣼⠇
+                ⠰⡏
+                ⢰⡇
+                ⢸⣷⡀
+                 ⢿⣷⡀
+               ⢀ ⠈⢻⣿⣄
+               ⠈⢆  ⠙⣿⣆
+                 ⢧  ⠘⢿⣇
+                 ⣸⡆  ⠘⣿⡀
+                ⣰⣿⠃   ⣿⠇
+               ⣼⣿⠃    ⡿⠁
+               ⣿⡏⣀⣀⣀ ⡜
+       ⣀⡤⠤⠒⠒⠋⠉⠉⠻⣧   ⠈⠉⠁   ⠢⢄
+      ⣾⣿    ⣀⣀⣀⣀⣤⣽⣦⣄⣀⣀⣀⣀    ⢹
+      ⣿⣿⣿⠷⠾⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠶⠚
+      ⢿⣿⡏      ⠈⠉⠉⠉⠉⠉⠉       ⣸⠛⠻⣷
+      ⠸⣿⣧                   ⢀⠃ ⢠⣿⠇
+       ⣹⣿⡆                 ⢠⣎⣠⣴⠿⠃
+ ⢀⣠⠔⠒⠈⠉ ⠹⣿⣄               ⣠⠾⠛⠛⠉⠒⠢⣄
+ ⣿⡁      ⠈⢻⣦⡀           ⣀⣾⡃       ⡟
+ ⠙⠻⣶⣀      ⠈⠙⠲⠦⣤⣄⣀⣀⣀⣤⣤⣾⣯⡵⠞⠋   ⣀⠟
+    ⠉⠛⠻⠿⠿⠶⠶⠤⠤⠤⣄⣀⣀⣀⣀⣀⣀⣀⣀⡠⠤⠤⠤⠴⠖⠉
+]],[[
+                   ⢀
+                   ⡼
+                  ⣼⠇
+                 ⠰⡏
+                 ⢰⡇
+                 ⢸⣷⡀
+                  ⢿⣷⡀
+                ⢀ ⠈⢻⣿⣄
+                ⠈⢆  ⠙⣿⣆
+                  ⢧  ⠘⢿⣇
+                  ⣸⡆  ⠘⣿⡀
+                 ⣰⣿⠃   ⣿⠇
+                ⣼⣿⠃    ⡿⠁
+                ⣿⡏⣀⣀  ⡜
+       ⣀⡤⠤⠒⠒⠋⠉⠉⠉⠻⣧  ⠈⠉⠁   ⠢⢄
+      ⣾⣿    ⣀⣀⣀⣀⣤⣽⣦⣄⣀⣀⣀⣀    ⢹
+      ⣿⣿⣿⠷⠾⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠶⠚
+      ⢿⣿⡏      ⠈⠉⠉⠉⠉⠉⠉       ⣸⠛⠻⣷
+      ⠸⣿⣧                   ⢀⠃ ⢠⣿⠇
+       ⣹⣿⡆                 ⢠⣎⣠⣴⠿⠃
+ ⢀⣠⠔⠒⠈⠉ ⠹⣿⣄               ⣠⠾⠛⠛⠉⠒⠢⣄
+ ⣿⡁      ⠈⢻⣦⡀           ⣀⣾⡃       ⡟
+ ⠙⠻⣶⣀      ⠈⠙⠲⠦⣤⣄⣀⣀⣀⣤⣤⣾⣯⡵⠞⠋   ⣀⠟
+    ⠉⠛⠻⠿⠿⠶⠶⠤⠤⠤⣄⣀⣀⣀⣀⣀⣀⣀⣀⡠⠤⠤⠤⠴⠖⠉
+]]}
+local frame_order = {2, 1}
+
+-- some small number which most likely doesn't cover any windows
+local bg_z = -100000
+local bg = require('velvet.window').create()
+bg:set_z_index(bg_z)
+bg:set_opacity(0)
+bg:set_transparency_mode(vv.api.transparency_mode.all)
+bg:set_line_wrapping(false)
+local colors = { 'red', 'green', 'blue', 'white', 'magenta', 'yellow' }
+local color = 1
+local frame = 1
+
+local function draw_coffee()
+  frame = 1 + (frame % #frame_order)
+  local coffee = coffee_frames[frame_order[frame]]
+  local sz = vv.api.get_screen_geometry()
+  bg:set_geometry({ left = 0, top = 0, width = sz.width, height = sz.height })
+
+  bg:clear_background_color()
+  bg:set_foreground_color(colors[color])
+  bg:clear()
+  local width = 0
+  local height = 0
+  for line in coffee:gmatch('(.-)\n') do
+    local strwidth = utf8.len(line) or 0
+    if strwidth > width then width = strwidth end
+    height = height + 1
+  end
+
+  local lnum = 0
+  local col = (sz.width // 2) - (width // 2)
+  local row = sz.height // 2 - height // 2
+  if col < 0 then col = 0 end
+  if row < 0 then row = 0 end
+  for line in coffee:gmatch('(.-)\n') do
+    bg:set_cursor(col, row + lnum)
+    bg:draw(line)
+    lnum = lnum + 1
+    if lnum >= sz.height then break end
   end
 end
 
-
-local function translate(geom, x, y)
-  local new_geom = { width = geom.width, height = geom.height, left = geom.left + round(x), top = geom.top + round(y) }
-  return new_geom
-end
-local function scale(geom, x, y)
-  local new_geom = { width = round(geom.width * x), height = round(geom.height * y), left = geom.left, top = geom.top }
-  return new_geom
-end
-
-local anim = require('velvet.stdlib.animation')
-local easing = anim.easing
-local animate = anim.animate
-
-local function juggle(duration)
-  local geom = vv.api.get_terminal_geometry()
-  local function func(win, initial_geometry, restore)
-    animate(win, { width = round(geom.width * 0.3), height = round(geom.height * 0.3), left = 10, top = 10 }, duration, {
-      easing_function = easing.overshoot,
-      done = function()
-        animate(win, translate(vv.api.window_get_geometry(win), geom.width * 0.5, 0), duration, {
-          easing_function = easing.spring,
-          done = function()
-            animate(win, scale(vv.api.window_get_geometry(win), 3, 3), duration, {
-              easing_function = easing.overshoot,
-              done = function()
-                animate(win,
-                  translate(scale(vv.api.window_get_geometry(win), 0.7, 0.7), -geom.width * 0.3, -geom.height * 0.3),
-                  duration, {
-                  easing_function = easing.linear,
-                  done = function()
-                    animate(win, initial_geometry, duration, {
-                      easing_function = easing.spring,
-                      done = function()
-                        if restore then restore() end
-                      end
-                    })
-                  end
-                })
-              end
-            })
-          end
-        })
-      end
-    })
-  end
-
-  local windows = vv.api.get_windows()
-  local delay = 0
-  for _, id in ipairs(windows) do
-    local initial_geom = vv.api.window_get_geometry(id)
-    local initial_layer = vv.api.window_get_layer(id)
-    vv.api.schedule_after(delay, function()
-      func(id, initial_geom, function()
-        vv.api.window_set_geometry(id, initial_geom)
-        vv.api.window_set_layer(id, initial_layer)
-      end)
-    end)
-    delay = delay + 200
-  end
+do
+  bg:on_mouse_click(function(_, args)
+    if args.mouse_button == vv.api.mouse_button.left and args.event_type == vv.api.mouse_event_type.mouse_down then
+      color = 1 + (color % #colors)
+      draw_coffee()
+    end
+  end)
 end
 
-vv.api.keymap_set("<C-x>ffff", function() juggle(1700) end)
-vv.options.key_repeat_timeout = 500
-
-local grp = vv.events.create_group("stuff", true)
-local ev = vv.events
--- ev.subscribe(grp, ev.window.moved, set_geom_as_title)
--- ev.subscribe(grp, ev.window.resized, set_geom_as_title)
-ev.subscribe(grp, ev.screen.resized, function() 
-  local geom = vv.api.get_terminal_geometry()
-  print(vv.inspect({ screen_size = geom }))
-end)
-
-ev.subscribe(grp, ev.window.created, function(id) 
-  local title = vv.api.window_get_title(id)
-  if title == 'DAP External Terminal' then 
-    local tags = 1 << 8
-    vv.api.window_set_tags(id, tags)
+draw_coffee()
+require('velvet.events').create_group('coffee_redraw', true).screen_resized = draw_coffee
+local sched = nil
+sched = function()
+  if bg:valid() then
+    draw_coffee()
+    vv.api.schedule_after(1500, sched)
   end
-end)
+end
+sched()
 
-map("<M-right>", function() 
-  local win = vv.api.get_focused_window()
-  local geom = translate(vv.api.window_get_geometry(win), 100, 0)
-  animate(win, geom, 250, { easing_function = anim.easing.spring })
-end)
-
-map("<M-left>", function() 
-  local win = vv.api.get_focused_window()
-  local geom = translate(vv.api.window_get_geometry(win), -100, 0)
-  animate(win, geom, 250, { easing_function = anim.easing.spring })
-end)
