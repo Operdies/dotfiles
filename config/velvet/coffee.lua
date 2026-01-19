@@ -55,12 +55,12 @@ local coffee_frames = { [[
 local frame_order = { 2, 1 }
 
 -- some small number which most likely doesn't cover any windows
-local bg_z = -100000
 local bg = require('velvet.window').create()
-bg:set_z_index(bg_z)
+bg:set_z_index(vv.layers.background)
 bg:set_opacity(0)
 bg:set_transparency_mode(vv.api.transparency_mode.all)
 bg:set_line_wrapping(false)
+bg:set_cursor_visible(false)
 local colors = { 'red', 'green', 'blue', 'white', 'magenta', 'yellow' }
 local color = 1
 local frame = 1

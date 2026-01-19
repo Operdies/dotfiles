@@ -31,3 +31,9 @@ map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
 map("<C-x>paint", require('paint').create_paint)
 require('coffee').enable()
 
+vv.events.create_group('close_if_all_exited', true).window_closed = function()
+  for _, id in ipairs(vv.api.get_windows()) do
+    if vv.api.window_is_valid(id) and not vv.api.window_is_lua(id) then return end
+  end
+  vv.api.quit()
+end
