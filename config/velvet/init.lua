@@ -16,6 +16,7 @@ map("<C-x>r", function()
   package.loaded['velvet.layout.dwm'] = nil
   package.loaded['paint'] = nil
   package.loaded['coffee'] = nil
+  package.loaded['logpanel'] = nil
   vv.events = require('velvet.events')
 
   for _, id in ipairs(vv.api.get_windows()) do
@@ -37,3 +38,7 @@ vv.events.create_group('close_if_all_exited', true).window_closed = function()
   end
   vv.api.quit()
 end
+
+local logpanel = require('logpanel')
+map('<C-M-l>', logpanel.toggle)
+logpanel.enable()

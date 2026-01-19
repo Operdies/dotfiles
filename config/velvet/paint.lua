@@ -58,7 +58,7 @@ function paint.create_paint()
   end
 
   local close_sequence = '<C-x>closepaint'
-  map(close_sequence, function()
+  vv.api.keymap_set(close_sequence, function()
     cool_win:close()
     vv.api.keymap_del(close_sequence)
   end)
