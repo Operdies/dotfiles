@@ -51,4 +51,6 @@ setopt HIST_SAVE_NO_DUPS
 # Save history immediately instead of waiting for session to end
 setopt INC_APPEND_HISTORY
 
+# less does not properly display graphemes without this (??)
+export LESSCHARSET=utf8
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH:$HOME/.local/bin"
