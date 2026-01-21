@@ -43,7 +43,7 @@ event_manager.window_closed = function()
 end
 
 local logpanel = require('logpanel')
-map('<C-M-l>', logpanel.toggle)
+map('<M-x>logs', logpanel.toggle)
 logpanel.enable()
 
 event_manager.pre_render = function(args)
