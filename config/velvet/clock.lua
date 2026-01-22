@@ -31,7 +31,7 @@ local function update_clock()
   timer:set_opacity(0)
   timer:set_transparency_mode('clear')
   timer:set_background_color('red')
-  timer:set_z_index(vv.layers.background)
+  timer:set_z_index(vv.layers.background + 1)
   timer:set_cursor_visible(false)
   local index = 0
   for chr in text:gmatch('.') do
@@ -52,7 +52,9 @@ end
 
 local function clock_timer()
   update_clock()
-  vv.api.schedule_after(10000, clock_timer)
+  local seconds = tonumber(os.date('%S'))
+  local sleep_ms = (60 - seconds) * 1000
+  vv.api.schedule_after(sleep_ms, clock_timer)
 end
 clock_timer()
 
