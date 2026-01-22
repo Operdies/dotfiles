@@ -66,7 +66,6 @@ local color = 1
 local frame = 1
 
 local function draw_coffee()
-  frame = 1 + (frame % #frame_order)
   local coffee = coffee_frames[frame_order[frame]]
   local sz = vv.api.get_screen_geometry()
   bg:set_geometry({ left = 0, top = 0, width = sz.width, height = sz.height })
@@ -111,6 +110,7 @@ return {
     local coffee_animation_schedule = nil
     coffee_animation_schedule = function()
       if bg:valid() then
+        frame = 1 + (frame % #frame_order)
         draw_coffee()
         vv.api.schedule_after(1500, coffee_animation_schedule)
       end
