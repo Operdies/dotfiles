@@ -5,6 +5,7 @@ function paint.create_paint()
   local sz = vv.api.get_screen_geometry()
   if cool_win then cool_win:close() end
   cool_win = require('velvet.window').create()
+  cool_win:set_cursor_visible(false)
 
   local brush = {
     red = 0,
@@ -13,8 +14,8 @@ function paint.create_paint()
   }
   local opacity = 1
 
-  local width, height = 30, 12
-  cool_win:set_geometry({ left = sz.width - width - 15, top = 2, width = width, height = height })
+  local width, height = sz.width - 20, sz.height - 10
+  cool_win:set_geometry({ left = sz.width // 2 - width // 2 - 4, top = 5, width = width, height = height })
   cool_win:set_opacity(opacity)
   cool_win:set_background_color('white')
   cool_win:clear()
