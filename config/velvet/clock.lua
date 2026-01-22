@@ -24,11 +24,12 @@ local function update_clock()
   local width = #text * 8
   local height = 7
   local sz = vv.api.get_screen_geometry()
-  timer:set_geometry({ left = sz.width // 2 - width // 2, top = sz.height - height - 5, width = width + 1, height = height })
+  timer:set_geometry({ left = sz.width // 2 - width // 2 - 1, top = sz.height - height - 5, width = width + 1, height = height })
 
   timer:clear_background_color()
   timer:clear()
-  timer:set_opacity(1)
+  timer:set_opacity(0)
+  timer:set_transparency_mode('clear')
   timer:set_background_color('red')
   timer:set_z_index(vv.layers.background)
   timer:set_cursor_visible(false)
@@ -47,7 +48,12 @@ local function update_clock()
     end
     index = index + 1
   end
-  vv.api.schedule_after(10000, update_clock)
 end
 
-update_clock()
+local function clock_timer()
+  update_clock()
+  vv.api.schedule_after(10000, clock_timer)
+end
+clock_timer()
+
+require('velvet.events').create_group('my_clock', true).screen_resized = update_clock
