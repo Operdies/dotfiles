@@ -10,6 +10,7 @@ rmap("<C-x>b", function() spawn("bash") end)
 map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 
 map("<C-x>r", function() 
+  package.loaded['velvet.default_options'] = nil
   package.loaded['velvet.default_config'] = nil
   package.loaded['velvet.events'] = nil
   package.loaded['velvet.window'] = nil
@@ -22,6 +23,7 @@ map("<C-x>r", function()
   for _, id in ipairs(vv.api.get_windows()) do
     if vv.api.window_is_lua(id) then pcall(vv.api.window_close, id) end
   end
+  require('velvet.default_options')
   dofile(home .. "/.config/velvet/init.lua") 
 end)
 
@@ -48,3 +50,4 @@ event_manager.pre_render = function(args)
   dbg({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' })
 end
 
+vv.options.theme = require('velvet.themes').gruvbox.dark
