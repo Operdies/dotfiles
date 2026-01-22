@@ -18,6 +18,7 @@ map("<C-x>r", function()
   package.loaded['paint'] = nil
   package.loaded['coffee'] = nil
   package.loaded['logpanel'] = nil
+  package.loaded['clock'] = nil
   vv.events = require('velvet.events')
 
   for _, id in ipairs(vv.api.get_windows()) do
@@ -50,4 +51,7 @@ event_manager.pre_render = function(args)
   dbg({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' })
 end
 
-vv.options.theme = require('velvet.themes').gruvbox.dark
+
+require('clock')
+vv.options.theme = require('velvet.themes').catppuccin.mocha
+
