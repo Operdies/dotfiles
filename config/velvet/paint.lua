@@ -106,6 +106,7 @@ function paint.create_paint()
     sat_slider:set_geometry({ left = wg.left, width = wg.width, height = 1, top = wg.top + wg.height + 1 })
     sat_slider:clear()
 
+    --- @return boolean,integer,integer,integer
     local function point_to_color(col, row)
       local px = col - cx
       local py = row - cy
@@ -116,24 +117,27 @@ function paint.create_paint()
         local rad = math.atan(normy, normx) + math.pi
         local deg = (180 + rad * (180 / math.pi)) % 360
         local r, g, b = hsv_to_rgb(deg, dist, saturation)
-        return r, g, b
+        return true, r, g, b
       end
-      return nil, nil, nil
+      return false, 0, 0, 0
     end
 
     local function draw_saturation_slider()
       local sat = saturation
+      local step = 1 / wg.width
       for i = 1, wg.width do
         saturation = i / wg.width
-        local r, g, b = point_to_color(sel_x, sel_y)
-        sat_slider:set_background_color(('#%02X%02X%02X'):format(r, g, b))
-        sat_slider:set_cursor(i, 1)
-        if saturation == sat then
-          local r2, g2, b2 = 255 - r, 255 - g, 255 - b
-          sat_slider:set_foreground_color(('#%02X%02X%02X'):format(r2, g2, b2))
-          sat_slider:draw('◆')
-        else
-          sat_slider:draw(' ')
+        local ok, r, g, b = point_to_color(sel_x, sel_y)
+        if ok then
+          sat_slider:set_background_color({ red = r, green = g, blue = b })
+          sat_slider:set_cursor(i, 1)
+          if saturation >= sat and saturation < (sat + step) then
+            local r2, g2, b2 = 255 - r, 255 - g, 255 - b
+            sat_slider:set_foreground_color({ red = r2, green = g2, blue = b2 })
+            sat_slider:draw('◆')
+          else
+            sat_slider:draw(' ')
+          end
         end
       end
       saturation = sat
@@ -142,13 +146,13 @@ function paint.create_paint()
     local function draw_wheel()
       for row = 0, wg.height do
         for col = 0, wg.width do
-          local r, g, b = point_to_color(col, row)
-          if r then
-            wheel:set_background_color(('#%02X%02X%02X'):format(r, g, b))
+          local ok, r, g, b = point_to_color(col, row)
+          if ok then
+            wheel:set_background_color({ red = r, green = g, blue = b })
             wheel:set_cursor(col, row)
             if row == sel_y and col == sel_x then
               local r2, g2, b2 = 255 - r, 255 - g, 255 - b
-              wheel:set_foreground_color(('#%02X%02X%02X'):format(r2, g2, b2))
+              wheel:set_foreground_color({ red = r2, green = g2, blue = b2 })
               wheel:draw('◆')
             else
               wheel:draw(' ')
@@ -159,8 +163,8 @@ function paint.create_paint()
     end
 
     local function set_color(col, row)
-      local r, g, b = point_to_color(col, row)
-      if r then
+      local ok, r, g, b = point_to_color(col, row)
+      if ok then
         brush = { red = r, green = g, blue = b }
         update_brush()
         sel_x, sel_y = col, row
@@ -170,6 +174,7 @@ function paint.create_paint()
     end
 
     local function set_saturation(col)
+      if col < 1 then col = 1 end if col > wg.width then col = wg.width end
       saturation = col / wg.width
       set_color(sel_x, sel_y)
     end
@@ -178,7 +183,9 @@ function paint.create_paint()
     --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
     local function mouse_pick_hue(_, x)
       if x.mouse_button == vv.api.mouse_button.left then
-        set_color(x.pos.col, x.pos.row)
+        if x.pos.col ~= sel_x or x.pos.row ~= sel_y then
+          set_color(x.pos.col, x.pos.row)
+        end
       end
     end
     wheel:on_mouse_click(mouse_pick_hue)
@@ -194,6 +201,16 @@ function paint.create_paint()
 
     set_color(sel_x, sel_y)
     set_saturation(wg.width)
+
+    -- local function cycle_saturation()
+    --   local start = vv.api.get_current_tick()
+    --   saturation = (saturation + 0.1) % 1
+    --   set_color(sel_x, sel_y)
+    --   vv.api.schedule_after(1000 // 10, cycle_saturation)
+    --   local now = vv.api.get_current_tick()
+    --   dbg({set_color = now - start})
+    -- end
+    -- cycle_saturation()
   end
 end
 
