@@ -35,18 +35,12 @@ map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
 map("<C-x>paint", require('paint').create_paint)
 require('coffee').enable()
 
-local event_manager = vv.events.create_group('close_if_all_exited', true)
-event_manager.window_closed = function()
-  for _, id in ipairs(vv.api.get_windows()) do
-    if vv.api.window_is_valid(id) and not vv.api.window_is_lua(id) then return end
-  end
-  vv.api.quit()
-end
 
 local logpanel = require('logpanel')
 map('<M-x>logs', logpanel.toggle)
 logpanel.enable()
 
+local event_manager = vv.events.create_group('debug.log_render_timing', true)
 event_manager.pre_render = function(args)
   dbg({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' })
 end
