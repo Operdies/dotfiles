@@ -26,18 +26,16 @@ function paint.create_paint()
     cool_win:set_background_color(brush)
   end
 
-  do
-    --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
-    local draw = function(win, x)
-      if x.mouse_button == vv.api.mouse_button.left then
-        win:set_cursor(x.pos.col, x.pos.row)
-        win:draw(' ')
-      end
+  --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
+  local draw = function(win, x)
+    if x.mouse_button == vv.api.mouse_button.left then
+      win:set_cursor(x.pos.col, x.pos.row)
+      win:draw(' ')
     end
-
-    cool_win:on_mouse_click(draw)
-    cool_win:on_mouse_move(draw)
   end
+
+  cool_win:on_mouse_click(draw)
+  cool_win:on_mouse_move(draw)
 
   local close_sequence = '<C-x>closepaint'
   vv.api.keymap_set(close_sequence, function()
@@ -122,6 +120,11 @@ function paint.create_paint()
       return false, 0, 0, 0
     end
 
+    local function highlight(r, g, b)
+      local luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+      if luminance > 128 then return 0, 0, 0 else return 255, 255, 255 end
+    end
+
     local function draw_saturation_slider()
       local sat = saturation
       local step = 1 / wg.width
@@ -132,7 +135,7 @@ function paint.create_paint()
           sat_slider:set_background_color({ red = r, green = g, blue = b })
           sat_slider:set_cursor(i, 1)
           if saturation >= sat and saturation < (sat + step) then
-            local r2, g2, b2 = 255 - r, 255 - g, 255 - b
+            local r2, g2, b2 = highlight(r, g, b)
             sat_slider:set_foreground_color({ red = r2, green = g2, blue = b2 })
             sat_slider:draw('◆')
           else
@@ -144,14 +147,14 @@ function paint.create_paint()
     end
 
     local function draw_wheel()
-      for row = 0, wg.height do
-        for col = 0, wg.width do
+      for row = 1, wg.height do
+        for col = 1, wg.width do
           local ok, r, g, b = point_to_color(col, row)
           if ok then
             wheel:set_background_color({ red = r, green = g, blue = b })
             wheel:set_cursor(col, row)
             if row == sel_y and col == sel_x then
-              local r2, g2, b2 = 255 - r, 255 - g, 255 - b
+              local r2, g2, b2 = highlight(r, g, b)
               wheel:set_foreground_color({ red = r2, green = g2, blue = b2 })
               wheel:draw('◆')
             else
@@ -180,11 +183,26 @@ function paint.create_paint()
     end
 
 
+    --- @type velvet.window|nil
+    local drag_win = nil
     --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
-    local function mouse_pick_hue(_, x)
+    local function mouse_pick_hue(w, x)
       if x.mouse_button == vv.api.mouse_button.left then
+        local ok = point_to_color(x.pos.col, x.pos.row)
+        if x.event_type and x.event_type == vv.api.mouse_event_type.mouse_down then 
+          drag_win = ok and wheel or cool_win
+        elseif x.event_type and x.event_type == vv.api.mouse_event_type.mouse_up then 
+          drag_win = nil
+        end
         if x.pos.col ~= sel_x or x.pos.row ~= sel_y then
-          set_color(x.pos.col, x.pos.row)
+          if drag_win == nil or drag_win == wheel then
+            set_color(x.pos.col, x.pos.row)
+          else
+            local gcol, grow = x.pos.col + wg.left, x.pos.row + wg.top
+            local lcol, lrow = gcol - pg.left, grow - pg.top
+            x.pos = { col = lcol, row = lrow }
+            draw(cool_win, x)
+          end
         end
       end
     end
@@ -202,15 +220,19 @@ function paint.create_paint()
     set_color(sel_x, sel_y)
     set_saturation(wg.width)
 
+    -- local fps_target = 120
+    -- local sat = 0
     -- local function cycle_saturation()
     --   local start = vv.api.get_current_tick()
-    --   saturation = (saturation + 0.1) % 1
+    --   sat = (sat + 0.01) % 2
+    --   saturation = (math.abs((sat / 2) - 0.5) + 0.1) * 1.6
     --   set_color(sel_x, sel_y)
-    --   vv.api.schedule_after(1000 // 10, cycle_saturation)
+    --   vv.api.schedule_after(1000 // fps_target, cycle_saturation)
     --   local now = vv.api.get_current_tick()
     --   dbg({set_color = now - start})
     -- end
     -- cycle_saturation()
+    -- cool_win:set_visibility(false)
   end
 end
 
