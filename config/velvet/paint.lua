@@ -128,14 +128,13 @@ function paint.create_paint()
 
     local function draw_saturation_slider()
       local sat = saturation
-      local step = 1 / wg.width
       for i = 1, wg.width do
         saturation = i / wg.width
         local ok, r, g, b = point_to_color(sel_x, sel_y)
         if ok then
           sat_slider:set_background_color({ red = r, green = g, blue = b })
           sat_slider:set_cursor(i, 1)
-          if saturation >= sat and saturation < (sat + step) then
+          if sat >= saturation and sat < ((i + 1) / wg.width) then
             local r2, g2, b2 = highlight(r, g, b)
             sat_slider:set_foreground_color({ red = r2, green = g2, blue = b2 })
             sat_slider:draw('◆')
@@ -179,10 +178,19 @@ function paint.create_paint()
 
     local function set_saturation(col)
       if col < 1 then col = 1 end if col > wg.width then col = wg.width end
-      saturation = col / wg.width
-      set_color(sel_x, sel_y)
+      local sat = col / wg.width
+      if saturation ~= sat then
+        saturation = sat
+        set_color(sel_x, sel_y)
+      end
     end
 
+    local sched_x, sched_y
+    local function scheduled_wheel_update()
+      if sched_x ~= sel_x or sched_y ~= sel_y then
+        set_color(sched_x, sched_y)
+      end
+    end
 
     --- @type velvet.window|nil
     local drag_win = nil
@@ -190,29 +198,34 @@ function paint.create_paint()
     local function mouse_pick_hue(w, x)
       if x.mouse_button == 'left' then
         local ok = point_to_color(x.pos.col, x.pos.row)
-        if x.event_type and x.event_type == 'mouse_down' then 
+        if x.event_type and x.event_type == 'mouse_down' then
           drag_win = ok and wheel or canvas
-        elseif x.event_type and x.event_type == 'mouse_up' then 
+        elseif x.event_type and x.event_type == 'mouse_up' then
           drag_win = nil
         end
-        if x.pos.col ~= sel_x or x.pos.row ~= sel_y then
-          if drag_win == nil or drag_win == wheel then
-            set_color(x.pos.col, x.pos.row)
-          else
-            local gcol, grow = x.pos.col + wg.left, x.pos.row + wg.top
-            local lcol, lrow = gcol - pg.left, grow - pg.top
-            x.pos = { col = lcol, row = lrow }
-            draw(canvas, x)
-          end
+        if drag_win == nil or drag_win == wheel then
+          sched_x, sched_y = x.pos.col, x.pos.row
+          vv.api.schedule_after(0, scheduled_wheel_update)
+        else
+          local gcol, grow = x.pos.col + wg.left, x.pos.row + wg.top
+          local lcol, lrow = gcol - pg.left, grow - pg.top
+          x.pos = { col = lcol, row = lrow }
+          draw(canvas, x)
         end
       end
     end
     wheel:on_mouse_click(mouse_pick_hue)
     wheel:on_mouse_move(mouse_pick_hue)
 
+    local sched_sat = -1
+    local function scheduled_saturation_update()
+      set_saturation(sched_sat)
+    end
+
     local function mouse_pick_saturation(_, x)
       if x.mouse_button == 'left' then
-        set_saturation(x.pos.col)
+        sched_sat = x.pos.col
+        vv.api.schedule_after(0, scheduled_saturation_update)
       end
     end
     sat_slider:on_mouse_click(mouse_pick_saturation)
@@ -221,7 +234,7 @@ function paint.create_paint()
     set_color(sel_x, sel_y)
     set_saturation(wg.width)
 
-    -- local fps_target = 120
+    -- local fps_target = 30
     -- local sat = 0
     -- local function cycle_saturation()
     --   local start = vv.api.get_current_tick()
@@ -233,7 +246,7 @@ function paint.create_paint()
     --   dbg({set_color = now - start})
     -- end
     -- cycle_saturation()
-    -- cool_win:set_visibility(false)
+    -- canvas:set_visibility(false)
   end
 end
 
