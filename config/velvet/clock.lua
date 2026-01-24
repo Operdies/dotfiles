@@ -21,6 +21,7 @@ local font = {
 
 local function update_clock()
   local text = os.date('%H:%M')
+  --- @cast text string
   local width = #text * 8
   local height = 7
   local sz = vv.api.get_screen_geometry()

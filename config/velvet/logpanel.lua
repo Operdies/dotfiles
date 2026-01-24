@@ -6,7 +6,7 @@ win:set_z_index(vv.layers.background + 1)
 win:set_opacity(0.1)
 win:set_auto_return(true)
 win:set_cursor_visible(false)
-win:set_transparency_mode(vv.api.transparency_mode.all)
+win:set_transparency_mode('all')
 
 local arrange = function()
   local sz = vv.api.get_screen_geometry()
@@ -25,18 +25,16 @@ local events = require('velvet.events')
 local ev = events.create_group('logpanel', true)
 ev.screen_resized = arrange
 
----@diagnostic disable-next-line: inject-field
-ev.debug_log = function(args, level)
+ev.system_message = function(evt)
   local colors = {
     debug = 'blue',
     info = 'white',
     warning = 'yellow',
     error = 'red',
   }
-  local text = type(args) == 'string' and args or vv.inspect(args)
-  win:set_foreground_color(colors[level or 'info'])
+  win:set_foreground_color(colors[evt.level] or colors.debug)
   win:set_background_color(bg)
-  win:draw(text)
+  win:draw(evt.message)
   win:draw('\n')
 end
 

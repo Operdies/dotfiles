@@ -1,11 +1,11 @@
 local vv = require('velvet')
 local paint = {}
-local cool_win = nil
+local canvas = nil
 function paint.create_paint()
   local sz = vv.api.get_screen_geometry()
-  if cool_win then cool_win:close() end
-  cool_win = require('velvet.window').create()
-  cool_win:set_cursor_visible(false)
+  if canvas then canvas:close() end
+  canvas = require('velvet.window').create()
+  canvas:set_cursor_visible(false)
 
   local brush = {
     red = 0,
@@ -16,36 +16,37 @@ function paint.create_paint()
 
   -- local width, height = sz.width - 20, sz.height - 10
   local width, height = sz.width // 3, sz.height
-  cool_win:set_geometry({ left = sz.width - width, top = 0, width = width, height = height })
-  cool_win:set_opacity(opacity)
-  cool_win:set_background_color('white')
-  cool_win:clear()
-  cool_win:set_background_color(brush)
+  canvas:set_geometry({ left = sz.width - width, top = 0, width = width, height = height })
+  canvas:set_opacity(opacity)
+  canvas:set_background_color('white')
+  canvas:clear()
+  canvas:set_background_color(brush)
+  canvas:set_visibility(false)
 
   local function update_brush()
-    cool_win:set_background_color(brush)
+    canvas:set_background_color(brush)
   end
 
   --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
   local draw = function(win, x)
-    if x.mouse_button == vv.api.mouse_button.left then
+    if x.mouse_button == 'left' then
       win:set_cursor(x.pos.col, x.pos.row)
       win:draw(' ')
     end
   end
 
-  cool_win:on_mouse_click(draw)
-  cool_win:on_mouse_move(draw)
+  canvas:on_mouse_click(draw)
+  canvas:on_mouse_move(draw)
 
   local close_sequence = '<C-x>closepaint'
   vv.api.keymap_set(close_sequence, function()
-    cool_win:close()
+    canvas:close()
     vv.api.keymap_del(close_sequence)
   end)
 
   do
-    local pg = cool_win:get_geometry()
-    local wheel = cool_win:create_child_window()
+    local pg = canvas:get_geometry()
+    local wheel = canvas:create_child_window()
     local wheel_width, wheel_height = 37, 17
     local wg = { left = pg.left + pg.width - wheel_width - 1, top = pg.top + 1, width = wheel_width, height =
     wheel_height }
@@ -187,11 +188,11 @@ function paint.create_paint()
     local drag_win = nil
     --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
     local function mouse_pick_hue(w, x)
-      if x.mouse_button == vv.api.mouse_button.left then
+      if x.mouse_button == 'left' then
         local ok = point_to_color(x.pos.col, x.pos.row)
-        if x.event_type and x.event_type == vv.api.mouse_event_type.mouse_down then 
-          drag_win = ok and wheel or cool_win
-        elseif x.event_type and x.event_type == vv.api.mouse_event_type.mouse_up then 
+        if x.event_type and x.event_type == 'mouse_down' then 
+          drag_win = ok and wheel or canvas
+        elseif x.event_type and x.event_type == 'mouse_up' then 
           drag_win = nil
         end
         if x.pos.col ~= sel_x or x.pos.row ~= sel_y then
@@ -201,7 +202,7 @@ function paint.create_paint()
             local gcol, grow = x.pos.col + wg.left, x.pos.row + wg.top
             local lcol, lrow = gcol - pg.left, grow - pg.top
             x.pos = { col = lcol, row = lrow }
-            draw(cool_win, x)
+            draw(canvas, x)
           end
         end
       end
@@ -210,7 +211,7 @@ function paint.create_paint()
     wheel:on_mouse_move(mouse_pick_hue)
 
     local function mouse_pick_saturation(_, x)
-      if x.mouse_button == vv.api.mouse_button.left then
+      if x.mouse_button == 'left' then
         set_saturation(x.pos.col)
       end
     end

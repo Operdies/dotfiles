@@ -58,7 +58,7 @@ local frame_order = { 2, 1 }
 local bg = require('velvet.window').create()
 bg:set_z_index(vv.layers.background)
 bg:set_opacity(0)
-bg:set_transparency_mode(vv.api.transparency_mode.all)
+bg:set_transparency_mode('all')
 bg:set_line_wrapping(false)
 bg:set_cursor_visible(false)
 local colors = { 'red', 'green', 'blue', 'white', 'magenta', 'yellow' }
@@ -96,7 +96,7 @@ end
 
 do
   bg:on_mouse_click(function(_, args)
-    if args.mouse_button == vv.api.mouse_button.left and args.event_type == vv.api.mouse_event_type.mouse_down then
+    if args.mouse_button == 'left' and args.event_type == 'mouse_down' then
       color = 1 + (color % #colors)
       draw_coffee()
     end

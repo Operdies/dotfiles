@@ -32,7 +32,8 @@ local dwm = require('velvet.layout.dwm')
 map("<M-->", function() dwm.inc_inactive_dim(0.05) end)
 map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
 
-map("<C-x>paint", require('paint').create_paint)
+local paint = require('paint')
+map("<C-x>paint", paint.create_paint)
 require('coffee').enable()
 
 
