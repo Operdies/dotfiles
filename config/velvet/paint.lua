@@ -140,7 +140,7 @@ function paint.create_paint()
         for col = 1, wg.width do
           local ok, r, g, b = point_to_color(col, row)
           if ok then
-            wheel:set_background_color({ red = r, green = g, blue = b, alpha = 0.50 })
+            wheel:set_background_color({ red = r, green = g, blue = b, alpha = 0.05 })
             wheel:set_cursor(col, row)
             if row == sel_y and col == sel_x then
               local r2, g2, b2 = highlight(r, g, b)

@@ -7,6 +7,7 @@ win:set_opacity(0.1)
 win:set_auto_return(true)
 win:set_cursor_visible(false)
 win:set_transparency_mode('all')
+win:set_title('logpanel')
 
 local arrange = function()
   local sz = vv.api.get_screen_geometry()
