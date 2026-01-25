@@ -21,7 +21,6 @@ function paint.create_paint()
   canvas:set_background_color('white')
   canvas:clear()
   canvas:set_background_color(brush)
-  canvas:set_visibility(false)
 
   local function update_brush()
     canvas:set_background_color(brush)
@@ -61,15 +60,6 @@ function paint.create_paint()
 
     -- assume a pixel is twice as tall as it is wide
 
-    local function round(x)
-      if x >= 0 then
-        return math.floor(x + 0.5)
-      else
-        return math.ceil(x - 0.5)
-      end
-    end
-
-
     local function hsv_to_rgb(h, s, v)
       local c = v * s
       -- float x = c * (1.0f - fabsf(fmodf(h / 60.0f, 2.0f) - 1.0f));
@@ -91,10 +81,9 @@ function paint.create_paint()
         rp, gp, bp = c, 0, x
       end
 
-      local mult = 255
-      local red = round((rp + m) * mult)
-      local green = round((gp + m) * mult)
-      local blue = round((bp + m) * mult)
+      local red = rp + m
+      local green = gp + m
+      local blue = bp + m
 
       return red, green, blue
     end
@@ -123,7 +112,7 @@ function paint.create_paint()
 
     local function highlight(r, g, b)
       local luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-      if luminance > 128 then return 0, 0, 0 else return 255, 255, 255 end
+      if luminance > 0.5 then return 0, 0, 0 else return 1, 1, 1 end
     end
 
     local function draw_saturation_slider()
@@ -151,7 +140,7 @@ function paint.create_paint()
         for col = 1, wg.width do
           local ok, r, g, b = point_to_color(col, row)
           if ok then
-            wheel:set_background_color({ red = r, green = g, blue = b })
+            wheel:set_background_color({ red = r, green = g, blue = b, alpha = 0.50 })
             wheel:set_cursor(col, row)
             if row == sel_y and col == sel_x then
               local r2, g2, b2 = highlight(r, g, b)
