@@ -53,6 +53,7 @@ function paint.create_paint()
     wheel:clear()
     wheel:set_opacity(0)
     wheel:set_transparency_mode('clear')
+    wheel:set_cursor_visible(false)
 
     local cx = 1 + wg.width // 2
     local cy = 1 + wg.height // 2
@@ -219,6 +220,7 @@ function paint.create_paint()
     end
     sat_slider:on_mouse_click(mouse_pick_saturation)
     sat_slider:on_mouse_move(mouse_pick_saturation)
+    sat_slider:set_cursor_visible(false)
 
     set_color(sel_x, sel_y)
     set_saturation(wg.width)
