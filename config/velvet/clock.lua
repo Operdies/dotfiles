@@ -52,6 +52,7 @@ local function update_clock()
 end
 
 local function clock_timer()
+  if not timer:valid() then return end
   update_clock()
   local seconds = tonumber(os.date('%S'))
   local sleep_ms = (60 - seconds) * 1000
