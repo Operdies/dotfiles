@@ -8,7 +8,7 @@ local rmap = function(keys, action) vv.api.keymap_set(keys, action, { repeatable
 
 map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 map("<C-x>z", function() dwm.toggle_arrange() end)
-vv.options.key_repeat_timeout = 200
+vv.options.key_repeat_timeout = 275
 
 map("<C-x>r", function() 
   package.loaded['velvet.default_options'] = nil
@@ -97,15 +97,16 @@ local pick_window = function(on_pick)
         local title = w:get_friendly_title()
         local display = ('%d - %s'):format(w.id, title)
         if display:find(filter, 1, true) then
+          if #display > width then width = #display end
           snapshot[i] = w
           titles[i] = display
           i = i + 1
         end
       end
     end
-    geom.height = #snapshot
-    geom.top = sz.height // 2 - #snapshot // 2
-    picker:set_geometry(geom)
+    height = #snapshot
+    local geom2 = { left = sz.width // 2 - width // 2, width = width, height = height, top = sz.height // 2 - height // 2 }
+    picker:set_geometry(geom2)
     picker:set_foreground_color('blue')
     if index > #snapshot then index = #snapshot end
     if index < 1 then index = 1 end
