@@ -48,11 +48,14 @@ end
 
 local windows = require('velvet.window')
 
+--- @type velvet.window | nil
+local picker = nil
 --- @param on_pick fun(win: velvet.window) pick callback
 local pick_window = function(on_pick)
   local evt = require('velvet.events')
   local e = evt.create_group('custom.pick_window', true)
-  local picker = windows.create()
+
+  picker = picker or windows.create()
   local winlist = vv.api.get_windows()
   local sz = vv.api.get_screen_geometry()
   local width = 50
@@ -65,16 +68,18 @@ local pick_window = function(on_pick)
   picker:clear_background_color()
   picker:set_opacity(0.8)
   picker:set_transparency_mode('all')
-  picker:focus()
   picker:set_cursor_visible(false)
+  picker:set_visibility(true)
+  picker:focus()
+
   local tmp = vv.options.focus_follows_mouse
   vv.options.focus_follows_mouse = false
-
   local function dispose()
     vv.options.focus_follows_mouse = tmp
     evt.delete_group(e)
-    picker:close()
+    picker:set_visibility(false)
   end
+
 
   local index = 1
   local snapshot = {}
@@ -180,10 +185,7 @@ local pick_window = function(on_pick)
 
   e.window_focus_changed = function(args)
     if args.new_focus ~= picker.id then
-      local winst = windows.from_handle(args.new_focus)
-      if winst.parent ~= picker then
-        dispose()
-      end
+      dispose()
     end
   end
   draw()
