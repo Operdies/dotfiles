@@ -8,7 +8,7 @@ local rmap = function(keys, action) vv.api.keymap_set(keys, action, { repeatable
 
 map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 map("<C-x>z", function() dwm.toggle_arrange() end)
-vv.options.key_repeat_timeout = 275
+vv.options.key_repeat_timeout = 300
 
 map("<C-x>r", function() 
   package.loaded['velvet.default_options'] = nil
@@ -70,6 +70,8 @@ local pick_window = function(on_pick)
   picker:set_transparency_mode('all')
   picker:set_cursor_visible(false)
   picker:set_visibility(true)
+
+  local prev_focus = vv.api.get_focused_window()
   picker:focus()
 
   local tmp = vv.options.focus_follows_mouse
@@ -78,6 +80,7 @@ local pick_window = function(on_pick)
     vv.options.focus_follows_mouse = tmp
     evt.delete_group(e)
     picker:set_visibility(false)
+    if vv.api.window_is_valid(prev_focus) then vv.api.set_focused_window(prev_focus) end
   end
 
 
