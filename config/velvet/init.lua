@@ -39,7 +39,6 @@ require('coffee').enable()
 
 local logpanel = require('logpanel')
 map('<M-x>logs', logpanel.toggle)
-logpanel.enable()
 
 local event_manager = vv.events.create_group('debug.log_render_timing', true)
 event_manager.pre_render = function(args)
