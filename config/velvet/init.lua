@@ -103,7 +103,9 @@ local pick_window = function(on_pick)
       if not w:is_lua() then
         local title = w:get_friendly_title()
         local display = ('%d - %s'):format(w.id, title)
-        if display:find(filter, 1, true) then
+        local case_sensitive = filter:lower() ~= filter
+        local search = case_sensitive and display or display:lower()
+        if search:find(filter, 1, true) then
           if #display > width then width = #display end
           snapshot[i] = w
           titles[i] = display
