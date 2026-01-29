@@ -551,7 +551,7 @@ pick.registry.project = function()
   for project in projects do
     local project_dir = vim.fs.joinpath(git_dir, project)
     local git_dir = vim.fs.joinpath(project_dir, ".git")
-    if vim.fn.isdirectory(git_dir) == 1 then
+    if vim.fn.isdirectory(git_dir) == 1 or vim.fn.filereadable(git_dir) == 1 then
       lst[#lst + 1] = { name = project, dir = project_dir }
     end
   end
