@@ -205,3 +205,11 @@ end)
 require('clock')
 vv.options.theme = require('velvet.themes').catppuccin.mocha
 
+local any_processes = false
+for _, id in ipairs(vv.api.get_windows()) do
+  if not vv.api.window_is_lua(id) then any_processes = true end
+end
+
+if not any_processes then
+  windows.create_process('zsh')
+end
