@@ -37,7 +37,7 @@ vim.o.cursorlineopt = 'number'
 -- vim.o.timeoutlen = 300
 
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos", "terminal",
+vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "help", "tabpages", "winsize", "winpos",
   "localoptions" }
 vim.opt.completeopt = { "menu", "menuone", "popup", "noinsert", "noselect", "fuzzy" }
 
@@ -1169,6 +1169,24 @@ vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
 
 local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
 
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = augroup,
+  callback = function(args)
+    if vim.bo[args.buf].filetype ~= "dapui_console" then return end
+    local start_auto_scroll = function()
+      vim.api.nvim_buf_call(args.buf, function()
+        vim.cmd("normal! G")
+      end)
+    end
+    -- first startup can be pretty slow
+    vim.defer_fn(start_auto_scroll, 5000)
+    vim.defer_fn(start_auto_scroll, 1500)
+    -- later startups are quite fast
+    vim.defer_fn(start_auto_scroll, 200)
+  end,
+})
+
+
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
     vim.highlight.on_yank()
@@ -1293,7 +1311,6 @@ require('toggleterm').setup({
   persist_size = true,
   persist_mode = false,
   close_on_exit = true,
-  shell = vim.o.shell,
   float_opts = {
     border = "curved",
   },
