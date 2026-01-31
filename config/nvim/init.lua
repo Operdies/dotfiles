@@ -546,12 +546,12 @@ pick.setup(pick_options)
 
 -- Pick Project {{{2
 pick.registry.project = function()
-  local projects = vim.fs.dir(git_dir, { depth = 1 })
+  local projects = vim.fs.dir(git_dir, { depth = 2 })
   local lst = {}
   for project in projects do
     local project_dir = vim.fs.joinpath(git_dir, project)
-    local git_dir = vim.fs.joinpath(project_dir, ".git")
-    if vim.fn.isdirectory(git_dir) == 1 or vim.fn.filereadable(git_dir) == 1 then
+    local git_marker = vim.fs.joinpath(project_dir, ".git")
+    if vim.fn.isdirectory(git_marker) == 1 or vim.fn.filereadable(git_marker) == 1 then
       lst[#lst + 1] = { name = project, dir = project_dir }
     end
   end
