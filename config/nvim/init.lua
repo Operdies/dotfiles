@@ -48,6 +48,7 @@ vim.opt.wildignore = { "*.o", "*.a" }
 
 vim.o.pumblend = 10
 vim.o.winblend = 10
+vim.o.foldlevel = 99
 
 -- hides (partial) commands in the cmd windows.
 -- Unfortunately, this also hides information about visual selections.
@@ -82,6 +83,9 @@ local function friendly_path(file)
   return file:gsub('^' .. git_dir, '󰊢 '):gsub('^' .. home_dir, " ")
 end
 
+
+-- common augroup {{{1
+local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
 
 -- Plugins {{{1
 vim.pack.add({
@@ -807,7 +811,20 @@ vim.ui.select = pick.ui_select
 -- Treesitter {{{1
 
 require('nvim-treesitter').setup()
-require('nvim-treesitter').install({ "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", })
+local filetypes = { "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", "lua" }
+require('nvim-treesitter').install(filetypes)
+
+vim.api.nvim_create_autocmd('FileType', {
+  group = augroup,
+  pattern = filetypes,
+  callback = function()
+    -- enable syntax highlighting (assigns hl-groups used by colorbuddy theme)
+    vim.treesitter.start()
+    vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.wo.foldmethod = 'expr'
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
+})
 
 require('treesitter-modules').setup({
   incremental_selection = {
@@ -977,6 +994,7 @@ vim.lsp.config('lua_ls', {
 vim.lsp.enable({ "lua_ls" })
 
 vim.api.nvim_create_autocmd('LspAttach', {
+  group = augroup,
   callback = function(ev)
     local function bufmap(mode, l, r, opts)
       opts = opts or {}
@@ -1167,8 +1185,6 @@ vim.keymap.set({ 'n', 'i', 't', 'v' }, '<ScrollWheelRight>', '<nop>')
 
 -- Autocommands {{{1
 
-local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
-
 vim.api.nvim_create_autocmd("TermOpen", {
   group = augroup,
   callback = function(args)
@@ -1188,10 +1204,10 @@ vim.api.nvim_create_autocmd("TermOpen", {
 
 
 vim.api.nvim_create_autocmd('TextYankPost', {
+  group = augroup,
   callback = function()
     vim.highlight.on_yank()
   end,
-  group = augroup,
   pattern = '*',
 })
 
@@ -1242,7 +1258,10 @@ vim.api.nvim_create_autocmd('BufReadPost', {
       -- note that this is scheduled because folds are not applied during BufReadPost,
       -- but they appear to be applied after the next schedule()
       -- use pcall() to suppress errors when no folds were found
-      vim.schedule(function() pcall(vim.cmd, "foldopen!") end)
+      local function open_folds()
+        pcall(function() vim.cmd("foldopen!") end)
+      end
+      vim.schedule(open_folds)
     end
   end,
 })
@@ -1682,4 +1701,4 @@ do
 end
 
 -- Modeline {{{1
--- vim: fdm=marker shiftwidth=2
+-- vim: fdm=marker shiftwidth=2 foldlevel=0
