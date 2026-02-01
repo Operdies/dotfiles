@@ -1,10 +1,10 @@
 local vv = require('velvet')
 require('velvet.default_config')
 local dwm = require('velvet.layout.dwm')
+local keymap = require('velvet.keymap')
 
 local home = os.getenv("HOME"):gsub("/$", "")
-local map = vv.api.keymap_set
-local rmap = function(keys, action) vv.api.keymap_set(keys, action, { repeatable = true }) end
+local map = keymap.set
 
 map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 map("<C-x>z", function() dwm.toggle_arrange() end)
@@ -15,6 +15,7 @@ map("<C-x>r", function()
   package.loaded['velvet.default_config'] = nil
   package.loaded['velvet.events'] = nil
   package.loaded['velvet.window'] = nil
+  package.loaded['velvet.keymap'] = nil
   package.loaded['velvet.layout.dwm'] = nil
   package.loaded['paint'] = nil
   package.loaded['coffee'] = nil
