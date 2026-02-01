@@ -860,7 +860,7 @@ require('treesitter-modules').setup({
 })
 
 -- LSP {{{1
-vim.lsp.set_log_level(vim.log.levels.OFF)
+vim.lsp.log.set_level(vim.log.levels.OFF)
 vim.diagnostic.config({ 
   signs = false, -- I prefer dedicating the gutter to gitsigns. Diagnostics are distracting here.
   virtual_text = { severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN } },
