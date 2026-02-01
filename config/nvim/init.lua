@@ -806,7 +806,9 @@ vim.ui.select = pick.ui_select
 
 -- Treesitter {{{1
 
+require('nvim-treesitter').setup()
 require('nvim-treesitter').install({ "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", })
+
 require('treesitter-modules').setup({
   incremental_selection = {
     enable = true,
@@ -1522,7 +1524,9 @@ end
 
 -- C# Unittest debugging {{{2
 
-require('csharp_unittest').setup({})
+if vim.treesitter.language.add('c_sharp') then
+  require('csharp_unittest').setup({})
+end
 
 -- C Debug Adapter {{{2
 
