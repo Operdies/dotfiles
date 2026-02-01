@@ -98,6 +98,8 @@ vim.pack.add({
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
   -- provides additional functions for manipulating syntax elements
   { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" },
+  -- provides easy configuration of incremental selection (previously provided directly by treesitter)
+  { src = "https://github.com/MeanderingProgrammer/treesitter-modules.nvim" },
   -- default configurations for most language servers
   { src = "https://github.com/neovim/nvim-lspconfig" },
   -- floating terminal
@@ -803,10 +805,9 @@ require('dressing').setup({ select = { enabled = false }})
 vim.ui.select = pick.ui_select
 
 -- Treesitter {{{1
-require("nvim-treesitter.configs").setup({
-  ensure_installed = { "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", },
-  indent = { enable = true, disable = { --[[ see :help nvim-treesitter-indentation-mod ]] }},
-  highlight = { enable = true },
+
+require('nvim-treesitter').install({ "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", })
+require('treesitter-modules').setup({
   incremental_selection = {
     enable = true,
     keymaps = {
@@ -816,47 +817,44 @@ require("nvim-treesitter.configs").setup({
       node_decremental = 'L',
     },
   },
-  textobjects = {
-    select = {
-      enable = true,
-      lookahead = true,         -- Automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-      },
-    },
-    move = {
-      enable = true,
-      set_jumps = true,         -- whether to set jumps in the jumplist
-      goto_next_start = {
-        [']]'] = '@function.outer',
-        [']p'] = '@parameter.inner',
-      },
-      goto_next_end = {
-        [']['] = '@function.outer',
-      },
-      goto_previous_start = {
-        ['[['] = '@function.outer',
-        ['[p'] = '@parameter.inner',
-      },
-      goto_previous_end = {
-        ['[]'] = '@function.outer',
-      },
-    },
-    swap = {
-      enable = true,
-      swap_next = {
-        ['<leader>a'] = '@parameter.inner',
-      },
-      swap_previous = {
-        ['<leader>A'] = '@parameter.inner',
-      },
+  select = {
+    enable = true,
+    lookahead = true,   -- Automatically jump forward to textobj, similar to targets.vim
+    keymaps = {
+      -- You can use the capture groups defined in textobjects.scm
+      ['aa'] = '@parameter.outer',
+      ['ia'] = '@parameter.inner',
+      ['af'] = '@function.outer',
+      ['if'] = '@function.inner',
     },
   },
-
+  move = {
+    enable = true,
+    set_jumps = true,   -- whether to set jumps in the jumplist
+    goto_next_start = {
+      [']]'] = '@function.outer',
+      [']p'] = '@parameter.inner',
+    },
+    goto_next_end = {
+      [']['] = '@function.outer',
+    },
+    goto_previous_start = {
+      ['[['] = '@function.outer',
+      ['[p'] = '@parameter.inner',
+    },
+    goto_previous_end = {
+      ['[]'] = '@function.outer',
+    },
+  },
+  swap = {
+    enable = true,
+    swap_next = {
+      ['<leader>a'] = '@parameter.inner',
+    },
+    swap_previous = {
+      ['<leader>A'] = '@parameter.inner',
+    },
+  },
 })
 
 -- LSP {{{1
