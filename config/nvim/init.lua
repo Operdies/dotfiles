@@ -816,7 +816,7 @@ require('nvim-treesitter').install(filetypes)
 
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup,
-  pattern = filetypes,
+  pattern = { "bash", "sh", "c", "cs", "html", "js", "json", "make", "xml", "yaml", "lua" },
   callback = function()
     -- enable syntax highlighting (assigns hl-groups used by colorbuddy theme)
     vim.treesitter.start()
