@@ -23,9 +23,13 @@ format = "[$ssh_symbol$hostname]($style)"
 
 [directory]
 style = "fg:#e3e5e5 bg:#769ff0"
-format = "[ $path ]($style)"
+repo_root_style = "fg:#e3e5e5 bg:#769ff0 bold"
+before_repo_root_style = "fg:#e3e5e5 bg:#769ff0"
+format = "[$path]($style)"
+repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style)'
 truncation_length = 3
 truncation_symbol = "…/"
+truncate_to_repo = false
 
 [status]
 disabled = false
