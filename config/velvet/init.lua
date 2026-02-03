@@ -84,11 +84,14 @@ local pick_window = function(on_pick)
   end
 
 
-  local index = 1
+  local index = -1
   local snapshot = {}
   local filter = ''
 
   local function draw()
+    local visible_indicator =     "👁"
+    local not_visible_indicator = " "
+
     if not picker:valid() then return end
     picker:set_title('Pick: ' .. filter)
     local lst = vv.api.get_windows()
@@ -102,18 +105,21 @@ local pick_window = function(on_pick)
     for _, win in ipairs(lst) do
       local w = windows.from_handle(win)
       if not w:is_lua() then
+        local vis = dwm.is_visible(w)
         local title = w:get_friendly_title()
-        local display = ('%d - %s'):format(w.id, title)
+        local display = ('%s  %d - %s'):format(vis and visible_indicator or not_visible_indicator, w.id, title)
         local case_sensitive = filter:lower() ~= filter
         local search = case_sensitive and display or display:lower()
         if search:find(filter, 1, true) then
           if #display > width then width = #display end
           snapshot[i] = w
           titles[i] = display
+          if index == -1 and vis then index = i end
           i = i + 1
         end
       end
     end
+    if index == -1 then index = 1 end
     height = #snapshot
     local geom2 = { left = sz.width // 2 - width // 2, width = width, height = height, top = sz.height // 2 - height // 2 }
     picker:set_geometry(geom2)
