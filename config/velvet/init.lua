@@ -10,26 +10,6 @@ map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
 map("<C-x>z", function() dwm.toggle_arrange() end)
 vv.options.key_repeat_timeout = 300
 
-map("<C-x>r", function() 
-  package.loaded['velvet.default_options'] = nil
-  package.loaded['velvet.default_config'] = nil
-  package.loaded['velvet.events'] = nil
-  package.loaded['velvet.window'] = nil
-  package.loaded['velvet.keymap'] = nil
-  package.loaded['velvet.layout.dwm'] = nil
-  package.loaded['paint'] = nil
-  package.loaded['coffee'] = nil
-  package.loaded['logpanel'] = nil
-  package.loaded['clock'] = nil
-  vv.events = require('velvet.events')
-
-  for _, id in ipairs(vv.api.get_windows()) do
-    if vv.api.window_is_lua(id) then pcall(vv.api.window_close, id) end
-  end
-  require('velvet.default_options')
-  dofile(home .. "/.config/velvet/init.lua") 
-end)
-
 map("<M-->", function() dwm.inc_inactive_dim(0.05) end)
 map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
 
