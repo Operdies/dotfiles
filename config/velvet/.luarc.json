@@ -1,5 +1,5 @@
 {
-  "workspace.library": ["/home/alex/repos/velvet/lua/velvet"],
+  "workspace.library": ["./lib"],
   "runtime": {
     "version": "Lua 5.5"
   },
