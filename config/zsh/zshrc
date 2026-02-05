@@ -27,6 +27,7 @@ generate_command_shortcuts \
 export EDITOR='nvim'
 export MANPAGER='nvim +Man! -'
 
+fpath+=($HOME/repos/velvet/main/shell-completion/zsh)
 autoload -U compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
