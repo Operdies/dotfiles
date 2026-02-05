@@ -26,167 +26,35 @@ event_manager.pre_render = function(args)
   dbg({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' })
 end
 
-local windows = require('velvet.window')
+local velvet_window = require('velvet.window')
 
---- @type velvet.window | nil
-local picker = nil
---- @param on_pick fun(win: velvet.window) pick callback
-local pick_window = function(on_pick)
-  local evt = require('velvet.events')
-  local e = evt.create_group('custom.pick_window', true)
-
-  picker = picker or windows.create()
-  local winlist = vv.api.get_windows()
-  local sz = vv.api.get_screen_geometry()
-  local width = 50
-  local height = #winlist
-  local geom = { left = sz.width // 2 - width // 2, width = width, height = height, top = sz.height // 2 - height // 2 }
-  picker:set_geometry(geom)
-  picker:set_frame_enabled(true)
-  picker:set_frame_color('red')
-  picker:set_z_index(vv.layers.popup)
-  picker:clear_background_color()
-  picker:set_opacity(0.8)
-  picker:set_transparency_mode('all')
-  picker:set_cursor_visible(false)
-  picker:set_visibility(true)
-
-  local prev_focus = vv.api.get_focused_window()
-  picker:focus()
-
-  local tmp = vv.options.focus_follows_mouse
-  vv.options.focus_follows_mouse = false
-  local function dispose()
-    vv.options.focus_follows_mouse = tmp
-    evt.delete_group(e)
-    picker:set_visibility(false)
-    if vv.api.window_is_valid(prev_focus) then vv.api.set_focused_window(prev_focus) end
-  end
-
-
-  local index = -1
-  local snapshot = {}
-  local filter = ''
-
-  local function draw()
-    local visible_indicator =     "👁"
-    local not_visible_indicator = " "
-
-    if not picker:valid() then return end
-    picker:set_title('Pick: ' .. filter)
-    local lst = vv.api.get_windows()
-    table.sort(lst, function(a, b) return a < b end)
-    local i = 1
-    snapshot = {}
-    picker:set_cursor(1, 1)
-    picker:clear_background_color()
-    picker:clear()
-    local titles = {}
-    for _, win in ipairs(lst) do
-      local w = windows.from_handle(win)
-      if not w:is_lua() then
-        local vis = dwm.is_visible(w)
-        local title = w:get_friendly_title()
-        local display = ('%s  %d - %s'):format(vis and visible_indicator or not_visible_indicator, w.id, title)
-        local case_sensitive = filter:lower() ~= filter
-        local search = case_sensitive and display or display:lower()
-        if search:find(filter, 1, true) then
-          if #display > width then width = #display end
-          snapshot[i] = w
-          titles[i] = display
-          if index == -1 and vis then index = i end
-          i = i + 1
-        end
-      end
-    end
-    if index == -1 then index = 1 end
-    height = #snapshot
-    local geom2 = { left = sz.width // 2 - width // 2, width = width, height = height, top = sz.height // 2 - height // 2 }
-    picker:set_geometry(geom2)
-    picker:set_foreground_color('blue')
-    if index > #snapshot then index = #snapshot end
-    if index < 1 then index = 1 end
-    for idx, _ in ipairs(snapshot) do
-      if idx == index then
-        picker:set_foreground_color('red')
-      else
-        picker:set_foreground_color('blue')
-      end
-      picker:set_cursor(1, idx)
-      picker:draw(("\x1b[K%s"):format(titles[idx]))
+map('<C-x>w', function()
+  local visible_indicator =     "(*) "
+  local not_visible_indicator = "    "
+  local pick = require('velvet.pick')
+  local lst = vv.api.get_windows()
+  table.sort(lst, function(a, b) return a < b end)
+  local items = {}
+  local initial_index = -1
+  local current_focus = vv.api.get_focused_window()
+  for _, id in ipairs(lst) do
+    local w = velvet_window.from_handle(id)
+    if not w:is_lua() and not w:get_parent() then
+      local display = w:get_friendly_title()
+      local prefix = w:get_visibility() and visible_indicator or not_visible_indicator
+      items[#items + 1] = { text = prefix .. display, win = w }
+      if id == current_focus then initial_index = #items end
     end
   end
 
-  local function submit()
-    dispose()
-    if index > 0 and index <= #snapshot then
-      on_pick(snapshot[index])
-    end
-  end
-
-  --- @param args velvet.api.window.on_key.event_args
-  picker:on_window_on_key(function(args)
-    local k = args.key
-    if k.event_type == 'press' or k.event_type == 'repeat' then
-      if k.name == 'ESC' or
-        (k.codepoint == string.byte('c') and k.modifiers.control)
-      then
-        dispose()
-        return
-      end
-      if k.name == 'DOWN' or
-        (k.codepoint == string.byte('n') and k.modifiers.control) then
-        index = 1 + (index % #snapshot)
-      elseif k.name == 'UP' or
-        (k.codepoint == string.byte('p') and k.modifiers.control) then
-        index = index - 1
-        if index == 0 then index = #snapshot end
-      elseif k.name == 'ENTER' then
-        submit()
-        return
-      elseif k.name == 'BACKSPACE' then
-        if #filter > 0 then
-          filter = filter:sub(1, -2)
-        end
-      elseif k.codepoint == string.byte('w') and k.modifiers.control then
-        filter = ''
-      elseif k.codepoint < 128 then
-        local cp = k.alternate_codepoint > 0 and k.alternate_codepoint or k.codepoint
-        local ch = utf8.char(cp)
-        filter = filter .. ch
-      end
-      draw()
-    end
-  end)
-
-  picker:on_mouse_click(function(_, args)
-    if args.mouse_button == 'left' and args.event_type == 'mouse_down' then
-      if args.pos.row <= #snapshot then
-        index = args.pos.row
-        submit()
-      end
-    end
-  end)
-  picker:on_mouse_move(function(_, args)
-    if args.pos.row <= #snapshot then
-      index = args.pos.row
-      draw()
-    end
-  end)
-
-  e.window_focus_changed = function(args)
-    if args.new_focus ~= picker.id then
-      dispose()
-    end
-  end
-  draw()
-end
-
-map('<C-x>w', function() 
-  pick_window(function(win)
-    win:focus()
-    dwm.make_visible(win)
-  end)
+  pick.select(items, {
+    on_choice = function(sel)
+      sel.win:focus()
+      dwm.make_visible(sel.win)
+    end,
+    prompt = "Focus window: ",
+    initial_selection = initial_index,
+  })
 end)
 
 require('clock')
@@ -198,5 +66,5 @@ for _, id in ipairs(vv.api.get_windows()) do
 end
 
 if not any_processes then
-  windows.create_process('zsh')
+  velvet_window.create_process('zsh')
 end
