@@ -68,3 +68,7 @@ end
 if not any_processes then
   velvet_window.create_process('zsh')
 end
+
+-- I am too used to the position of these keys on MacOS
+keymap.remap_key('§', '`')
+keymap.remap_key('±', '~')
