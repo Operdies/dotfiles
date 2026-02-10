@@ -1526,22 +1526,12 @@ vim.fn.sign_define("DapLogPoint", { text = "", texthl = "ErrorMsg", linehl = 
 
 -- C# Debug Adapter {{{2
 -- Download netcoredbg from: https://github.com/Samsung/netcoredbg/releases
-if is_osx then
-  vim.pack.add({
-    { src = "https://github.com/Cliffback/netcoredbg-macOS-arm64.nvim" },
-  })
-
-  local dap = require('dap')
-  require('netcoredbg-macOS-arm64').setup(dap)
-  dap.configurations.cs = {}
-else
-  local netcoredbg = vim.fs.joinpath(tools_dir, 'netcoredbg', 'netcoredbg')
-  dap.adapters.coreclr = {
-    type = 'executable',
-    command = netcoredbg,
-    args = { '--interpreter=vscode' }
-  }
-end
+local netcoredbg = vim.fs.joinpath(tools_dir, 'netcoredbg', 'build', 'src', 'netcoredbg')
+dap.adapters.coreclr = {
+  type = 'executable',
+  command = netcoredbg,
+  args = { '--interpreter=vscode' }
+}
 
 -- C# Unittest debugging {{{2
 
