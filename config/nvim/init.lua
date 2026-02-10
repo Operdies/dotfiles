@@ -987,7 +987,7 @@ vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
       runtime = {
-        version = 'LuaJIT',
+        version = 'Lua 5.5',
       }
     }
   }
