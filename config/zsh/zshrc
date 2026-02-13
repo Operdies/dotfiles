@@ -55,3 +55,7 @@ setopt INC_APPEND_HISTORY
 # less does not properly display graphemes without this (??)
 export LESSCHARSET=utf8
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH:$HOME/.local/bin"
+
+if [ -f ~/.zsh_local ]; then
+  . ~/.zsh_local
+fi
