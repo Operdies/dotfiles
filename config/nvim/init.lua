@@ -1040,8 +1040,7 @@ vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
 vim.keymap.set({ 'n', 'x' }, '<leader>d', '"+d') -- delete to system clipboard
 vim.keymap.set('n', '<C-s>', "<cmd>write<cr>")  -- write buffer if it has unsaved changes
 vim.keymap.set('n', '<leader>fh', "<cmd>Pick help<CR>")
--- vim.keymap.set('n', '<leader>ff', function() require('mini.pick').builtin.files({ tool = "fd" }, nil) end)
-vim.keymap.set('n', 'gff', function() require('mini.pick').builtin.files({ tool = "fd" }, nil) end)
+vim.keymap.set('n', 'gff', function() pick.builtin.cli({ command = { 'fd', '-H', '-E', '.git' } }, nil) end)
 vim.keymap.set('n', '<leader>fg', "<cmd>Pick grep_live<CR>")
 vim.keymap.set('n', '<leader>cs', "<cmd>Pick lsp scope='document_symbol'<cr>")
 vim.keymap.set('n', 'gfj', "<cmd>Pick pick_jumplist<CR>")
