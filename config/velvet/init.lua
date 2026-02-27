@@ -15,7 +15,7 @@ map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
 
 local paint = require('paint')
 map("<C-x>paint", paint.create_paint)
-require('coffee').enable()
+-- require('coffee').enable()
 
 
 local logpanel = require('logpanel')
