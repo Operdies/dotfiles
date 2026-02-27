@@ -1447,6 +1447,19 @@ function lazygit_edit_file(file, line)
   pcall(vim.cmd, cmd)
 end
 
+if is_osx then
+  local opencode = require('toggleterm.terminal').Terminal:new({
+    cmd = 'agent opencode',
+    hidden = true,
+    direction = 'float',
+    on_open = function(term)
+      vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-q>", '<cmd>close<cr>', { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-\\>", '<cmd>close<cr>', { noremap = true, silent = true })
+    end,
+  })
+  vim.keymap.set("n", "<leader>go", function() opencode:toggle() end, { desc = "opencode" })
+end
+
 
 -- dap {{{1
 
