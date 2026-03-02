@@ -811,12 +811,12 @@ vim.ui.select = pick.ui_select
 -- Treesitter {{{1
 
 require('nvim-treesitter').setup()
-local filetypes = { "bash", "c", "c_sharp", "html", "javascript", "json", "make", "xml", "yaml", "lua" }
+local filetypes = { "bash", "c", "c_sharp", "html", "javascript", "typescript", "json", "make", "xml", "yaml", "lua" }
 require('nvim-treesitter').install(filetypes)
 
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup,
-  pattern = { "bash", "sh", "c", "cs", "html", "js", "json", "make", "xml", "yaml", "lua" },
+  pattern = { "bash", "sh", "c", "cs", "html", "js", "json", "make", "xml", "yaml", "lua", "ts", "typescript" },
   callback = function()
     -- enable syntax highlighting (assigns hl-groups used by colorbuddy theme)
     vim.treesitter.start()
@@ -994,6 +994,18 @@ vim.lsp.config('lua_ls', {
 })
 
 vim.lsp.enable({ "lua_ls" })
+
+if vim.fn.executable('typescript-language-server') then
+  vim.lsp.config('typescript_ls', {
+    cmd = { 'typescript-language-server', '--stdio' },
+    filetypes = { 'js', 'javascript', 'ts', 'typescript' },
+    root_markers = {
+      'package.json', 'tsconfig.json'
+    },
+  })
+
+  vim.lsp.enable({ 'typescript_ls' })
+end
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = augroup,
