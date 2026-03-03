@@ -391,8 +391,8 @@ local function oil_setup()
     if result.code == 0 then
       for line in vim.gsplit(result.stdout, "\n", { plain = true, trimempty = true }) do
         -- Remove trailing slash
-        line = line:gsub("/$", "")
-        ret[line] = true
+        local l2 = line:gsub("/$", "")
+        ret[l2] = true
       end
     end
     return ret
@@ -811,12 +811,12 @@ vim.ui.select = pick.ui_select
 -- Treesitter {{{1
 
 require('nvim-treesitter').setup()
-local filetypes = { "bash", "c", "c_sharp", "html", "javascript", "typescript", "json", "make", "xml", "yaml", "lua" }
+local filetypes = { "bash", "c", "c_sharp", "html", "javascript", "typescript", "json", "make", "xml", "yaml", "lua", "odin" }
 require('nvim-treesitter').install(filetypes)
 
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup,
-  pattern = { "bash", "sh", "c", "cs", "html", "js", "json", "make", "xml", "yaml", "lua", "ts", "typescript" },
+  pattern = { "bash", "sh", "c", "cs", "html", "js", "json", "make", "xml", "yaml", "lua", "ts", "typescript", "odin" },
   callback = function()
     -- enable syntax highlighting (assigns hl-groups used by colorbuddy theme)
     vim.treesitter.start()
@@ -1007,6 +1007,17 @@ if vim.fn.executable('typescript-language-server') then
   vim.lsp.enable({ 'typescript_ls' })
 end
 
+local ols = vim.fs.joinpath(tools_dir, 'ols', 'ols')
+if vim.fn.executable(ols) then
+  vim.lsp.config('ols', {
+    cmd = { ols },
+    filetypes = { "odin" },
+    root_markers = { ".git" },
+  })
+  vim.lsp.enable({ "ols" })
+end
+
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = augroup,
   callback = function(ev)
@@ -1157,9 +1168,9 @@ vim.keymap.set('n', "<leader>f'", "<cmd>Pick registers<CR>")
 
 vim.keymap.set('n', '<leader>o', "<cmd>Oil<CR>")
 -- TODO: Get out of the habit of formatting code!
--- vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
-vim.keymap.set('n', '<leader>cf', prefer("formatting ranges"))
-vim.keymap.set('x', '<leader>cf', vim.lsp.buf.format)
+vim.keymap.set({'x','n'}, '<leader>cf', vim.lsp.buf.format)
+-- vim.keymap.set('n', '<leader>cf', prefer("formatting ranges"))
+-- vim.keymap.set('x', '<leader>cf', vim.lsp.buf.format)
 vim.keymap.set('n', "<leader>bd", "<cmd>bp|bd #<cr>")    -- close current buffer
 vim.keymap.set('n', "<esc>", "<esc><cmd>nohlsearch<cr>") -- clear search highlight on escape
 vim.keymap.set('n', "gp", "`[v`]")                       -- visually select last paste
@@ -1231,6 +1242,16 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
     vim.opt_local.filetype = "xml"
     vim.opt_local.shiftwidth = 4
+  end,
+})
+
+-- Use tab indentation in some languages (go, odin)
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = augroup,
+  pattern = { "*.go", "*.odin" },
+  callback = function()
+    vim.opt_local.expandtab = false
+    vim.opt_local.shiftwidth = 2
   end,
 })
 
