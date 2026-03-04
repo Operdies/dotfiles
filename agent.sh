@@ -14,16 +14,39 @@
 # This causes weird issues when compilation servers are shared between agents.
 export UseSharedCompilation=false
 cmd="opencode"
+sandbox_config="code-mode"
 
-case "$1" in
-  "")
-    ;;
-  *)
-    cmd=("$@")
-esac
+while ! test -z "$1"; do
+  case "$1" in
+    "")
+      ;;
+    "--mode")
+      shift
+      case "$1" in 
+        "code")
+          sandbox_config="code-mode"
+          ;;
+        "chat")
+          sandbox_config="chat-mode"
+          ;;
+        *)
+          echo "Unrecognized mode: $1. Only code and chat is supported."
+          exit 1
+          ;;
+      esac
+      ;;
+    *)
+      cmd=("$@")
+      break
+      ;;
+  esac
+  shift
+done
 
-workdir="$(pwd)"
-sandbox-exec -f <(cat << EOF
+chat-mode() {
+  binary="$(realpath $(command which ${cmd[0]}))"
+  workdir="$(pwd)"
+  cat << EOF
 (version 1)
 (allow default)                             ; by default, allow everything.
                                             ; It would be better to deny everything by default,
@@ -36,8 +59,8 @@ sandbox-exec -f <(cat << EOF
 
 (deny file-write* (regex "^/"))             ; deny writing all files by default.
 
-(allow file-write* 
-  ; (regex "^/dev")                         ; unclear if this is needed; stdin/stdout is here, but TUIs appear to work without it.
+(allow file* 
+  (regex "^/dev")
   (regex "^/var")                           ; temp files
   (regex "^/tmp")                           ; temp files
   (regex "^/private")                       ; temp files
@@ -48,9 +71,21 @@ sandbox-exec -f <(cat << EOF
   (regex "^${HOME}/.local/share/opencode")  ; opencode config
   (regex "^${HOME}/.local/state/opencode")  ;
   (regex "^${HOME}/.config/opencode")       ;
-  (regex "^${HOME}/.cache/opencode")        ;
-  (regex "^${HOME}/.nuget")                 ; nuget cache
-  (regex "^${workdir}"))
+  (regex "^${HOME}/.cache/opencode"))       ;
+(allow file-read* (regex "^${workdir}"))
 
 (deny file* (regex "^${HOME}/.ssh"))        ; deny reading / writing ssh keys
-EOF) ${cmd[@]}
+EOF
+}
+
+code-mode() {
+  workdir="$(pwd)"
+  chat-mode
+  cat << EOF
+(allow file-write* 
+  (regex "^${HOME}/.nuget")                 ; nuget cache
+  (regex "^${workdir}"))
+EOF
+}
+
+sandbox-exec -f <(${sandbox_config}) ${cmd[@]}
