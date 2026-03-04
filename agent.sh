@@ -35,6 +35,10 @@ while ! test -z "$1"; do
           ;;
       esac
       ;;
+    -*)
+      echo "unrecognized option $1"
+      exit 1
+      ;;
     *)
       cmd=("$@")
       break
@@ -59,7 +63,7 @@ chat-mode() {
 
 (deny file-write* (regex "^/"))             ; deny writing all files by default.
 
-(allow file* 
+(allow file-write*  file-read*
   (regex "^/dev")
   (regex "^/var")                           ; temp files
   (regex "^/tmp")                           ; temp files
