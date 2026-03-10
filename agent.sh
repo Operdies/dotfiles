@@ -78,6 +78,10 @@ chat-mode() {
   (regex "^${HOME}/.cache/opencode"))       ;
 (allow file-read* (regex "^${workdir}"))
 
+(deny network*                              ; block docker access since this is a trivial full sandbox escape
+  (literal "/var/run/docker.sock")
+  (literal "/private/var/run/docker.sock")
+  (literal "${HOME}/.docker/run/docker.sock"))
 (deny file* (regex "^${HOME}/.ssh"))        ; deny reading / writing ssh keys
 EOF
 }
