@@ -995,7 +995,7 @@ vim.lsp.config('lua_ls', {
 
 vim.lsp.enable({ "lua_ls" })
 
-if vim.fn.executable('typescript-language-server') then
+if vim.fn.executable('typescript-language-server') == 1 then
   vim.lsp.config('typescript_ls', {
     cmd = { 'typescript-language-server', '--stdio' },
     filetypes = { 'js', 'javascript', 'ts', 'typescript' },
@@ -1008,7 +1008,7 @@ if vim.fn.executable('typescript-language-server') then
 end
 
 local ols = vim.fs.joinpath(tools_dir, 'ols', 'ols')
-if vim.fn.executable(ols) then
+if vim.fn.executable(ols) == 1 then
   vim.lsp.config('ols', {
     cmd = { ols },
     filetypes = { "odin" },
