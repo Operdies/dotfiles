@@ -37,10 +37,11 @@ function paint.create_paint()
   canvas:on_mouse_click(draw)
   canvas:on_mouse_move(draw)
 
+  local keymap = require('velvet.keymap')
   local close_sequence = '<C-x>closepaint'
-  vv.api.keymap_set(close_sequence, function()
+  keymap.set(close_sequence, function()
     canvas:close()
-    vv.api.keymap_del(close_sequence)
+    keymap.del(close_sequence)
   end)
 
   do
