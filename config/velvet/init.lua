@@ -1,25 +1,28 @@
 local vv = require('velvet')
-require('velvet.default_config')
+local map_prefix = "<C-x>"
+require('velvet.default_config').setup({ prefix = map_prefix })
+
 local dwm = require('velvet.layout.dwm')
 local keymap = require('velvet.keymap')
 
 local home = os.getenv("HOME"):gsub("/$", "")
 local map = keymap.set
 
-map("<C-x>K", function() vv.api.window_close(vv.api.get_focused_window()) end)
-map("<C-x>z", function() dwm.toggle_arrange() end)
+map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window()) end)
+map(map_prefix .. "z", function() dwm.toggle_arrange() end)
 vv.options.key_repeat_timeout = 300
 
 map("<M-->", function() dwm.inc_inactive_dim(0.05) end)
 map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
 
 local paint = require('paint')
-map("<C-x>paint", paint.create_paint)
+map(map_prefix .. "paint", paint.create_paint)
 -- require('coffee').enable()
 
 
 local logpanel = require('logpanel')
 map('<M-x>logs', logpanel.toggle)
+-- logpanel.enable()
 
 local event_manager = vv.events.create_group('debug.log_render_timing', true)
 event_manager.pre_render = function(args)
@@ -28,7 +31,7 @@ end
 
 local velvet_window = require('velvet.window')
 
-map('<C-x>w', function()
+map(map_prefix .. 'w', function()
   local visible_indicator =     "(*) "
   local not_visible_indicator = "    "
   local pick = require('velvet.pick')
