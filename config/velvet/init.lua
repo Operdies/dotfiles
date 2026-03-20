@@ -90,7 +90,7 @@ do
     local width = screen_size.width + 2
     if width < minwidth then width = minwidth end
     local height = screen_size.height // 3
-    local minheight = math.min(40, screen_size.height)
+    local minheight = math.max(20, screen_size.height // 2)
     if height < minheight then height = minheight end
     local hostSize = {
       width = width,
@@ -139,9 +139,11 @@ do
       quakeHost:set_geometry(geom)
     end)
     setsize()
+    local screen = vv.api.get_screen_geometry()
+    local _, new_size = get_size()
+    new_size.top = screen.height
+    quake:set_geometry(new_size)
   end
-
-  create_quake()
 
   local prevFocus = nil
   local visible = false
@@ -179,7 +181,7 @@ do
   end
 
   local function toggle()
-    if not quake:valid() then
+    if not quake or not quake:valid() then
       visible = false
       if quakeHost and quakeHost:valid() then quakeHost:close() end
       create_quake()
