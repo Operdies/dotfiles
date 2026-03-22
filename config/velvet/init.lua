@@ -68,10 +68,6 @@ for _, id in ipairs(vv.api.get_windows()) do
   if not vv.api.window_is_lua(id) then any_processes = true end
 end
 
-if not any_processes then
-  velvet_window.create_process('zsh')
-end
-
 -- I am too used to the position of these keys on MacOS
 keymap.remap_key('§', '`')
 keymap.remap_key('±', '~')
@@ -141,8 +137,6 @@ do
     setsize()
   end
 
-  create_quake()
-
   local prevFocus = nil
   local visible = false
 
@@ -179,7 +173,7 @@ do
   end
 
   local function toggle()
-    if not quake:valid() then
+    if quake == nil or not quake:valid() then
       visible = false
       if quakeHost and quakeHost:valid() then quakeHost:close() end
       create_quake()
