@@ -25,7 +25,7 @@ local function update_clock()
   local width = #text * 8
   local height = 7
   local sz = vv.api.get_screen_geometry()
-  timer:set_geometry({ left = sz.width // 2 - width // 2 - 1, top = sz.height - height - 5, width = width + 1, height = height })
+  timer:set_geometry({ left = sz.width // 2 - width // 2, top = sz.height - height - 5, width = width, height = height })
 
   timer:clear_background_color()
   timer:clear()
