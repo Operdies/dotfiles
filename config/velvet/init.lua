@@ -247,8 +247,11 @@ local function overlay(blockwise)
     if col1 > col2 then col1, col2 = col2, col1 end
     if row1 > row2 then row1, row2 = row2, row1 end
 
+    -- TODO: This makes sense for block select, but is misguided. It makes line select much more complicated than it needs to be
+    -- We need to collect a list of {{start, end}} pairs and fetch the text linewise from the window.
+    -- We also need to actually draw the selected text on the overlay, otherwise behavior gets a bit weird with double width chars
     if col1 < 1 then col1 = 1 end
-    if col2 > geom.width then col2 = geom.width + 1 end
+    if col2 > geom.width then col2 = geom.width end
     if row1 < 1 then row1 = 1 end
     if row2 > geom.height then row2 = geom.height end
 
@@ -259,28 +262,34 @@ local function overlay(blockwise)
     end
 
     do
-      local c1 = { col = col1, row = row1 }
-      local c2 = { col = col2, row = row2 }
-      c1 = global_to_local(ov.id, local_to_global(selection.id, c1))
-      c2 = global_to_local(ov.id, local_to_global(selection.id, c2))
+      local c_start_orig = global_to_local(ov.id, local_to_global(selection.id, selection.start))
+      local c_end_orig = global_to_local(ov.id, local_to_global(selection.id, selection._end))
+
+      local c_start = { col = col1, row = row1 }
+      local c_end = { col = col2, row = row2 }
+      c_start = global_to_local(ov.id, local_to_global(selection.id, c_start))
+      c_end = global_to_local(ov.id, local_to_global(selection.id, c_end))
 
       if blockwise then
-        for row = c1.row, c2.row do
-          ov:set_cursor(c1.col, row)
-          local str = (' '):rep(1 + c2.col - c1.col)
+        for row = c_start.row, c_end.row do
+          ov:set_cursor(c_start.col, row)
+          local str = (' '):rep(1 + c_end.col - c_start.col)
           ov:draw(str)
         end
       else
-        -- TODO: line selection broken
-        -- When there is only one line nothing is highlighted,
-        -- and it looks like not enough characters are highlighted on the boundaries
-        local selection_start_col = selection.start.col
-        local selection_end_col = selection._end.col
-        if selection.start.row > selection._end.row then selection_start_col, selection_end_col = selection_end_col,
-              selection_start_col end
-        for row = c1.row, c2.row do
-          local start_col = (row == c1.row) and selection_start_col or 1
-          local end_col   = (row == c2.row) and selection_end_col or geom.width
+        local upleft, bottomright = c_start_orig.col, c_end_orig.col
+        if c_start_orig.row > c_end_orig.row then
+          -- when multiple lines are selected, the start/end column depends on
+          -- the direction of the selection
+          upleft, bottomright = bottomright, upleft
+        end
+        for row = c_start.row, c_end.row do
+          local start_col = (row == c_start.row) and upleft or geom.left
+          local end_col   = (row == c_end.row) and 1 + bottomright or geom.width + geom.left
+          if c_start_orig.row == c_end_orig.row then
+            -- special case when only one line is selected
+            start_col, end_col = c_start.col, c_end.col
+          end
           ov:set_cursor(start_col, row)
           ov:draw((' '):rep(end_col - start_col))
         end
@@ -314,4 +323,4 @@ end
 
 map("<C-x>v", function() overlay(false) end)
 map("<C-x>V", function() overlay(true) end)
-logpanel.enable()
+-- logpanel.enable()
