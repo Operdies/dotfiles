@@ -185,7 +185,8 @@ do
   map("<F1>", toggle)
 end
 
-local function overlay(blockwise)
+local function overlay()
+  local blockwise = false
   local function local_to_global(id, cord)
     local geom = vv.api.window_get_geometry(id)
     return { col = geom.left + cord.col - 1, row = geom.top + cord.row - 1 }
@@ -196,20 +197,22 @@ local function overlay(blockwise)
   end
 
   local ov = velvet_window.create()
+
+  -- put selection overlay on top of everything else to capture mouse events
   ov:set_z_index(100000)
   ov:set_cursor_visible(false)
-  ov:set_background_color('yellow')
-  ov:set_opacity(0.3)
+
+  -- only highlight selected region -- the rest of the window is completely opaque
+  ov:set_opacity(0.1)
+  ov:set_transparency_mode('clear')
+
+  -- cover the entire screen
   local sz = vv.api.get_screen_geometry()
   ov:set_geometry({ left = 1, top = 1, width = sz.width, height = sz.height })
   ov:focus()
-  ov:on_window_on_key(function(_, args)
-    if args.key.codepoint == 27 then
-      ov:close()
-    end
-  end)
 
-  local function hit(cord)
+  local function get_topmost_window_at_cord(cord)
+    -- find the topmost window in the Z order which is underneath the indicated coordinate.
     local windows = vv.api.get_windows()
     local lst = {}
     for _, id in ipairs(windows) do
@@ -221,21 +224,24 @@ local function overlay(blockwise)
       end
     end
     table.sort(lst, function(x, y) return x.z > y.z end)
-    for _, w in ipairs(lst) do
-      if cord.col >= w.geom.left and cord.col < w.geom.left + w.geom.width
-          and cord.row >= w.geom.top and cord.row < w.geom.top + w.geom.height then
-        return w.win
+    for _, it in ipairs(lst) do
+      if cord.col >= it.geom.left and cord.col < it.geom.left + it.geom.width
+          and cord.row >= it.geom.top and cord.row < it.geom.top + it.geom.height then
+        return it.win
       end
     end
   end
 
   local selection = nil
+  local dragging = false
 
   local function draw()
     if not selection then return end
     ov:clear_background_color()
     ov:clear()
-    local bg = blockwise and 'yellow' or 'red'
+    local linewise_bg = '#ffffffc0'
+    local blockwise_bg = '#ffffffc0'
+    local bg = blockwise and blockwise_bg or linewise_bg
     ov:set_background_color(bg)
 
     local geom = vv.api.window_get_geometry(selection.id)
@@ -297,30 +303,41 @@ local function overlay(blockwise)
     end
   end
 
+  ov:on_window_on_key(function(_, args)
+    -- close on escape
+    if args.key.codepoint == 27 then
+      ov:close()
+    elseif dragging then
+      -- detect alt without moving the mouse. this only works when the hosting terminal supports kitty keys
+      blockwise = args.key.modifiers.alt and true or false
+      draw()
+    end
+  end)
+
   ov:on_mouse_move(function(_, move)
-    if not selection then return end
+    if not selection or not dragging then return end
     selection._end = global_to_local(selection.id, local_to_global(move.win_id, move.pos))
+    blockwise = move.modifiers.alt and true or false
     draw()
   end)
 
   ov:on_mouse_click(function(_, click)
     if click.mouse_button == 'left' then
       if click.event_type == 'mouse_down' then
-        local win = hit(local_to_global(click.win_id, click.pos))
+        local win = get_topmost_window_at_cord(local_to_global(click.win_id, click.pos))
         if win then
+          dragging = true
+          blockwise = click.modifiers.alt and true or false
           local pos = global_to_local(win.id, local_to_global(click.win_id, click.pos))
           selection = { id = win.id, start = pos, _end = pos }
           draw()
         end
       else
-        selection = nil
-        ov:clear_background_color()
-        ov:clear()
+        dragging = false
       end
     end
   end)
 end
 
-map("<C-x>v", function() overlay(false) end)
-map("<C-x>V", function() overlay(true) end)
--- logpanel.enable()
+map("<C-x>v", overlay)
+logpanel.enable()
