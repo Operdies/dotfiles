@@ -63,7 +63,6 @@ end)
 require('clock')
 vv.options.theme = require('velvet.themes').catppuccin.mocha
 
-local any_processes = false
 for _, id in ipairs(vv.api.get_windows()) do
   if not vv.api.window_is_lua(id) then any_processes = true end
 end
@@ -88,19 +87,12 @@ do
     local height = screen_size.height // 3
     local minheight = math.min(40, screen_size.height)
     if height < minheight then height = minheight end
-    local hostSize = {
+    return {
       width = width,
       height = height,
-      left = -1,
+      left = 1,
       top = 1 + screen_size.height - height,
     }
-    local winSize = {
-      width = hostSize.width - 2,
-      height = hostSize.height - 2,
-      left = hostSize.left + 1,
-      top = hostSize.top + 1,
-    }
-    return hostSize, winSize
   end
 
   local function setsize()
@@ -112,30 +104,9 @@ do
     quakeHost:set_background_color('black')
     quakeHost:set_opacity(0.1)
     quakeHost:set_z_index(quake:get_z_index())
-    local hostSize, winSize = get_size()
-    quakeHost:set_geometry(hostSize)
+    local winSize = get_size()
     quake:set_geometry(winSize)
     quakeHost:clear()
-  end
-
-  local function create_quake()
-    quakeHost = velvet_window.create()
-    quake = quakeHost:create_child_process_window("zsh",
-      { working_directory = vv.api.window_get_working_directory(vv.api.get_focused_window()) })
-    quake_evt.screen_resized = setsize
-    quake:set_visibility(false)
-    quakeHost:set_visibility(false)
-
-    quake:on_window_closed(function() quakeHost:close() end)
-    quake:on_window_moved(function(_, args)
-      local geom = args.new_size
-      geom.height = geom.height + 2
-      geom.width = geom.width + 2
-      geom.left = geom.left - 1
-      geom.top = geom.top - 1
-      quakeHost:set_geometry(geom)
-    end)
-    setsize()
   end
 
   local prevFocus = nil
@@ -143,7 +114,7 @@ do
 
   local anim = require('velvet.stdlib.animation')
 
-  local anim_duration = 200
+  local anim_duration = 100
   local function hide()
     if prevFocus and vv.api.window_is_valid(prevFocus) then
       vv.api.set_focused_window(prevFocus)
@@ -151,7 +122,7 @@ do
     end
 
     local screen = vv.api.get_screen_geometry()
-    local _, new_size = get_size()
+    local new_size = get_size()
     new_size.top = screen.height
     anim.animate(quake.id, new_size, anim_duration, {
       easing_function = anim.easing.spring,
@@ -164,13 +135,33 @@ do
   end
 
   local function show()
-    prevFocus = vv.api.get_focused_window()
+    local focus = vv.api.get_focused_window()
+    if focus ~= quake.id then prevFocus = focus end
     quake:set_visibility(true)
     quakeHost:set_visibility(true)
     quake:focus()
-    local _, new_size = get_size()
+    local new_size = get_size()
     anim.animate(quake.id, new_size, anim_duration, { easing_function = anim.easing.spring })
     visible = true
+  end
+
+  local function create_quake()
+    quakeHost = velvet_window.create()
+    quake = quakeHost:create_child_process_window("zsh",
+      { working_directory = vv.api.window_get_working_directory(vv.api.get_focused_window()) })
+    quake_evt.screen_resized = setsize
+    quake:set_visibility(false)
+    quakeHost:set_visibility(false)
+
+    quake:on_window_closed(function() quakeHost:close() end)
+    quake:on_window_moved(function(_, args) quakeHost:set_geometry(args.new_size) end)
+    quake:on_focus_changed(function(_, args)
+      if args.new == quake then show() else hide() end
+      if args.new == quake then
+        if args.old and args.old ~= quake then prevFocus = args.old.id end
+      end
+    end)
+    setsize()
   end
 
   local function toggle()
