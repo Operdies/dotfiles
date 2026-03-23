@@ -32,7 +32,7 @@ end
 local velvet_window = require('velvet.window')
 
 map(map_prefix .. 'w', function()
-  local visible_indicator =     "(*) "
+  local visible_indicator = "(*) "
   local not_visible_indicator = "    "
   local pick = require('velvet.pick')
   local lst = vv.api.get_windows()
@@ -120,7 +120,8 @@ do
 
   local function create_quake()
     quakeHost = velvet_window.create()
-    quake = quakeHost:create_child_process_window("zsh", { working_directory = vv.api.window_get_working_directory(vv.api.get_focused_window()) })
+    quake = quakeHost:create_child_process_window("zsh",
+      { working_directory = vv.api.window_get_working_directory(vv.api.get_focused_window()) })
     quake_evt.screen_resized = setsize
     quake:set_visibility(false)
     quakeHost:set_visibility(false)
@@ -183,3 +184,134 @@ do
 
   map("<F1>", toggle)
 end
+
+local function overlay(blockwise)
+  local function local_to_global(id, cord)
+    local geom = vv.api.window_get_geometry(id)
+    return { col = geom.left + cord.col - 1, row = geom.top + cord.row - 1 }
+  end
+  local function global_to_local(id, cord)
+    local geom = vv.api.window_get_geometry(id)
+    return { col = 1 + cord.col - geom.left, row = 1 + cord.row - geom.top }
+  end
+
+  local ov = velvet_window.create()
+  ov:set_z_index(100000)
+  ov:set_cursor_visible(false)
+  ov:set_background_color('yellow')
+  ov:set_opacity(0.3)
+  local sz = vv.api.get_screen_geometry()
+  ov:set_geometry({ left = 1, top = 1, width = sz.width, height = sz.height })
+  ov:focus()
+  ov:on_window_on_key(function(_, args)
+    if args.key.codepoint == 27 then
+      ov:close()
+    end
+  end)
+
+  local function hit(cord)
+    local windows = vv.api.get_windows()
+    local lst = {}
+    for _, id in ipairs(windows) do
+      local win = velvet_window.from_handle(id)
+      if id ~= ov.id and win:get_visibility() then
+        local z = vv.api.window_get_z_index(id)
+        local g = vv.api.window_get_geometry(id)
+        lst[#lst + 1] = { win = win, z = z, geom = g }
+      end
+    end
+    table.sort(lst, function(x, y) return x.z > y.z end)
+    for _, w in ipairs(lst) do
+      if cord.col >= w.geom.left and cord.col < w.geom.left + w.geom.width
+          and cord.row >= w.geom.top and cord.row < w.geom.top + w.geom.height then
+        return w.win
+      end
+    end
+  end
+
+  local selection = nil
+
+  local function draw()
+    if not selection then return end
+    ov:clear_background_color()
+    ov:clear()
+    local bg = blockwise and 'yellow' or 'red'
+    ov:set_background_color(bg)
+
+    local geom = vv.api.window_get_geometry(selection.id)
+    local col1 = selection.start.col
+    local col2 = selection._end.col
+    local row1 = selection.start.row
+    local row2 = selection._end.row
+
+    if col1 > col2 then col1, col2 = col2, col1 end
+    if row1 > row2 then row1, row2 = row2, row1 end
+
+    if col1 < 1 then col1 = 1 end
+    if col2 > geom.width then col2 = geom.width + 1 end
+    if row1 < 1 then row1 = 1 end
+    if row2 > geom.height then row2 = geom.height end
+
+    local region = { left = col1, width = col2 - col1, top = row1, height = 1 + row2 - row1 }
+    local text = vv.api.window_get_text(selection.id, region)
+    for i, line in ipairs(text) do
+      dbg(("%d) %s"):format(i, line))
+    end
+
+    do
+      local c1 = { col = col1, row = row1 }
+      local c2 = { col = col2, row = row2 }
+      c1 = global_to_local(ov.id, local_to_global(selection.id, c1))
+      c2 = global_to_local(ov.id, local_to_global(selection.id, c2))
+
+      if blockwise then
+        for row = c1.row, c2.row do
+          ov:set_cursor(c1.col, row)
+          local str = (' '):rep(1 + c2.col - c1.col)
+          ov:draw(str)
+        end
+      else
+        -- TODO: line selection broken
+        -- When there is only one line nothing is highlighted,
+        -- and it looks like not enough characters are highlighted on the boundaries
+        local selection_start_col = selection.start.col
+        local selection_end_col = selection._end.col
+        if selection.start.row > selection._end.row then selection_start_col, selection_end_col = selection_end_col,
+              selection_start_col end
+        for row = c1.row, c2.row do
+          local start_col = (row == c1.row) and selection_start_col or 1
+          local end_col   = (row == c2.row) and selection_end_col or geom.width
+          ov:set_cursor(start_col, row)
+          ov:draw((' '):rep(end_col - start_col))
+        end
+      end
+    end
+  end
+
+  ov:on_mouse_move(function(_, move)
+    if not selection then return end
+    selection._end = global_to_local(selection.id, local_to_global(move.win_id, move.pos))
+    draw()
+  end)
+
+  ov:on_mouse_click(function(_, click)
+    if click.mouse_button == 'left' then
+      if click.event_type == 'mouse_down' then
+        local win = hit(local_to_global(click.win_id, click.pos))
+        if win then
+          local pos = global_to_local(win.id, local_to_global(click.win_id, click.pos))
+          selection = { id = win.id, start = pos, _end = pos }
+          draw()
+        end
+      else
+        selection = nil
+        ov:clear_background_color()
+        ov:clear()
+      end
+    end
+  end)
+end
+
+map("<C-x>v", function() overlay(false) end)
+map("<C-x>V", function() overlay(true) end)
+logpanel.enable()
