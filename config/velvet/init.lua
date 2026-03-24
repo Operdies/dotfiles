@@ -95,6 +95,10 @@ local function overlay()
   ov:set_geometry({ left = 1, top = 1, width = sz.width, height = sz.height })
   ov:focus()
 
+  ov:on_focus_changed(function(_, args)
+    if args.new ~= ov then ov:close() end
+  end)
+
   local function get_topmost_window_at_cord(cord)
     -- find the topmost window in the Z order which is underneath the indicated coordinate.
     local windows = vv.api.get_windows()
