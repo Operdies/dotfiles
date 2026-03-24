@@ -69,7 +69,8 @@ keymap.remap_key('±', '~')
 
 map("<F1>", require('quake').toggle)
 
-local function overlay()
+--- @param on_select fun(text: string): nil
+local function mouse_copy(on_select)
   local blockwise = false
   local function local_to_global(id, cord)
     local geom = vv.api.window_get_geometry(id)
@@ -87,8 +88,9 @@ local function overlay()
   ov:set_cursor_visible(false)
 
   -- only highlight selected region -- the rest of the window is completely opaque
-  ov:set_opacity(0.1)
-  ov:set_transparency_mode('clear')
+  local clear_bg = '#00000020'
+  ov:set_background_color(clear_bg)
+  ov:clear()
 
   -- cover the entire screen
   local sz = vv.api.get_screen_geometry()
@@ -123,88 +125,85 @@ local function overlay()
   local selection = nil
   local dragging = false
 
-  local function draw()
-    if not selection then return end
-    ov:clear_background_color()
-    ov:clear()
-    local linewise_bg = '#ffffffc0'
-    local blockwise_bg = '#ffffffc0'
-    local bg = blockwise and blockwise_bg or linewise_bg
-    ov:set_background_color(bg)
-
+  local function get_selection_ranges()
+    if not selection then return nil end
     local geom = vv.api.window_get_geometry(selection.id)
-    local col1 = selection.start.col
-    local col2 = selection._end.col
-    local row1 = selection.start.row
-    local row2 = selection._end.row
-
-    if col1 > col2 then col1, col2 = col2, col1 end
-    if row1 > row2 then row1, row2 = row2, row1 end
-
-    -- TODO: This makes sense for block select, but is misguided. It makes line select much more complicated than it needs to be
-    -- We need to collect a list of {{start, end}} pairs and fetch the text linewise from the window.
-    -- We also need to actually draw the selected text on the overlay, otherwise behavior gets a bit weird with double width chars
-    if col1 < 1 then col1 = 1 end
-    if col2 > geom.width then col2 = geom.width end
-    if row1 < 1 then row1 = 1 end
-    if row2 > geom.height then row2 = geom.height end
-
-    local region = { left = col1, width = col2 - col1, top = row1, height = 1 + row2 - row1 }
-    local text = vv.api.window_get_text(selection.id, region)
-    for i, line in ipairs(text) do
-      dbg(("%d) %s"):format(i, line))
-    end
-
-    do
-      local c_start_orig = global_to_local(ov.id, local_to_global(selection.id, selection.start))
-      local c_end_orig = global_to_local(ov.id, local_to_global(selection.id, selection._end))
-
-      local c_start = { col = col1, row = row1 }
-      local c_end = { col = col2, row = row2 }
-      c_start = global_to_local(ov.id, local_to_global(selection.id, c_start))
-      c_end = global_to_local(ov.id, local_to_global(selection.id, c_end))
-
-      if blockwise then
-        for row = c_start.row, c_end.row do
-          ov:set_cursor(c_start.col, row)
-          local str = (' '):rep(1 + c_end.col - c_start.col)
-          ov:draw(str)
-        end
-      else
-        local upleft, bottomright = c_start_orig.col, c_end_orig.col
-        if c_start_orig.row > c_end_orig.row then
-          -- when multiple lines are selected, the start/end column depends on
-          -- the direction of the selection
-          upleft, bottomright = bottomright, upleft
-        end
-        for row = c_start.row, c_end.row do
-          local start_col = (row == c_start.row) and upleft or geom.left
-          local end_col   = (row == c_end.row) and 1 + bottomright or geom.width + geom.left
-          if c_start_orig.row == c_end_orig.row then
-            -- special case when only one line is selected
-            start_col, end_col = c_start.col, c_end.col
-          end
-          ov:set_cursor(start_col, row)
-          ov:draw((' '):rep(end_col - start_col))
-        end
+    if blockwise then
+      local col1, col2 = selection.start.col, selection._end.col
+      local row1, row2 = selection.start.row, selection._end.row
+      if col1 > col2 then col1, col2 = col2, col1 end
+      if row1 > row2 then row1, row2 = row2, row1 end
+      local ranges = {}
+      for row = row1, row2 do
+        if row > geom.height then break end
+        ranges[#ranges + 1] = { row = row, col1 = col1, col2 = col2 }
       end
+      return ranges, geom
+    else
+      local start, _end = selection.start, selection._end
+      if start.row > _end.row then start, _end = _end, start end
+      local ranges = {}
+      for row = start.row, _end.row do
+        if row > geom.height then break end
+        local col1 = row == start.row and start.col or 1
+        local col2 = row == _end.row and _end.col or geom.width
+        if start.row == _end.row and col1 > col2 then col1, col2 = col2, col1 end
+        ranges[#ranges + 1] = { row = row, col1 = col1, col2 = col2 }
+      end
+      return ranges
     end
   end
+
+  local function draw()
+    if not selection then return end
+    local ranges = get_selection_ranges()
+    if not ranges then return end
+    ov:set_background_color(clear_bg)
+    ov:clear()
+    local bg = vv.options.theme.foreground
+    local fg = vv.options.theme.background
+    ov:set_background_color(bg)
+    ov:set_foreground_color(fg)
+    for _, r in ipairs(ranges) do
+      local line = vv.api.window_get_text(selection.id, { top = r.row, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
+      local pos = local_to_global(selection.id, { col = r.col1, row = r.row })
+      local gpos = global_to_local(ov.id, pos)
+      ov:set_cursor(gpos.col, gpos.row)
+      ov:draw(line)
+    end
+  end
+
+  local function submit()
+    if not selection then return nil end
+    local ranges = get_selection_ranges()
+    if not ranges then return end
+    local lines = {}
+    for _, r in ipairs(ranges) do
+      local line = vv.api.window_get_text(selection.id, { top = r.row, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
+      lines[#lines + 1] = line:match('(.-)%s*$')
+    end
+    if on_select then pcall(on_select, table.concat(lines, '\n')) end
+    ov:close()
+  end
+
 
   ov:on_window_on_key(function(_, args)
     -- close on escape
     if args.key.codepoint == 27 then
       ov:close()
-    elseif dragging then
-      -- detect alt without moving the mouse. this only works when the hosting terminal supports kitty keys
-      blockwise = args.key.modifiers.alt and true or false
-      draw()
     end
   end)
 
   ov:on_mouse_move(function(_, move)
     if not selection or not dragging then return end
-    selection._end = global_to_local(selection.id, local_to_global(move.win_id, move.pos))
+    local geom = vv.api.window_get_geometry(selection.id)
+    local sel = global_to_local(selection.id, local_to_global(move.win_id, move.pos))
+    -- clamp column to window
+    sel.col = math.max(math.min(geom.width, sel.col), 1)
+    -- clamp row to height+1 -- this allows the user to select the full last row by dragging out of the window.
+    -- special handling in get_selection_ranges to support this.
+    sel.row = math.max(math.min(geom.height + 1, sel.row), 1)
+    selection._end = sel
     blockwise = move.modifiers.alt and true or false
     draw()
   end)
@@ -221,11 +220,11 @@ local function overlay()
           draw()
         end
       else
-        dragging = false
+        pcall(submit)
+        ov:close()
       end
     end
   end)
 end
 
-map("<C-x>v", overlay)
--- logpanel.enable()
+map("<C-x>v", function() mouse_copy(vv.api.clipboard_set) end)
