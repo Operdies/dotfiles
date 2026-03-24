@@ -9,7 +9,7 @@ local quake = nil
 local function get_size()
   local screen_size = vv.api.get_screen_geometry()
   local minwidth = 3
-  local width = screen_size.width + 2
+  local width = screen_size.width
   if width < minwidth then width = minwidth end
   local height = screen_size.height // 3
   local minheight = math.min(40, screen_size.height)
