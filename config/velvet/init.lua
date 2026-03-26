@@ -169,7 +169,7 @@ local function mouse_copy(on_select)
       local pos = local_to_global(selection.id, { col = r.col1, row = r.row })
       local gpos = global_to_local(ov.id, pos)
       ov:set_cursor(gpos.col, gpos.row)
-      ov:draw(line)
+      ov:draw(line.text)
     end
   end
 
@@ -178,9 +178,21 @@ local function mouse_copy(on_select)
     local ranges = get_selection_ranges()
     if not ranges then return end
     local lines = {}
-    for _, r in ipairs(ranges) do
-      local line = vv.api.window_get_text(selection.id, { top = r.row, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
-      lines[#lines + 1] = line:match('(.-)%s*$')
+    if blockwise then
+      for _, r in ipairs(ranges) do
+        local line = vv.api.window_get_text(selection.id, { top = r.row, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
+        lines[#lines + 1] = line.text:match('(.-)%s*$')
+      end
+    else
+      local wrapping = false
+      for _, r in ipairs(ranges) do
+        local line = vv.api.window_get_text(selection.id, { top = r.row, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
+        local text = line.wraps and line.text or line.text:match('(.-)%s*$')
+        local index = wrapping and #lines or #lines + 1
+        if wrapping then text = lines[index] .. text end
+        lines[index] = text
+        wrapping = line.wraps
+      end
     end
     if on_select then pcall(on_select, table.concat(lines, '\n')) end
     ov:close()
@@ -220,11 +232,17 @@ local function mouse_copy(on_select)
           draw()
         end
       else
-        pcall(submit)
+        local ok, err = pcall(submit)
+        if not ok then dbg(err) end
         ov:close()
       end
     end
   end)
 end
 
-map("<C-x>v", function() mouse_copy(vv.api.clipboard_set) end)
+map("<C-x>v", function() 
+  mouse_copy(function(text) 
+    vv.api.clipboard_set(text)
+  end) 
+end)
+logpanel.enable()
