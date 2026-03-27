@@ -214,6 +214,7 @@ local function mouse_copy(on_select)
         lines[index] = text
         wrapping = line.wraps
       end
+      if #lines > 0 then lines[#lines] = lines[#lines]:match('(.-)%s*$') end
     end
     if on_select then pcall(on_select, table.concat(lines, '\n')) end
     ov:close()
