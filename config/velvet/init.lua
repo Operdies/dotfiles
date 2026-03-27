@@ -20,9 +20,30 @@ map(map_prefix .. "paint", paint.create_paint)
 -- require('coffee').enable()
 
 
-local logpanel = require('logpanel')
-map('<M-x>logs', logpanel.toggle)
--- logpanel.enable()
+do
+  -- TODO: Create a persistent session table which automatically 
+  -- loads and stores keys instead of this manual business.
+  -- e.g. the check would just be |session.logpanel_enabled = not session.logpanel_enabled|
+  -- and then reading back |session.logpanel_enabled| would just work
+  local logpanel = require('logpanel')
+  local enabled_key = "config.logpanel.enabled"
+  local enabled = vv.api.session_load_value(enabled_key)
+  local function update_logpanel_state()
+    if enabled then
+      logpanel.enable()
+    else
+      logpanel.disable()
+    end
+    vv.api.session_store_value(enabled_key, enabled)
+  end
+  local function toggle_logpanel()
+    enabled = not enabled
+    update_logpanel_state()
+  end
+  map('<M-x>logs', toggle_logpanel)
+  update_logpanel_state()
+end
+
 
 local event_manager = vv.events.create_group('debug.log_render_timing', true)
 event_manager.pre_render = function(args)
@@ -245,4 +266,3 @@ map("<C-x>v", function()
     vv.api.clipboard_set(text)
   end) 
 end)
-logpanel.enable()
