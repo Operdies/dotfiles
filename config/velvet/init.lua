@@ -1,5 +1,8 @@
 local vv = require('velvet')
 local map_prefix = "<C-x>"
+
+-- values stored in |session| will survive reloads.
+local session = require('velvet.session_storage').create("config")
 require('velvet.default_config').setup({ prefix = map_prefix })
 
 local dwm = require('velvet.layout.dwm')
@@ -21,23 +24,16 @@ map(map_prefix .. "paint", paint.create_paint)
 
 
 do
-  -- TODO: Create a persistent session table which automatically 
-  -- loads and stores keys instead of this manual business.
-  -- e.g. the check would just be |session.logpanel_enabled = not session.logpanel_enabled|
-  -- and then reading back |session.logpanel_enabled| would just work
   local logpanel = require('logpanel')
-  local enabled_key = "config.logpanel.enabled"
-  local enabled = vv.api.session_load_value(enabled_key)
   local function update_logpanel_state()
-    if enabled then
+    if session.logpanel_enabled then
       logpanel.enable()
     else
       logpanel.disable()
     end
-    vv.api.session_store_value(enabled_key, enabled)
   end
   local function toggle_logpanel()
-    enabled = not enabled
+    session.logpanel_enabled = not session.logpanel_enabled
     update_logpanel_state()
   end
   map('<M-x>logs', toggle_logpanel)
