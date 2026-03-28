@@ -10,6 +10,9 @@
 # debug permissions with:
 # sudo log stream --predicate 'process == "kernel" AND eventMessage CONTAINS "Sandbox"'
 
+# Disable claude update notifications -- who cares!!
+export DISABLE_AUTOUPDATER=1
+
 # Prevent dotnet from using a compilation server.
 # This causes weird issues when compilation servers are shared between agents.
 export UseSharedCompilation=false
