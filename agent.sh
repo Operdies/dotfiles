@@ -86,6 +86,9 @@ chat-mode() {
   (regex "^${HOME}/.claude")                               ; claude config
   (regex "^${HOME}/.claude.json")                          ;
 
+  (regex "^${HOME}/.cache")                                ; cache folders must be writable for some tools
+  (regex "^${HOME}/Library/Caches")                        ; such as lua_lsp to work correctly
+
   (regex "^${HOME}/.local/share/opencode")                 ; opencode config
   (regex "^${HOME}/.local/state/opencode")                 ;
   (regex "^${HOME}/.config/opencode")                      ;
