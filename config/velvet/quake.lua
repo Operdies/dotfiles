@@ -39,7 +39,7 @@ end
 local prevFocus = nil
 local visible = false
 
-local anim = require('velvet.stdlib.animation')
+local anim = require('velvet.ui.animation')
 
 local anim_duration = 200
 local function hide()
