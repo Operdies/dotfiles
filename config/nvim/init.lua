@@ -526,12 +526,6 @@ local pick_options = {
     choose_marked = '<C-q>',
     scroll_down = '<C-e>',
     scroll_up = '<C-y>',
-    refresh = {
-      char = '<C-r>',
-      func = function ()
-        pick.refresh()
-      end
-    },
   },
   window = {
     config = function()
