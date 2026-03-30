@@ -57,7 +57,7 @@ local frame_order = { 2, 1 }
 -- some small number which most likely doesn't cover any windows
 local bg = require('velvet.window').create()
 bg:set_z_index(vv.layers.background)
-bg:set_opacity(0)
+bg:set_alpha(0)
 bg:set_transparency_mode('all')
 bg:set_line_wrapping(false)
 bg:set_cursor_visible(false)

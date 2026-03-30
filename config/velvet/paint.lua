@@ -12,12 +12,12 @@ function paint.create_paint()
     green = 0,
     blue = 0,
   }
-  local opacity = 1
+  local alpha = 1
 
   -- local width, height = sz.width - 20, sz.height - 10
   local width, height = sz.width // 3, sz.height
   canvas:set_geometry({ left = sz.width - width, top = 0, width = width, height = height })
-  canvas:set_opacity(opacity)
+  canvas:set_alpha(alpha)
   canvas:set_background_color('white')
   canvas:clear()
   canvas:set_background_color(brush)
@@ -53,7 +53,7 @@ function paint.create_paint()
     wheel_height }
     wheel:set_geometry(wg)
     wheel:clear()
-    wheel:set_opacity(0)
+    wheel:set_alpha(0)
     wheel:set_transparency_mode('clear')
     wheel:set_cursor_visible(false)
 

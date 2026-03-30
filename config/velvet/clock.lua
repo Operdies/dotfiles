@@ -35,7 +35,7 @@ local function update_clock()
 
   timer:clear_background_color()
   timer:clear()
-  timer:set_opacity(0)
+  timer:set_alpha(0)
   timer:set_transparency_mode('clear')
   timer:set_background_color('red')
   timer:set_z_index(vv.layers.background + 1)
