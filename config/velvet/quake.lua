@@ -74,8 +74,10 @@ end
 
 local function create_quake()
   quakeHost = velvet_window.create()
-  quake = quakeHost:create_child_process_window("zsh",
-    { working_directory = vv.api.window_get_working_directory(vv.api.get_focused_window()) })
+  local cwd = nil
+  local fg = vv.api.get_focused_window()
+  if fg ~= 0 then cwd = vv.api.window_get_working_directory(fg) end
+  quake = quakeHost:create_child_process_window("zsh", { working_directory = cwd })
   quake_evt.screen_resized = setsize
   quake:set_visibility(false)
   quakeHost:set_visibility(false)
