@@ -3,23 +3,26 @@ local map_prefix = "<C-x>"
 
 -- values stored in |session| will survive reloads.
 local session = require('velvet.session_storage').create("config")
-require('velvet.default_config').setup({ prefix = map_prefix })
+require('velvet.default_config').setup() -- ({ startup = { spawn_shell = false }, shutdown = { on_last_window_exit = false }})
 
 local dwm = require('velvet.layout.dwm')
 local keymap = require('velvet.keymap')
 
 local home = os.getenv("HOME"):gsub("/$", "")
-local map = keymap.set
 
-map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window()) end)
-map(map_prefix .. "z", function() dwm.toggle_arrange() end)
+--- @param lhs string
+--- @param func fun()
+--- @param opt string|table
+local map = function(lhs, func, opt) keymap.set(lhs, func, type(opt) == 'table' and opt or { description = opt }) end
+
+map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window()) end, "Close focused window")
 vv.options.key_repeat_timeout = 300
 
-map("<M-->", function() dwm.inc_inactive_dim(0.05) end)
-map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end)
+map("<M-->", function() dwm.inc_inactive_dim(0.05) end, "Increase inactive dim")
+map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end, "Decrease inactive dim")
 
 local paint = require('paint')
-map(map_prefix .. "paint", paint.create_paint)
+map(map_prefix .. "paint", paint.create_paint, "Open paint window")
 -- require('coffee').enable()
 
 
@@ -36,7 +39,7 @@ do
     session.logpanel_enabled = not session.logpanel_enabled
     update_logpanel_state()
   end
-  map('<M-x>logs', toggle_logpanel)
+  map('<M-x>logs', toggle_logpanel, "Toggle logpanel")
   update_logpanel_state()
 end
 
@@ -75,7 +78,7 @@ map(map_prefix .. 'w', function()
     prompt = "Focus window: ",
     initial_selection = initial_index,
   })
-end)
+end, "Start window picker")
 
 require('clock')
 vv.options.theme = require('velvet.themes').catppuccin.mocha
@@ -84,7 +87,7 @@ vv.options.theme = require('velvet.themes').catppuccin.mocha
 keymap.remap_key('§', '`')
 keymap.remap_key('±', '~')
 
-map("<F1>", require('quake').toggle)
+map("<F1>", require('quake').toggle, "Toggle Quake window")
 
 --- @param on_select fun(text: string): nil
 local function mouse_copy(on_select)
@@ -261,5 +264,24 @@ end
 map("<C-x>v", function() 
   mouse_copy(function(text) 
     vv.api.clipboard_set(text)
-  end) 
-end)
+  end)
+end, { description = "Start copy mode" })
+
+map("<C-x><space>", function() keymap.set_passthrough(true) end, "Temporarily disable keymap")
+
+map("<C-k>", function()
+  local foc = vv.api.get_focused_window()
+  if foc ~= 0 then
+    local scroll_event = { win_id = foc, pos = { col = 2, row = 2 }, direction = 'up', modifiers = {}  }
+    vv.api.window_send_mouse_scroll(scroll_event)
+  end
+end, { description = "scroll up" })
+
+map("<C-j>", function()
+  local foc = vv.api.get_focused_window()
+  if foc ~= 0 then
+    local scroll_event = { win_id = foc, pos = { col = 2, row = 2 }, direction = 'down', modifiers = {}  }
+    vv.api.window_send_mouse_scroll(scroll_event)
+  end
+end, { description = "scroll down" })
+
