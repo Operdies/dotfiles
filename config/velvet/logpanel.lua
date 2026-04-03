@@ -2,7 +2,7 @@ local vv = require('velvet')
 
 local win = require('velvet.window').create()
 local bg = 'black'
-win:set_z_index(vv.layers.background + 1)
+win:set_z_index(vv.z_hint.background + 1)
 win:set_alpha(0.1)
 win:set_auto_return(true)
 win:set_cursor_visible(false)

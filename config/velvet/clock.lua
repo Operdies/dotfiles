@@ -38,7 +38,7 @@ local function update_clock()
   timer:set_alpha(0)
   timer:set_transparency_mode('clear')
   timer:set_background_color('red')
-  timer:set_z_index(vv.layers.background + 1)
+  timer:set_z_index(vv.z_hint.background + 1)
   timer:set_cursor_visible(false)
   local index = 0
   for chr in text:gmatch('.') do

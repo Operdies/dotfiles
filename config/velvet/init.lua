@@ -104,7 +104,7 @@ local function mouse_copy(on_select)
   local ov = velvet_window.create()
 
   -- put selection overlay on top of everything else to capture mouse events
-  ov:set_z_index(100000)
+  ov:set_z_index(vv.z_hint.overlay)
   ov:set_cursor_visible(false)
 
   -- only highlight selected region -- the rest of the window is completely opaque
@@ -268,20 +268,4 @@ map("<C-x>v", function()
 end, { description = "Start copy mode" })
 
 map("<C-x><space>", function() keymap.set_passthrough(true) end, "Temporarily disable keymap")
-
-map("<C-k>", function()
-  local foc = vv.api.get_focused_window()
-  if foc ~= 0 then
-    local scroll_event = { win_id = foc, pos = { col = 2, row = 2 }, direction = 'up', modifiers = {}  }
-    vv.api.window_send_mouse_scroll(scroll_event)
-  end
-end, { description = "scroll up" })
-
-map("<C-j>", function()
-  local foc = vv.api.get_focused_window()
-  if foc ~= 0 then
-    local scroll_event = { win_id = foc, pos = { col = 2, row = 2 }, direction = 'down', modifiers = {}  }
-    vv.api.window_send_mouse_scroll(scroll_event)
-  end
-end, { description = "scroll down" })
 
