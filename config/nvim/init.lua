@@ -84,8 +84,6 @@ local function friendly_path(file)
 end
 
 
--- common augroup {{{1
-local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
 
 -- Plugins {{{1
 vim.pack.add({
@@ -802,6 +800,8 @@ require('mini.extra').setup()
 require('dressing').setup({ select = { enabled = false }})
 vim.ui.select = pick.ui_select
 
+-- common augroup {{{1
+local augroup = vim.api.nvim_create_augroup('personal-autocommands', { clear = true })
 -- Treesitter {{{1
 
 require('nvim-treesitter').setup()
@@ -973,10 +973,6 @@ vim.lsp.config('lua_ls', {
   -- Sets the "workspace" to the directory where any of these files is found.
   root_markers = {
     ".luarc.json",
-    ".luarc.jsonc",
-    ".luacheckrc",
-    ".stylua.toml",
-    ".git",
   },
   settings = {
     Lua = {
