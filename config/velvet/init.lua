@@ -1,9 +1,8 @@
-local vv = require('velvet')
 local map_prefix = "<C-x>"
+require('velvet.presets.dwm').setup({ prefix = map_prefix, startup = { spawn_shell = true }, shutdown = { on_last_window_exit = true }})
 
 -- values stored in |session| will survive reloads.
 local session = require('velvet.session_storage').create("config")
-require('velvet.default_config').setup() -- ({ startup = { spawn_shell = false }, shutdown = { on_last_window_exit = false }})
 
 local dwm = require('velvet.layout.dwm')
 local keymap = require('velvet.keymap')
