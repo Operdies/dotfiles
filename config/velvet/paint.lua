@@ -6,6 +6,7 @@ function paint.create_paint()
   if canvas and canvas:valid() then canvas:close() end
   canvas = require('velvet.window').create()
   canvas:set_cursor_visible(false)
+  canvas:focus()
 
   local brush = {
     red = 0,
@@ -16,7 +17,7 @@ function paint.create_paint()
 
   -- local width, height = sz.width - 20, sz.height - 10
   local width, height = sz.width // 3, sz.height
-  canvas:set_geometry({ left = sz.width - width, top = 0, width = width, height = height })
+  canvas:set_geometry({ left = sz.width - width, top = 1, width = width, height = height })
   canvas:set_alpha(alpha)
   canvas:set_background_color('white')
   canvas:clear()
@@ -34,16 +35,27 @@ function paint.create_paint()
     end
   end
 
-  canvas:on_mouse_click(draw)
-  canvas:on_mouse_move(draw)
-
-  local map_prefix = require('velvet.default_config').settings.prefix
   local keymap = require('velvet.keymap')
-  local close_sequence = map_prefix .. 'closepaint'
-  keymap.set(close_sequence, function()
+  local close_sequence = '<C-x>' .. 'closepaint'
+
+  local close = function()
     canvas:close()
     keymap.del(close_sequence)
-  end)
+  end
+
+  keymap.set(close_sequence, close, { description = "Close paint" })
+
+  local function close_on_esc(_, args)
+    local kn = require('velvet.keymap.named_keys')
+    if args.key.event_type == 'press' and args.key.name == kn.ESC then
+      close()
+    end
+  end
+
+  canvas:on_mouse_click(draw)
+  canvas:on_mouse_move(draw)
+  canvas:on_window_on_key(close_on_esc)
+
 
   do
     local pg = canvas:get_geometry()
@@ -56,6 +68,7 @@ function paint.create_paint()
     wheel:set_alpha(0)
     wheel:set_transparency_mode('clear')
     wheel:set_cursor_visible(false)
+    wheel:on_window_on_key(close_on_esc)
 
     local cx = 1 + wg.width // 2
     local cy = 1 + wg.height // 2
@@ -223,6 +236,7 @@ function paint.create_paint()
     sat_slider:on_mouse_click(mouse_pick_saturation)
     sat_slider:on_mouse_move(mouse_pick_saturation)
     sat_slider:set_cursor_visible(false)
+    sat_slider:on_window_on_key(close_on_esc)
 
     set_color(sel_x, sel_y)
     set_saturation(wg.width)
