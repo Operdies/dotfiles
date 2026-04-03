@@ -25,12 +25,13 @@ end
 local function setsize()
   quake:set_frame_enabled(true)
   quake:set_frame_color('magenta')
-  quake:set_z_index(99999)
+  -- put quake right below popups
+  quake:set_z_index(vv.z_hint.popup - 1)
   quake:set_title("Quake")
   quake:set_alpha(0.7)
   quakeHost:set_background_color('black')
   quakeHost:set_alpha(0.1)
-  quakeHost:set_z_index(quake:get_z_index())
+  quakeHost:set_z_index(quake:get_z_index() - 1)
   local winSize = get_size()
   quake:set_geometry(winSize)
   quakeHost:clear()
@@ -78,6 +79,10 @@ local function create_quake()
   local fg = vv.api.get_focused_window()
   if fg ~= 0 then cwd = vv.api.window_get_working_directory(fg) end
   quake = quakeHost:create_child_process_window("zsh", { working_directory = cwd })
+  if not quake then 
+    quakeHost:close()
+    error("Unable to create quake window: could not spawn shell.")
+  end
   quake_evt.screen_resized = setsize
   quake:set_visibility(false)
   quakeHost:set_visibility(false)
