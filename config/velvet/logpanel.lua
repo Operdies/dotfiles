@@ -43,12 +43,12 @@ win:set_visibility(false)
 
 local function enable()
   win:set_visibility(true)
-  dbg('show log panel')
+  vv.log('show log panel')
 end
 
 local function disable()
   win:set_visibility(false)
-  dbg('hide log panel')
+  vv.log('hide log panel')
 end
 
 return {

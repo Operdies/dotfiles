@@ -45,7 +45,7 @@ end
 
 local event_manager = vv.events.create_group('debug.log_render_timing', true)
 event_manager.pre_render = function(args)
-  dbg({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' })
+  vv.log(vv.inspect({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' }), 'debug')
 end
 
 local velvet_window = require('velvet.window')
@@ -253,7 +253,7 @@ local function mouse_copy(on_select)
         end
       else
         local ok, err = pcall(submit)
-        if not ok then dbg(err) end
+        if not ok then vv.log(err, 'error') end
         ov:close()
       end
     end
