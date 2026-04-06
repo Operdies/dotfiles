@@ -11,11 +11,10 @@ local home = os.getenv("HOME"):gsub("/$", "")
 
 --- @param lhs string
 --- @param func fun()
---- @param opt string|table
+--- @param opt string|velvet.keys.set.options
 local map = function(lhs, func, opt) keymap.set(lhs, func, type(opt) == 'table' and opt or { description = opt }) end
 
 map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window()) end, "Close focused window")
-vv.options.key_repeat_timeout = 300
 
 map("<M-->", function() dwm.inc_inactive_dim(0.05) end, "Increase inactive dim")
 map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end, "Decrease inactive dim")
@@ -26,7 +25,7 @@ map(map_prefix .. "paint", paint.create_paint, "Open paint window")
 
 
 do
-  local logpanel = require('logpanel')
+  local logpanel = require('velvet.diagnostics.logpanel')
   local function update_logpanel_state()
     if session.logpanel_enabled then
       logpanel.enable()
@@ -121,23 +120,8 @@ local function mouse_copy(on_select)
   end)
 
   local function get_topmost_window_at_cord(cord)
-    -- find the topmost window in the Z order which is underneath the indicated coordinate.
-    local windows = vv.api.get_windows()
-    local lst = {}
-    for _, id in ipairs(windows) do
-      local win = velvet_window.from_handle(id)
-      if id ~= ov.id and win:get_visibility() then
-        local z = vv.api.window_get_z_index(id)
-        local g = vv.api.window_get_geometry(id)
-        lst[#lst + 1] = { win = win, z = z, geom = g }
-      end
-    end
-    table.sort(lst, function(x, y) return x.z > y.z end)
-    for _, it in ipairs(lst) do
-      if cord.col >= it.geom.left and cord.col < it.geom.left + it.geom.width
-          and cord.row >= it.geom.top and cord.row < it.geom.top + it.geom.height then
-        return it.win
-      end
+    for _, win in ipairs(velvet_window.get_window_at_coordinate(cord)) do
+      if win ~= ov then return win end
     end
   end
 
@@ -268,3 +252,16 @@ end, { description = "Start copy mode" })
 
 map("<C-x><space>", function() keymap.set_passthrough(true) end, "Temporarily disable keymap")
 
+map(map_prefix .. "<C-p>", function()
+  local foc = vv.api.get_focused_window()
+  if foc ~= 0 then
+    vv.api.window_set_scroll_offset(foc, vv.api.window_get_scroll_offset(foc) + 3)
+  end
+end, { description = "scroll up", repeatable = true })
+
+map(map_prefix .. "<C-n>", function()
+  local foc = vv.api.get_focused_window()
+  if foc ~= 0 then
+    vv.api.window_set_scroll_offset(foc, vv.api.window_get_scroll_offset(foc) - 3)
+  end
+end, { description = "scroll down", repeatable = true })
