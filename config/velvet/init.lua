@@ -68,10 +68,45 @@ map(map_prefix .. 'w', function()
     end
   end
 
+  local underlay = nil
+  local prev_preview = { win = nil, z = nil, visible = nil, alpha = nil }
+  local function restore_prev()
+    local w = prev_preview and prev_preview.win
+    if w and w:valid() then
+      w:set_z_index(prev_preview.z)
+      w:set_visibility(prev_preview.visible)
+      w:set_alpha(prev_preview.alpha)
+    end
+  end
+  local function dispose()
+    restore_prev()
+    if underlay and underlay.close then underlay:close() end
+  end
   pick.select(items, {
+    on_preview = function(sel)
+      local picker = pick.get_active_picker()
+      if not underlay then
+        underlay = picker:create_child_window()
+        underlay:set_z_index(picker:get_z_index() - 2)
+      end
+      local ts = vv.api.get_screen_geometry()
+      underlay:set_geometry({left = 1, top = 1, width = ts.width, height = ts.height })
+      underlay:set_background_color(vv.options.theme.background)
+      underlay:clear()
+      restore_prev()
+      prev_preview = { win = sel.win, z = sel.win:get_z_index(), visible = sel.win:get_visibility(), alpha = sel.win:get_alpha() }
+      sel.win:set_z_index(picker:get_z_index() - 1)
+      sel.win:set_visibility(true)
+      sel.win:set_alpha(1.0)
+      if sel.win.borders then sel.win:set_frame_color('magenta') end
+    end,
+    on_cancel = function()
+      dispose()
+    end,
     on_choice = function(sel)
       sel.win:focus()
       dwm.make_visible(sel.win)
+      dispose()
     end,
     prompt = "Focus window: ",
     initial_selection = initial_index,
@@ -265,3 +300,4 @@ map(map_prefix .. "<C-n>", function()
     vv.api.window_set_scroll_offset(foc, vv.api.window_get_scroll_offset(foc) - 3)
   end
 end, { description = "scroll down", repeatable = true })
+map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
