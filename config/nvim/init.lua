@@ -123,6 +123,9 @@ vim.pack.add({
   { src = "https://github.com/rcarriga/nvim-dap-ui" },
   -- nio -- asynchronous io. Dependency of nvim-dap-ui
   { src = "https://github.com/nvim-neotest/nvim-nio" },
+  -- blink.cmp
+  { src = "https://github.com/rafamadriz/friendly-snippets" },
+  { src = "https://github.com/saghen/blink.cmp", version = "v1.10.2" },
 })
 
 -- Theming {{{1
@@ -1017,14 +1020,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.keymap.set(mode, l, r, opts)
     end
 
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    if client and client:supports_method('textDocument/completion') then
-      local triggers = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.>'
-
-      local chars = {}; triggers:gsub(".", function(c) table.insert(chars, c) end)
-      client.server_capabilities.completionProvider.triggerCharacters = chars
-      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-    end
     bufmap('n', 'gd', vim.lsp.buf.definition)
     bufmap('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     bufmap('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
@@ -1033,20 +1028,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
+-- Blink Completion {{{1
+require('blink.cmp').setup({
+  completion = { list = { selection = { preselect = false, auto_insert = true } } },
+  keymap = {
+    preset = 'default',
+    ['<C-e>'] = { 'select_and_accept', 'fallback' },
+    ['<C-a>'] = { 'cancel', 'fallback' },
+    ['<C-y>'] = false,
+  },
+})
+
 -- set undo point before inserting text
 vim.keymap.set('i', '<C-a>', '<C-G>u<C-a><C-G>u', { silent = true, noremap = true })
-
--- tab completion:
--- snippet jump if snippet is active
--- start omnicomplete if popup is closed
--- pick next completion option if popup is open
-vim.keymap.set('i', '<tab>', function()
-  if vim.snippet.active({ direction = 1 }) then
-    return '<cmd>lua vim.snippet.jump(1)<cr>'
-  else
-    return '<C-n>'
-  end
-end, { expr = true })
 
 -- Keybindings {{{1
 vim.keymap.set({ 'n', 'x' }, '<leader>y', '"+y') -- yank to system clipboard
@@ -1173,10 +1167,6 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 -- create undo points around paste in insert mode
 vim.keymap.set('i', '<C-r>"', '<C-G>u<C-r>"<C-G>u')
 vim.keymap.set('i', '<C-r>+', '<C-G>u<C-r>+<C-G>u')
-
--- Navigate without leaving insert mode
-vim.keymap.set('i', "<C-j>", "<Down>")
-vim.keymap.set('i', "<C-k>", "<Up>")
 
 -- Shell style navigation in insert and command mode
 vim.keymap.set({'i', 'c'}, "<C-h>", "<bs>")
