@@ -1024,18 +1024,80 @@ vim.api.nvim_create_autocmd('LspAttach', {
     bufmap('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end)
     bufmap('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end)
     bufmap('n', '<leader>cd', prefer("<C-w>d"))
-    bufmap('i', '<C-s>', function() vim.lsp.buf.signature_help({ width = 200, height = 5 }) end )
   end,
 })
 
 -- Blink Completion {{{1
+
+local function drill_or_accept(cmp)
+  local function lsp_timeout()
+    -- all LSPs are not created equal.
+    -- Clangd is typically extremely fast, while lua_ls is often very slow to respond.
+    local lsp_timeouts = {
+      lua_ls = 200,
+      clangd = 50,
+      default = 100,
+    }
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
+    local timeout = lsp_timeouts.default
+    for _, client in ipairs(clients) do
+      if lsp_timeouts[client.name] then timeout = math.max(timeout, lsp_timeouts[client.name]) end
+    end
+    return timeout
+  end
+
+  if not cmp.is_menu_visible() then return end
+  local item = cmp.get_selected_item()
+  if not item then return end
+
+  -- Some of these are only sometimes drillable.
+  -- For example, fields and variables matches both structures
+  -- and primitives. But the timeout logic takes care of that.
+  -- The main issue was the '.' insertion interferring with snipepts
+  -- and auto-bracket insertion.
+  local drillable = {
+    [5] = true,        -- Field
+    [6] = true,        -- Variable
+    [10] = true,       -- Property
+    [22] = true,       -- Struct
+    [9] = true,        -- Module
+    [7] = true,        -- Class
+  }
+
+  if not drillable[item.kind] then
+    return cmp.accept()
+  end
+
+  return cmp.accept({
+    callback = function()
+      vim.api.nvim_feedkeys('.', 'n', false)
+      -- After a short delay, check if the menu opened.
+      -- If not, remove the trailing "."
+      vim.defer_fn(function()
+        if not require('blink.cmp').is_menu_visible() then
+          -- Delete the "." we just inserted
+          local key = vim.api.nvim_replace_termcodes('<BS>', true, false, true)
+          vim.api.nvim_feedkeys(key, 'n', false)
+        end
+      end, lsp_timeout())
+    end,
+  })
+end
+
 require('blink.cmp').setup({
-  completion = { list = { selection = { preselect = false, auto_insert = true } } },
+  completion = {
+    list = {
+      selection = { preselect = true, auto_insert = true },
+    },
+    documentation = { auto_show = false },
+  },
   keymap = {
     preset = 'default',
     ['<C-e>'] = { 'select_and_accept', 'fallback' },
     ['<C-a>'] = { 'cancel', 'fallback' },
     ['<C-y>'] = false,
+    ['<C-k>'] = { "show_documentation", "fallback" },
+    ['<C-f>'] = { drill_or_accept, 'fallback' }
   },
 })
 
