@@ -43,7 +43,7 @@ local visible = false
 local anim = require('velvet.ui.animation')
 
 local anim_duration = 200
-local function hide()
+local function hide(duration)
   if prevFocus and vv.api.window_is_valid(prevFocus) then
     vv.api.set_focused_window(prevFocus)
     prevFocus = nil
@@ -52,7 +52,7 @@ local function hide()
   local screen = vv.api.get_screen_geometry()
   local new_size = get_size()
   new_size.top = screen.height
-  anim.animate(quake.id, new_size, anim_duration, {
+  anim.animate(quake.id, new_size, duration or anim_duration, {
     easing_function = anim.easing.spring,
     on_completed = function()
       quake:set_visibility(false)
@@ -103,6 +103,8 @@ local function toggle()
     visible = false
     if quakeHost and quakeHost:valid() then quakeHost:close() end
     create_quake()
+    -- hide with animations disable so the initial open will also slide in from the bottom
+    hide(0)
   end
   if visible then hide() else show() end
 end
