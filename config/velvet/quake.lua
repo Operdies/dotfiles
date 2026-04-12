@@ -53,12 +53,12 @@ local function hide(duration)
   local screen = vv.api.get_screen_geometry()
   local new_size = get_size()
   new_size.top = screen.height
-  coroutine.wrap(function() 
+  vv.async.run(function() 
     if anim.animate(quake.id, new_size, duration or anim_duration, opts) then
       quake:set_visibility(false)
       quakeHost:set_visibility(false)
     end
-  end)()
+  end)
   visible = false
 end
 
@@ -70,12 +70,12 @@ local function show(duration)
   quakeHost:set_visibility(true)
   quake:focus()
   local new_size = get_size()
-  coroutine.wrap(function() anim.animate(quake.id, new_size, duration, opts) end)()
+  vv.async.run(anim.animate, quake.id, new_size, duration, opts)
   visible = true
 end
 
 local session = require('velvet.session_storage').create("quake")
-coroutine.wrap(function()
+vv.async.run(function()
   vv.async.wait('pre_reload')
   if quake and quake:valid() then
     -- hack: set the window as its own parent so dwm will not try to manage it.
@@ -84,7 +84,7 @@ coroutine.wrap(function()
     session.quake = quake.id
     session.visible = visible
   end
-end)()
+end)
 
 local function create_quake(win)
   quakeHost = velvet_window.create()
