@@ -1093,7 +1093,8 @@ require('blink.cmp').setup({
   },
   keymap = {
     preset = 'default',
-    ['<C-e>'] = { drill_or_accept, 'fallback' },
+    ['<C-e>'] = { 'accept', 'fallback' },
+    ['<C-o>'] = { drill_or_accept, 'fallback' },
     ['<C-a>'] = { 'cancel', 'fallback' },
     ['<C-y>'] = false,
     ['<C-k>'] = { "show_documentation", "fallback" },
