@@ -308,8 +308,16 @@ vv.cli.add_command({
     local params = {}
     local explicit = {}
     for i, arg in ipairs(args) do
-      params[i] = tonumber(arg) or arg
-      explicit[arg] = true
+      if i == 1 and arg == '--json' then
+        local to_json = require('velvet.json').to_json
+        inspect = function(...)
+          local fmt = {...}
+          return to_json(#fmt == 1 and fmt[1] or fmt)
+        end
+      else
+        params[#params+1] = tonumber(arg) or arg
+        explicit[arg] = true
+      end
     end
     if #params == 0 then return ("No events specified.") end
     while true do
@@ -318,7 +326,7 @@ vv.cli.add_command({
       -- but we include them if they are explicitly added since it makes sense under some circumstances as
       -- long as the window does not output directly to a visible velvet window.
       if explicit[match] or (match ~= 'window_output' and match ~= 'pre_render') then
-        print(inspect(match, result))
+        print(inspect({ event = match, data = result}))
       end
     end
   end
