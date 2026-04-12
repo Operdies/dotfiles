@@ -62,23 +62,41 @@ local function hide(duration)
   visible = false
 end
 
-local function show()
+local function show(duration)
+  duration = duration or anim_duration
   local focus = vv.api.get_focused_window()
   if focus ~= quake.id then prevFocus = focus end
   quake:set_visibility(true)
   quakeHost:set_visibility(true)
   quake:focus()
   local new_size = get_size()
-  coroutine.wrap(function() anim.animate(quake.id, new_size, anim_duration, opts) end)()
+  coroutine.wrap(function() anim.animate(quake.id, new_size, duration, opts) end)()
   visible = true
 end
 
-local function create_quake()
+local session = require('velvet.session_storage').create("quake")
+coroutine.wrap(function()
+  vv.async.wait('pre_reload')
+  if quake and quake:valid() then
+    -- hack: set the window as its own parent so dwm will not try to manage it.
+    -- Once the session is reloaded, quakeHost will adopt it again
+    vv.api.window_set_parent(quake.id, quake.id);
+    session.quake = quake.id
+    session.visible = visible
+  end
+end)()
+
+local function create_quake(win)
   quakeHost = velvet_window.create()
   local cwd = nil
   local fg = vv.api.get_focused_window()
   if fg ~= 0 then cwd = vv.api.window_get_working_directory(fg) end
-  quake = quakeHost:create_child_process_window("zsh", { working_directory = cwd })
+  if win then
+    vv.api.window_set_parent(win.id, quakeHost.id)
+    quake = win
+  else
+    quake = quakeHost:create_child_process_window("zsh", { working_directory = cwd })
+  end
   if not quake then 
     quakeHost:close()
     error("Unable to create quake window: could not spawn shell.")
@@ -107,6 +125,13 @@ local function toggle()
     hide(0)
   end
   if visible then hide() else show() end
+end
+
+if session.quake and vv.api.window_is_valid(session.quake) then
+  visible = session.visible
+  create_quake(velvet_window.from_handle(session.quake))
+  quakeHost:set_geometry(quake:get_geometry())
+  if visible then show(0) else hide(0) end
 end
 
 return {
