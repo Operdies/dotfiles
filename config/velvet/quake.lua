@@ -41,6 +41,7 @@ local prevFocus = nil
 local visible = false
 
 local anim = require('velvet.ui.animation')
+local opts = { easing_function = anim.easing.spring }
 
 local anim_duration = 200
 local function hide(duration)
@@ -52,13 +53,12 @@ local function hide(duration)
   local screen = vv.api.get_screen_geometry()
   local new_size = get_size()
   new_size.top = screen.height
-  anim.animate(quake.id, new_size, duration or anim_duration, {
-    easing_function = anim.easing.spring,
-    on_completed = function()
+  coroutine.wrap(function() 
+    if anim.animate(quake.id, new_size, duration or anim_duration, opts) then
       quake:set_visibility(false)
       quakeHost:set_visibility(false)
     end
-  })
+  end)()
   visible = false
 end
 
@@ -69,7 +69,7 @@ local function show()
   quakeHost:set_visibility(true)
   quake:focus()
   local new_size = get_size()
-  anim.animate(quake.id, new_size, anim_duration, { easing_function = anim.easing.spring })
+  coroutine.wrap(function() anim.animate(quake.id, new_size, anim_duration, opts) end)()
   visible = true
 end
 
