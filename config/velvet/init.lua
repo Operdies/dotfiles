@@ -42,11 +42,6 @@ do
 end
 
 
-local event_manager = vv.events.create_group('debug.log_render_timing', true)
-event_manager.pre_render = function(args)
-  vv.log(vv.inspect({ render_at = args.time / 1000, cause = args.cause }, { newline = ' ', indent = '' }), 'debug')
-end
-
 local velvet_window = require('velvet.window')
 
 map(map_prefix .. 'w', function()
@@ -301,3 +296,31 @@ map(map_prefix .. "<C-n>", function()
   end
 end, { description = "scroll down", repeatable = true })
 map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
+
+vv.cli.add_command({
+  name = "log-events",
+  description = "<e1> {e2, e3, ...} -- keep logging the indicated events forever.",
+  action = function(_, args)
+    local inspect = function(...)
+      local fmt = {...}
+      return vv.inspect(#fmt == 1 and fmt[1] or fmt, { indent = '', newline = ' ' })
+    end
+    local params = {}
+    local explicit = {}
+    for i, arg in ipairs(args) do
+      params[i] = tonumber(arg) or arg
+      explicit[arg] = true
+    end
+    if #params == 0 then return ("No events specified.") end
+    while true do
+      local match, result = vv.async.wait(table.unpack(params))
+      -- normally window_output and pre_render are undesirable because they cause a render loop when printed,
+      -- but we include them if they are explicitly added since it makes sense under some circumstances as
+      -- long as the window does not output directly to a visible velvet window.
+      if explicit[match] or (match ~= 'window_output' and match ~= 'pre_render') then
+        print(inspect(match, result))
+      end
+    end
+  end
+})
+
