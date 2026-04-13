@@ -325,10 +325,11 @@ vv.cli.add_command({
       -- normally window_output and pre_render are undesirable because they cause a render loop when printed,
       -- but we include them if they are explicitly added since it makes sense under some circumstances as
       -- long as the window does not output directly to a visible velvet window.
-      if explicit[match] or (match ~= 'window_output' and match ~= 'pre_render') then
+      if explicit[match] or (match ~= 'window.output' and match ~= 'pre_render') then
         print(inspect({ event = match, data = result}))
       end
     end
   end
 })
 
+require('multi_click')
