@@ -115,7 +115,7 @@ vv.options.theme = require('velvet.themes').catppuccin.mocha
 keymap.remap_key('§', '`')
 keymap.remap_key('±', '~')
 
-map("<F1>", require('quake').toggle, "Toggle Quake window")
+map("<F1>", require('velvet.extras.quake').toggle, "Toggle Quake window")
 
 --- @param on_select fun(text: string): nil
 local function mouse_copy(on_select)
