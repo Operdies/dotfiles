@@ -34,11 +34,12 @@ truncate_to_repo = false
 [status]
 disabled = false
 format = '[ $symbol $status]($style)'
-style = "bg:#eba0ac fg:#1e1e2e"
+style = "bg:#f38ba8 fg:#f9e2af"
 pipestatus = true
 map_symbol = false
 pipestatus_format = '[$pipestatus => $symbol $status]($style)'
 pipestatus_separator = '[ | ]($style)'
+symbol = ''
 
 [git_branch]
 symbol = ""
