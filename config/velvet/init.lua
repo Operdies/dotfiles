@@ -282,22 +282,15 @@ end, { description = "Start copy mode" })
 
 map("<C-x><space>", function()
   keymap.set_passthrough(true)
-  local esc = 'passthrough.key.escape'
-  vv.async.run(function()
-    while keymap.get_passthrough() do
-      local k = vv.async.wait_for_session_on_key()
-      if k.key.name == 'ESCAPE' and k.key.event_type == 'press' then
-        vv.events.emit_event(esc, k)
-      end
-    end
-  end)
+  local registration = { event = 'session.on_key', when = function(_, args) return args.key.name == 'ESCAPE' and args.key.event_type == 'press' end }
   -- triple tap escape to disable
   vv.async.run(function()
     local timeout = 200
     while keymap.get_passthrough() do
-      vv.async.wait(esc)
-      if vv.async.wait(esc, timeout) and vv.async.wait(esc, timeout) then
+      vv.async.wait(registration)
+      if vv.async.wait(registration, timeout) and vv.async.wait(registration, timeout) then
         keymap.set_passthrough(false)
+        break
       end
     end
   end)
