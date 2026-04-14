@@ -1,7 +1,6 @@
 {
-  "workspace.library": ["./lib"],
+  "workspace.library": ["/usr/local/share/velvet/lua"],
   "runtime": {
     "version": "Lua 5.5"
-  },
-  "hint.enable": false
+  }
 }
