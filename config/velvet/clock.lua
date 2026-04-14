@@ -1,7 +1,3 @@
--- WIP: clocks and countdowns
-local vv = require('velvet')
-local timer = require('velvet.window').create()
-
 -- brick font stolen from: https://github.com/race604/clock-tui/blob/master/clock-tui/src/clock_text/font/bricks.rs
 local font = {
   ["0"] = { { 0, 6 }, { 0, 2, 2, 2 }, { 0, 2, 2, 2 }, { 0, 2, 2, 2 }, { 0, 6 } },
@@ -25,7 +21,8 @@ local font = {
   ["F"] = { { 0, 6 }, { 0, 2 }, { 0, 5 }, { 0, 2 }, { 0, 2 } },
 }
 
-local function update_clock()
+local timer = require('velvet.window').create()
+local function update()
   local text = os.date('%H:%M')
   --- @cast text string
   local width = #text * 8
@@ -57,13 +54,14 @@ local function update_clock()
   end
 end
 
-local function clock_timer()
-  if not timer:valid() then return end
-  update_clock()
-  local seconds = tonumber(os.date('%S'))
-  local sleep_ms = (60 - seconds) * 1000
-  vv.api.schedule_after(sleep_ms, clock_timer)
+local function ticker()
+  -- remove clock if coroutine is disposed
+  vv.async.defer(function() timer:close() end)
+  while timer:valid() do
+    update()
+    local current_seconds = tonumber(os.date('%S'))
+    local next_minute = (60 - current_seconds) * 1000
+    vv.async.wait('screen.resized', next_minute)
+  end
 end
-clock_timer()
-
-require('velvet.events').create_group('my_clock', true).screen_resized = update_clock
+vv.async.run(ticker)

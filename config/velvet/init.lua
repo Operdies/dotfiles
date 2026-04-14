@@ -108,7 +108,6 @@ map(map_prefix .. 'w', function()
   })
 end, "Start window picker")
 
-require('clock')
 vv.options.theme = require('velvet.themes').catppuccin.mocha
 
 -- I am too used to the position of these keys on MacOS
@@ -346,4 +345,5 @@ vv.cli.add_command({
   end
 })
 
-require('multi_click')
+require('clock')
+-- require('multi_click')
