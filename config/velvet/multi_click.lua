@@ -10,13 +10,13 @@ vv.async.run(function()
   local left_click = { event = 'mouse.click', when = when }
   while true do
     local reg, event = vv.async.wait(left_click)
-    vv.events.emit_event(M.left_single_click, event.data)
+    vv.events.emit(M.left_single_click, event.data)
     reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
     if reg == left_click then
-      vv.events.emit_event(M.left_double_click, event.data)
+      vv.events.emit(M.left_double_click, event.data)
       reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
       if reg == left_click then
-        vv.events.emit_event(M.left_triple_click, event.data)
+        vv.events.emit(M.left_triple_click, event.data)
       else
       end
     end
