@@ -282,7 +282,7 @@ end, { description = "Start copy mode" })
 
 map("<C-x><space>", function()
   keymap.set_passthrough(true)
-  local registration = { event = 'session.on_key', when = function(_, args) return args.key.name == 'ESCAPE' and args.key.event_type == 'press' end }
+  local registration = { event = 'session.on_key', when = function(_, result) return result.data.key.name == 'ESCAPE' and result.data.key.event_type == 'press' end }
   -- triple tap escape to disable
   vv.async.run(function()
     local timeout = 200
@@ -335,12 +335,12 @@ vv.cli.add_command({
     end
     if #params == 0 then return ("No events specified.") end
     while true do
-      local match, result = vv.async.wait(table.unpack(params))
+      local _, result = vv.async.wait(table.unpack(params))
       -- normally window_output and pre_render are undesirable because they cause a render loop when printed,
       -- but we include them if they are explicitly added since it makes sense under some circumstances as
       -- long as the window does not output directly to a visible velvet window.
-      if explicit[match] or (match ~= 'window.output' and match ~= 'pre_render') then
-        print(inspect({ event = match, data = result}))
+      if explicit[result.name] or (result.name ~= 'window.output' and result.name ~= 'pre_render') then
+        print(inspect(result))
       end
     end
   end

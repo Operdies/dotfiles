@@ -6,18 +6,17 @@ local M = {
 
 vv.async.run(function()
   local timeout = 500
-  local when = function(_, _, clk) return clk.event_type == 'mouse_down' and clk.mouse_button == 'left' end
+  local when = function(_, clk) return clk.data.event_type == 'mouse_down' and clk.data.mouse_button == 'left' end
   local left_click = { event = 'mouse.click', when = when }
   while true do
-    local evt, double, triple
-    local _, _, single = vv.async.wait(left_click)
-    vv.events.emit_event(M.left_single_click, single)
-    evt, _, double = vv.async.wait(left_click, 'mouse.move', timeout)
-    if evt == left_click then
-      vv.events.emit_event(M.left_double_click, double)
-      evt, _, triple = vv.async.wait(left_click, 'mouse.move', timeout)
-      if evt == left_click then
-        vv.events.emit_event(M.left_triple_click, triple)
+    local reg, event = vv.async.wait(left_click)
+    vv.events.emit_event(M.left_single_click, event.data)
+    reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
+    if reg == left_click then
+      vv.events.emit_event(M.left_double_click, event.data)
+      reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
+      if reg == left_click then
+        vv.events.emit_event(M.left_triple_click, event.data)
       else
       end
     end
