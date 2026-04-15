@@ -333,13 +333,12 @@ vv.cli.add_command({
       end
     end
     if #params == 0 then return ("No events specified.") end
-    while true do
-      local _, result = vv.async.wait(table.unpack(params))
+    for _, result in vv.async.stream(table.unpack(params)) do
       -- normally window_output and pre_render are undesirable because they cause a render loop when printed,
       -- but we include them if they are explicitly added since it makes sense under some circumstances as
       -- long as the window does not output directly to a visible velvet window.
       if explicit[result.name] or (result.name ~= 'window.output' and result.name ~= 'pre_render') then
-        print(inspect(result))
+        print(type(result) == 'string' and result or inspect(result))
       end
     end
   end
