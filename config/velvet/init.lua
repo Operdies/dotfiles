@@ -357,21 +357,23 @@ vv.async.run(function()
     local foc = vv.api.get_focused_window()
     pcall(vv.api.window_send_keys, foc, payload)
   end
+
+  local remap = {
+    ["'"] = 'æ', ["z"] = 'æ', ["S-'"] = 'Æ', ["S-z"] = 'Æ',
+    ["l"] = 'ø', ["o"] = 'ø', ["S-l"] = 'Ø', ["S-o"] = 'Ø',
+    ["w"] = 'å', ["a"] = 'å', ["S-w"] = 'Å', ["S-a"] = 'Å',
+  }
+
+  local mappings = {}
+  for from, to in pairs(remap) do
+    mappings[string.format("<M-%s>", from)] = function() send(to) end
+  end
+
   while true do
     vv.async.wait(alt_down)
-    map("<M-z>", function() send('æ') end, 'insert æ')
-    map("<M-S-z>", function() send('Æ') end, 'insert Æ')
-    map("<M-l>", function() send('ø') end, 'insert Ø')
-    map("<M-S-l>", function() send('Ø') end, 'insert Ø')
-    map("<M-w>", function() send('å') end, 'insert å')
-    map("<M-S-w>", function() send('Å') end, 'insert Å')
+    for from, to in pairs(mappings) do keymap.set(from, to) end
     vv.async.wait(alt_up)
-    keymap.del("<M-z>")
-    keymap.del("<M-S-z>")
-    keymap.del("<M-l>")
-    keymap.del("<M-S-l>")
-    keymap.del("<M-w>")
-    keymap.del("<M-S-w>")
+    for from, _ in pairs(mappings) do keymap.del(from) end
   end
 end)
 
