@@ -344,5 +344,36 @@ vv.cli.add_command({
   end
 })
 
+-- workaround for ghostty not correctly setting associated text when option is held on MacOS
+vv.async.run(function()
+  local is_alt = function(k) return k.key.name == 'RIGHT_ALT' end
+  local is_release = function(k) return k.key.event_type == 'release' end
+  local is_press = function(k) return k.key.event_type == 'press' end
+
+  local alt_down = { event = 'session.on_key', when = function(_, r) return is_alt(r.data) and is_press(r.data) end }
+  local alt_up = { event = 'session.on_key', when = function(_, r) return is_alt(r.data) and is_release(r.data) end }
+
+  local function send(payload)
+    local foc = vv.api.get_focused_window()
+    pcall(vv.api.window_send_keys, foc, payload)
+  end
+  while true do
+    vv.async.wait(alt_down)
+    map("<M-z>", function() send('æ') end, 'insert æ')
+    map("<M-S-z>", function() send('Æ') end, 'insert Æ')
+    map("<M-l>", function() send('ø') end, 'insert Ø')
+    map("<M-S-l>", function() send('Ø') end, 'insert Ø')
+    map("<M-w>", function() send('å') end, 'insert å')
+    map("<M-S-w>", function() send('Å') end, 'insert Å')
+    vv.async.wait(alt_up)
+    keymap.del("<M-z>")
+    keymap.del("<M-S-z>")
+    keymap.del("<M-l>")
+    keymap.del("<M-S-l>")
+    keymap.del("<M-w>")
+    keymap.del("<M-S-w>")
+  end
+end)
+
 require('clock')
 -- require('multi_click')
