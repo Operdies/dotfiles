@@ -313,14 +313,14 @@ map("<M-`>", dwm.select_previous_view, { description = "Select the previous view
 vv.cli.add_command({
   name = "log-events",
   description = "<e1> {e2, e3, ...} -- keep logging the indicated events forever.",
-  action = function(_, args)
+  action = function(_, ...)
     local inspect = function(...)
       local fmt = {...}
       return vv.inspect(#fmt == 1 and fmt[1] or fmt, { indent = '', newline = ' ' })
     end
     local params = {}
     local explicit = {}
-    for i, arg in ipairs(args) do
+    for i, arg in ipairs({...}) do
       if i == 1 and arg == '--json' then
         local to_json = require('velvet.json').to_json
         inspect = function(...)
