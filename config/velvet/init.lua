@@ -185,6 +185,7 @@ vv.cli.add_command({
       -- but we include them if they are explicitly added since it makes sense under some circumstances as
       -- long as the window does not output directly to a visible velvet window.
       if explicit[result.name] or (result.name ~= 'window.output' and result.name ~= 'pre_render') then
+        if type(result) == 'table' then result.time = os.date("%H:%M:%S") end
         print(type(result) == 'string' and result or inspect(result))
       end
     end
@@ -229,6 +230,34 @@ vv.async.run(function()
   vv.async.run(add_modifier, 'RIGHT_ALT', 'M')
   vv.async.run(add_modifier, 'RIGHT_SUPER', 'D')
 end)
+
+local function pick_session()
+  local pick = require('velvet.pick')
+  local lst = vv.api.get_servernames()
+  local cur = vv.api.get_servername()
+  table.sort(lst, function(a, b) return a < b end)
+
+  local options = {}
+  for i, text in ipairs(lst) do
+    if text ~= cur then
+      options[#options + 1] = { text = text }
+    end
+  end
+
+  pick.select(options, {
+    freetext = { enabled = true, prefix = 'New Session: ' },
+    on_choice = function(choice)
+      if choice ~= cur then
+        print(vv.inspect({ pick_session = choice }))
+        vv.api.client_reattach(vv.api.get_active_client(), choice.text)
+      end
+    end,
+    prompt = "Select server: "
+  })
+
+end
+
+map(map_prefix .. 's', pick_session, "Switch session")
 
 require('clock')
 -- require('multi_click')
