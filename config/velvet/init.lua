@@ -1,8 +1,8 @@
 local map_prefix = "<C-x>"
 require('velvet.presets.dwm').setup({ prefix = map_prefix, startup = { spawn_shell = true }, shutdown = { on_last_window_exit = true }})
 
--- values stored in |session| will survive reloads.
-local session = require('velvet.session_storage').create("config")
+-- values stored in |storage| will survive reloads.
+local storage = require('velvet.runtime_storage').create("config")
 
 local dwm = require('velvet.layout.dwm')
 local keymap = require('velvet.keymap')
@@ -27,14 +27,14 @@ map(map_prefix .. "paint", paint.create_paint, "Open paint window")
 do
   local logpanel = require('velvet.diagnostics.logpanel')
   local function update_logpanel_state()
-    if session.logpanel_enabled then
+    if storage.logpanel_enabled then
       logpanel.enable()
     else
       logpanel.disable()
     end
   end
   local function toggle_logpanel()
-    session.logpanel_enabled = not session.logpanel_enabled
+    storage.logpanel_enabled = not storage.logpanel_enabled
     update_logpanel_state()
   end
   map('<M-x>logs', toggle_logpanel, "Toggle logpanel")
@@ -121,7 +121,7 @@ map("<C-x>v", mouse_select.select_and_copy, { description = "Start copy mode" })
 
 map("<C-x><space>", function()
   keymap.set_passthrough(true)
-  local registration = { event = 'session.on_key', when = function(_, result) return result.data.key.name == 'ESCAPE' and result.data.key.event_type == 'press' end }
+  local registration = { event = 'on_key', when = function(_, result) return result.data.key.name == 'ESCAPE' and result.data.key.event_type == 'press' end }
   -- triple tap escape to disable
   vv.async.run(function()
     local timeout = 200
@@ -152,25 +152,32 @@ map("<M-`>", dwm.select_previous_view, { description = "Select the previous view
 
 vv.cli.add_command({
   name = "log-events",
-  description = "<e1> {e2, e3, ...} -- keep logging the indicated events forever.",
+  description = "print the indicated events as json",
+  complete = function(...) 
+    local seen = {}
+    for _, v in ipairs({...}) do
+      seen[v] = true
+    end
+    local events = vv.async.get_observed_events()
+    local completions = {{name = "--json", description = "format the output as json" }}
+    for k, v in pairs(events) do
+      if not seen[k] then
+        completions[#completions+1] = { name = k, description = type(v) == 'string' and v or nil }
+      end
+    end
+    return completions
+  end,
   action = function(_, ...)
+    local to_json = require('velvet.json').to_json
     local inspect = function(...)
       local fmt = {...}
-      return vv.inspect(#fmt == 1 and fmt[1] or fmt, { indent = '', newline = ' ' })
+      return to_json(#fmt == 1 and fmt[1] or fmt)
     end
     local params = {}
     local explicit = {}
-    for i, arg in ipairs({...}) do
-      if i == 1 and arg == '--json' then
-        local to_json = require('velvet.json').to_json
-        inspect = function(...)
-          local fmt = {...}
-          return to_json(#fmt == 1 and fmt[1] or fmt)
-        end
-      else
-        params[#params+1] = tonumber(arg) or arg
-        explicit[arg] = true
-      end
+    for _, arg in ipairs({...}) do
+      params[#params+1] = tonumber(arg) or arg
+      explicit[arg] = true
     end
     if #params == 0 then return ("No events specified.") end
     for _, result in vv.async.stream(table.unpack(params)) do
@@ -192,8 +199,8 @@ vv.async.run(function()
     local is_release = function(k) return k.key.event_type == 'release' end
     local is_press = function(k) return k.key.event_type == 'press' end
 
-    local key_down = { event = 'session.on_key', when = function(_, r) return is_key(r.data) and is_press(r.data) end }
-    local key_up = { event = 'session.on_key', when = function(_, r) return is_key(r.data) and is_release(r.data) end }
+    local key_down = { event = 'on_key', when = function(_, r) return is_key(r.data) and is_press(r.data) end }
+    local key_up = { event = 'on_key', when = function(_, r) return is_key(r.data) and is_release(r.data) end }
 
     local function send(payload)
       local foc = vv.api.get_focused_window()
