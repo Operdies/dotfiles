@@ -232,23 +232,42 @@ vv.async.run(function()
 end)
 
 local function pick_session()
-  local pick = require('velvet.pick')
-  local lst = vv.api.get_servernames()
-  local cur = vv.api.get_servername()
-  table.sort(lst, function(a, b) return a < b end)
+  local this = vv.api.get_servername()
+  local function get_servers()
+    local lst = vv.api.get_servernames()
+    table.sort(lst, function(a, b) return a < b end)
 
-  local options = {}
-  for i, text in ipairs(lst) do
-    if text ~= cur then
-      options[#options + 1] = { text = text }
+    local options = {}
+    for i, text in ipairs(lst) do
+      if text ~= this then
+        options[#options + 1] = { text = text }
+      end
     end
+    return options
   end
+  local pick = require('velvet.pick')
 
-  pick.select(options, {
+  pick.select(get_servers(), {
     freetext = { enabled = true, prefix = 'New Session: ' },
+    mappings = {
+      {
+        keys = "<C-w>",
+        action = function(sel) 
+          -- hack: make the new process a child of the picker so dwm will not attempt to arrange or show it.
+          -- TODO: Add process API for non-window processes
+          local p = pick:get_active_picker()
+          if p and p:valid() then
+            local cmd = { "vv", "-S", sel.text, "quit" }
+            local win = p:create_child_process_window(cmd)
+            win:set_visibility(false)
+            win:on_window_closed(function() pick.update_items(get_servers()) end)
+          end
+        end,
+        description = "Close selected session"
+      },
+    },
     on_choice = function(choice)
-      if choice ~= cur then
-        print(vv.inspect({ pick_session = choice }))
+      if choice ~= this then
         vv.api.client_reattach(vv.api.get_active_client(), choice.text)
       end
     end,
