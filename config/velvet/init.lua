@@ -253,14 +253,13 @@ local function pick_session()
       {
         keys = "<C-w>",
         action = function(sel) 
-          -- hack: make the new process a child of the picker so dwm will not attempt to arrange or show it.
-          -- TODO: Add process API for non-window processes
           local p = pick:get_active_picker()
           if p and p:valid() then
-            local cmd = { "vv", "-S", sel.text, "quit" }
-            local win = p:create_child_process_window(cmd)
-            win:set_visibility(false)
-            win:on_window_closed(function() pick.update_items(get_servers()) end)
+            local proc = vv.api.process_spawn({ "vv", "-S", sel.text, "quit" })
+            vv.async.run(function()
+              vv.async.wait({ event = 'process.exited', when = function(_, e) return e.data.id == proc end })
+              pick.update_items(get_servers())
+            end)
           end
         end,
         description = "Close selected session"
