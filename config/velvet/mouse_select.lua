@@ -98,8 +98,9 @@ local function mouse_copy(on_select)
     local fg = vv.options.theme.background
     ov:set_background_color(bg)
     ov:set_foreground_color(fg)
+    local offset = vv.api.window_get_scroll_offset(selection.id)
     for _, r in ipairs(ranges) do
-      local line = vv.api.window_get_text(selection.id, { top = r.row, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
+      local line = vv.api.window_get_text(selection.id, { top = r.row - offset, height = 1, left = r.col1, width = r.col2 - r.col1 + 1 })[1]
       local pos = local_to_global(selection.id, { col = r.col1, row = r.row })
       local gpos = global_to_local(ov.id, pos)
       ov:set_cursor(gpos.col, gpos.row)
