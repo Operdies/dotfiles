@@ -7,12 +7,10 @@ local storage = require('velvet.runtime_storage').create("config")
 local dwm = require('velvet.layout.dwm')
 local keymap = require('velvet.keymap')
 
-local home = os.getenv("HOME"):gsub("/$", "")
-
 --- @param lhs string
 --- @param func fun()
 --- @param opt string|velvet.keys.set.options
-local map = function(lhs, func, opt) keymap.set(lhs, func, type(opt) == 'table' and opt or { description = opt }) end
+local map = function(lhs, func, opt) keymap:set(lhs, func, type(opt) == 'table' and opt or { description = opt }) end
 
 map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window()) end, "Close focused window")
 
@@ -111,24 +109,28 @@ end, "Start window picker")
 vv.options.theme = require('velvet.themes').catppuccin.mocha
 
 -- I am too used to the position of these keys on MacOS
-keymap.remap_key('§', '`')
-keymap.remap_key('±', '~')
+keymap:remap_key('§', '`')
+keymap:remap_key('±', '~')
 
-map("<F1>", require('velvet.extras.quake').toggle, "Toggle Quake window")
+local quake = require('velvet.extras.quake')
+local quake1 = quake.create('zsh', 'default')
+local lazygit = quake.create('lazygit', 'lazygit')
+map(map_prefix .. "<C-\\>", quake1.toggle, "Toggle Zsh Quake")
+map(map_prefix .. "<C-]>", lazygit.toggle, "Toggle Lazygit Quake")
 
 local mouse_select = require('mouse_select')
 map("<C-x>v", mouse_select.select_and_copy, { description = "Start copy mode" })
 
 map("<C-x><space>", function()
-  keymap.set_passthrough(true)
+  keymap:set_passthrough(true)
   local registration = { event = 'on_key', when = function(_, result) return result.data.key.name == 'ESCAPE' and result.data.key.event_type == 'press' end }
   -- triple tap escape to disable
   vv.async.run(function()
     local timeout = 200
-    while keymap.get_passthrough() do
+    while keymap:get_passthrough() do
       vv.async.wait(registration)
       if vv.async.wait(registration, timeout) and vv.async.wait(registration, timeout) then
-        keymap.set_passthrough(false)
+        keymap:set_passthrough(false)
         break
       end
     end
