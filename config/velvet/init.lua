@@ -260,7 +260,12 @@ local function pick_session()
             local proc = vv.api.process_spawn({ "vv", "-S", sel.text, "quit" })
             vv.async.run(function()
               vv.async.wait({ event = 'process.exited', when = function(_, e) return e.data.id == proc end })
-              pick.update_items(get_servers())
+              local servers = get_servers()
+              if #servers == 0 then
+                pick.dispose()
+              else
+                pick.update_items(servers)
+              end
             end)
           end
         end,
