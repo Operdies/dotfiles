@@ -1797,5 +1797,35 @@ do
   vim.keymap.set('n', 'L', hover_peek_or_enter)
 end
 
+-- velvet movement {{{1
+
+if vim.fn.getenv("VELVET") ~= vim.NIL then
+  local function get_neighbor(dir_key)
+    local cur = vim.fn.winnr()
+    local neighbor = vim.fn.winnr(dir_key)
+    if neighbor == cur then
+      return nil
+    end
+    return vim.fn.win_getid(neighbor)
+  end
+
+  local function neighbor_or_velvet(dir_key)
+    local neighbor = get_neighbor(dir_key)
+    if neighbor then
+      vim.api.nvim_set_current_win(neighbor)
+    else
+      vim.system( { "vv", "focus", dir_key })
+    end
+  end
+
+  local directions = {'h', 'j', 'k', 'l'}
+  for _, dir in ipairs(directions) do
+    vim.keymap.set('n', string.format('<C-w><C-%s>', dir),
+      function()
+        neighbor_or_velvet(dir)
+      end)
+  end
+end
+
 -- Modeline {{{1
 -- vim: fdm=marker shiftwidth=2 foldlevel=0

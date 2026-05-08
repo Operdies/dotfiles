@@ -286,3 +286,16 @@ map(map_prefix .. 's', pick_session, "Switch session")
 
 require('clock')
 -- require('multi_click')
+
+vv.cli.add_command({
+  name = 'focus',
+  description = 'change focus',
+  action = function(_, dir)
+    if dir == 'j' or dir == 'h' then
+      require('velvet.layout.dwm').focus_next()
+    elseif dir == 'k' or dir =='l' then
+      require('velvet.layout.dwm').focus_prev()
+    end
+  end,
+})
+

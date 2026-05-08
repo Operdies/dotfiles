@@ -17,7 +17,6 @@ vv.async.run(function()
       reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
       if reg == left_click then
         vv.events.emit(M.left_triple_click, event.data)
-      else
       end
     end
   end
