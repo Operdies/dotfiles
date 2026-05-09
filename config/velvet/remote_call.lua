@@ -1,36 +1,19 @@
 local M = {}
+local process = require('process')
 local function remote_call(servername, fn, ...)
-  local proc = vv.api.process_spawn({ "vv", "--socket", servername, "lua", "-" })
-  local output = {
-    event = "process.output",
-    when = function(_, e)
-      return e.data.channel == 'stdout' and e.data.id == proc
-    end
-  }
-  local error = {
-    event = "process.output",
-    when = function(_, e)
-      return e.data.channel == 'stderr' and e.data.id == proc
-    end
-  }
-  local exit = { event = "process.exited", when = function(_, evt) return evt.data.id == proc end }
   local args = {}
-  for i, v in ipairs({...}) do
+  for i, v in ipairs({ ... }) do
     args[i] = vv.inspect(v)
   end
   local payload = string.format("print(vv.inspect(%s(%s)))", fn, table.concat(args, ", "))
-  vv.api.process_stdin_write(proc, payload)
-  vv.api.process_stdin_close(proc)
+  local proc = process.spawn({ "vv", "--socket", servername, "lua", "-" },
+    { stdin = payload }
+  )
 
-  local strings = { "return " }
-  for reg, evt in vv.async.stream(output, error, exit) do
-    if reg == exit then break end
-    if reg == output then strings[#strings + 1] = evt.data.output end
-    if reg == error then printerr(evt.data.output) end
-  end
+  local stdout, stderr = proc:read_to_end()
+  if stderr then printerr(stderr) end
 
-  local text = table.concat(strings, "")
-  local ok, err = load(text)
+  local ok, err = load('return ' .. stdout)
   if not ok then error(err) end
   local loaded = ok()
   return loaded
