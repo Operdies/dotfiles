@@ -153,6 +153,20 @@ end, { description = "scroll down", repeatable = true })
 map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
 
 vv.cli.add_command({
+  name = "log",
+  description = "print all system messages",
+  action = function()
+    for _, e in vv.async.stream('system_message') do
+      if e.data.level == 'error' then
+        printerr(e.data.message)
+      else
+        print(e.data.message)
+      end
+    end
+  end,
+})
+
+vv.cli.add_command({
   name = "log-events",
   description = "print the indicated events as json",
   complete = function(...) 
