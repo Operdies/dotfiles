@@ -134,12 +134,11 @@ end
 --- @field on_exit? fun(process: Process, status: integer) callback called when the process exits
 --- @field stdin? string input provided as stdin on startup
 
---- spawn a new process
---- @param cmd string|string[] process to spawn
+--- wrap process |p| to make the high level facilities available
+--- Output generated before wrapping the process is lost.
 --- @param options? velvet.process.options spawn options
-function M.spawn(cmd, options)
+function M.wrap(p, options)
   options = options or {}
-  local p = vv.api.process_spawn(cmd, options)
   if options.stdin then
     vv.api.process_stdin_write(p, options.stdin)
     vv.api.process_stdin_close(p)
@@ -160,6 +159,14 @@ function M.spawn(cmd, options)
     end
   end)
   return instance
+end
+
+--- spawn a new process
+--- @param cmd string|string[] process to spawn
+--- @param options? velvet.process.options spawn options
+function M.spawn(cmd, options)
+  local p = vv.api.process_spawn(cmd, options)
+  return M.wrap(p, options)
 end
 
 return M
