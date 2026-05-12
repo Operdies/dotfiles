@@ -118,9 +118,6 @@ local lazygit = quake.create('lazygit', 'lazygit')
 map(map_prefix .. "<C-\\>", quake1.toggle, "Toggle Zsh Quake")
 map(map_prefix .. "<C-]>", lazygit.toggle, "Toggle Lazygit Quake")
 
-local mouse_select = require('mouse_select')
-map("<C-x>v", mouse_select.select_and_copy, { description = "Start copy mode" })
-
 map("<C-x><space>", function()
   keymap:set_passthrough(true)
   local registration = { event = 'on_key', when = function(_, result) return result.data.key.name == 'ESCAPE' and result.data.key.event_type == 'press' end }
@@ -237,9 +234,9 @@ vv.async.run(function()
 
     while true do
       vv.async.wait(key_down)
-      for from, to in pairs(mappings) do keymap.set(from, to) end
+      for from, to in pairs(mappings) do keymap:set(from, to) end
       vv.async.wait(key_up)
-      for from, _ in pairs(mappings) do keymap.del(from) end
+      for from, _ in pairs(mappings) do keymap:del(from) end
     end
   end
 
@@ -293,23 +290,80 @@ local function pick_session()
     end,
     prompt = "Select server: "
   })
-
 end
 
+
 map(map_prefix .. 's', pick_session, "Switch session")
-
 require('clock')
--- require('multi_click')
 
-vv.cli.add_command({
-  name = 'focus',
-  description = 'change focus',
-  action = function(_, dir)
-    if dir == 'j' or dir == 'h' then
-      require('velvet.layout.dwm').focus_next()
-    elseif dir == 'k' or dir =='l' then
-      require('velvet.layout.dwm').focus_prev()
+local status = require('velvet.extras.statusbar').create({ where = 'bottom', background = '#00000000' })
+status:add_segment('right'):update({ { text = vv.api.get_servername():upper(), fg = '#000000', bold = true, bg = 'red' } })
+
+local function battery_status()
+  local process = require('process')
+  local loop = 'while true; do acpi; sleep 3; done'
+  local poll_id = storage.poll_id
+  if poll_id then
+    pcall(vv.api.process_kill, poll_id)
+    poll_id = nil
+  end
+  local acpi_poller
+  if poll_id then
+    acpi_poller = process.wrap(poll_id)
+  else
+    acpi_poller = process.spawn({ 'bash', '-c', loop })
+  end
+
+  local seg = status:add_segment('center')
+  vv.async.defer(function() seg:remove() end)
+  for _, line in acpi_poller:lines() do
+    local charging = line:match('Charging')
+    local bat = { charging = "󰂄", discharging = "󰁿" }
+    local pct, time = line:match('(%d+%%), (%d+:%d+:%d+)')
+    local pow = string.format("%s %s (%s)", charging and bat.charging or bat.discharging, time, pct)
+    seg:update({ { text = pow, bold = true, bg = '#ffee60', fg = 'black' } })
+  end
+end
+vv.async.run(battery_status)
+
+local function dwm_tags()
+  local function tag_occupied(tags, tag)
+    for _, set in pairs(tags) do
+      if set[tag] then return true end
     end
-  end,
-})
+    return false
+  end
+  local seg = status:add_segment('left')
+  vv.async.defer(seg.remove)
+  while true do
+    local segments = {}
+    local state = dwm.get_state()
+    for i, v in ipairs(state.view) do
+      if v or tag_occupied(state.tags, i) then
+        segments[#segments + 1] = {
+          bg = v and 'red' or 'blue',
+          fg = '#000000',
+          text = i,
+          bold = v,
+          italic = not v,
+          underline = false,
+        }
+      end
+    end
+    seg:update(segments)
+    dwm.wait_for_state_change()
+  end
+end
+vv.async.run(dwm_tags)
 
+local function status_clock()
+  local clock = status:add_segment('right')
+  while true do
+    local text = tostring(os.date('%H:%M'))
+    clock:update({ { text = text, bg = 'blue', fg = '#000000', bold = true } })
+    local current_seconds = tonumber(os.date('%S'))
+    local next_minute = (60 - current_seconds) * 1000
+    vv.async.wait(next_minute)
+  end
+end
+vv.async.run(status_clock)
