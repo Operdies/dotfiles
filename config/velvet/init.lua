@@ -301,7 +301,7 @@ status:add_segment('right'):update({ { text = vv.api.get_servername():upper(), f
 
 local function battery_status()
   local process = require('process')
-  local loop = 'while true; do acpi; sleep 3; done'
+  local loop = 'while acpi; do sleep 3; done'
   local poll_id = storage.poll_id
   if poll_id then
     pcall(vv.api.process_kill, poll_id)
