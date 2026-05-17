@@ -198,8 +198,8 @@ vv.cli.add_command({
       -- but we include them if they are explicitly added since it makes sense under some circumstances as
       -- long as the window does not output directly to a visible velvet window.
       if explicit[result.name] or (result.name ~= 'window.output' and result.name ~= 'pre_render') then
-        if type(result) == 'table' then result.time = os.date("%H:%M:%S") end
-        print(type(result) == 'string' and result or inspect(result))
+        local when = os.date("%H:%M:%S")
+        print(inspect({name = result.name, timestamp = when, result.data}))
       end
     end
   end
@@ -296,12 +296,47 @@ end
 map(map_prefix .. 's', pick_session, "Switch session")
 require('clock')
 
-local status = require('velvet.extras.statusbar').create({ where = 'bottom', background = '#00000000' })
+local mocha = {
+  -- extra colors not mapped to ansi colors
+  rosewater = "#f5e0dc",
+  flamingo = "#f2cdcd",
+  pink = "#f5c2e7",
+  mauve = "#cba6f7",
+  red = "#f38ba8",
+  maroon = "#eba0ac",
+  peach = "#fab387",
+  yellow = "#f9e2af",
+  green = "#a6e3a1",
+  teal = "#94e2d5",
+  sky = "#89dceb",
+  sapphire = "#74c7ec",
+  blue = "#89b4fa",
+  lavender = "#b4befe",
+  text = "#cdd6f4",
+  ['subtext 1'] = "#bac2de",
+  ['subtext 0'] = "#a6adc8",
+  ['overlay 2'] = "#9399b2",
+  ['overlay 1'] = "#7f849c",
+  ['overlay 0'] = "#6c7086",
+  ['surface 2'] = "#585b70",
+  ['surface 1'] = "#45475a",
+  ['surface 0'] = "#313244",
+  base = "#1e1e2e",
+  mantle = "#181825",
+  crust = "#11111b",
+}
+
+for k, v in pairs(mocha) do
+  vv.options.theme[k] = v
+end
+
+dwm.reserve(0, 0, 1, 0)
+local status = require('velvet.extras.statusbar').create({ where = 'bottom', background = 'mantle' })
 status:add_segment('right'):update({ { text = vv.api.get_servername():upper(), fg = '#000000', bold = true, bg = 'red' } })
 
 local function battery_status()
   local process = require('process')
-  local loop = 'while acpi; do sleep 3; done'
+  local loop = 'while acpi; do sleep 10; done'
   local poll_id = storage.poll_id
   if poll_id then
     pcall(vv.api.process_kill, poll_id)
