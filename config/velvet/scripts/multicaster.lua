@@ -17,10 +17,23 @@ for _, server in ipairs(vv.api.get_servernames()) do
   end
 end
 
+local function remove_if(t, pred)
+  local j = 1
+  for i = 1, #t do
+    if not pred(t[i]) then
+      t[j] = t[i]
+      j = j + 1
+    end
+  end
+  for i = j, #t do
+    t[i] = nil
+  end
+end
+
 local function wait_all(args)
   while #args > 0 do
     local resolved = vv.async.wait(table.unpack(args))
-    table.remove_if(args, function(x) return x == resolved end)
+    remove_if(args, function(x) return x == resolved end)
   end
 end
 
