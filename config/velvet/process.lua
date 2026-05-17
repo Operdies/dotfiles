@@ -139,10 +139,6 @@ end
 --- @param options? velvet.process.options spawn options
 function M.wrap(p, options)
   options = options or {}
-  if options.stdin then
-    vv.api.process_stdin_write(p, options.stdin)
-    vv.api.process_stdin_close(p)
-  end
   local instance = setmetatable({ id = p }, Process)
   local on_output, on_exit = get_registrations(p)
   vv.async.run(function()
@@ -165,7 +161,20 @@ end
 --- @param cmd string|string[] process to spawn
 --- @param options? velvet.process.options spawn options
 function M.spawn(cmd, options)
-  local p = vv.api.process_spawn(cmd, options)
+  options = options or {}
+  local p = vv.api.process_spawn(cmd, {
+    environment = options.environment or nil,
+    working_directory = options.working_directory or nil,
+    stderr_mode = options.stderr_mode or 'stream',
+    stdout_mode = options.stdout_mode or 'stream',
+    stdin_mode = options.stdin_mode or (options.stdin and 'stream' or 'none')
+  })
+  if options.stdin then
+    vv.api.process_stdin_write(p, options.stdin)
+    if options.stdin_mode ~= 'stream' then
+      vv.api.process_stdin_close(p)
+    end
+  end
   return M.wrap(p, options)
 end
 
