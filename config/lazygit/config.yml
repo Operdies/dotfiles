@@ -4,10 +4,37 @@ os:
   # nvim does not yet support the '+{cmd}' syntax supported by vim. As a hack, we can instead send the keystroke to go to a specific line after opening.
   editAtLine: 'nvim --server "$NVIM" --remote-send "<C-q>" ; nvim --server "$NVIM" --remote-silent {{filename}} ; nvim --server "$NVIM" --remote-send "{{line}}gg"; '
   editInTerminal: true
-gui:
-  skipDiscardChangeWarning: true
 notARepository: skip
 promptToReturnFromSubprocess: false
+customCommands:
+  - key: 'F'
+    command: 'git pull --rebase --autostash'
+    context: 'localBranches'
+    output: log
+gui:
+  skipDiscardChangeWarning: true
+  theme:
+    activeBorderColor:
+      - '#a6e3a1'
+      - bold
+    inactiveBorderColor:
+      - '#a6adc8'
+    optionsTextColor:
+      - '#89b4fa'
+    selectedLineBgColor:
+      - '#313244'
+    cherryPickedCommitBgColor:
+      - '#45475a'
+    cherryPickedCommitFgColor:
+      - '#a6e3a1'
+    unstagedChangesColor:
+      - '#f38ba8'
+    defaultFgColor:
+      - '#cdd6f4'
+    searchingActiveBorderColor:
+      - '#f9e2af'
+  authorColors:
+    '*': '#b4befe'
 keybinding:
   universal:
     quit: <disabled>
