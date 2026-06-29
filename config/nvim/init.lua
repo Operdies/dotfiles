@@ -1377,6 +1377,21 @@ vim.api.nvim_create_user_command('Print', function(ctx)
   print(vim.inspect(result))
 end, { nargs = '+', complete = "lua" })
 
+vim.api.nvim_create_user_command('Scratch', function(ctx)
+  local bufname = ctx.fargs[1] or nil
+  local ft = ctx.fargs[2] or nil
+  local buf = vim.api.nvim_create_buf(false, true)
+  if bufname then
+    vim.api.nvim_buf_set_name(buf, bufname)
+    vim.api.nvim_set_option_value("buflisted", true, { buf = buf })
+  end
+  if ft then 
+    vim.api.nvim_set_option_value("ft", ft, { buf = buf }) 
+  end
+  local winid = vim.fn.bufwinid(vim.fn.bufnr())
+  vim.api.nvim_win_set_buf(winid, buf)
+end, { nargs = '+' })
+
 -- toggleterm {{{1
 if is_windows then
   vim.cmd [[
