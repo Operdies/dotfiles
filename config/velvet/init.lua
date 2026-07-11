@@ -134,19 +134,6 @@ map("<C-x><space>", function()
   end)
 end, "Temporarily disable keymap")
 
-map(map_prefix .. "<C-p>", function()
-  local foc = vv.api.get_focused_window()
-  if foc ~= 0 then
-    vv.api.window_set_scroll_offset(foc, vv.api.window_get_scroll_offset(foc) + 3)
-  end
-end, { description = "scroll up", repeatable = true })
-
-map(map_prefix .. "<C-n>", function()
-  local foc = vv.api.get_focused_window()
-  if foc ~= 0 then
-    vv.api.window_set_scroll_offset(foc, vv.api.window_get_scroll_offset(foc) - 3)
-  end
-end, { description = "scroll down", repeatable = true })
 map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
 
 vv.cli.add_command({
