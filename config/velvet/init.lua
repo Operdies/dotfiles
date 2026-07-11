@@ -1,10 +1,14 @@
+-- call dwm.reserve() before sourcing the preset to avoid
+-- tiling windows to (0,0,0,0) after reload
+local dwm = require('velvet.layout.dwm')
+dwm.reserve(0, 0, 1, 0)
+
 local map_prefix = "<C-x>"
 require('velvet.presets.dwm').setup({ prefix = map_prefix, startup = { spawn_shell = true }, shutdown = { on_last_window_exit = true }})
 
 -- values stored in |storage| will survive reloads.
 local storage = require('velvet.runtime_storage').create("config")
 
-local dwm = require('velvet.layout.dwm')
 local keymap = require('velvet.keymap')
 
 --- @param lhs string
@@ -355,7 +359,6 @@ for k, v in pairs(mocha) do
   vv.options.theme[k] = v
 end
 
-dwm.reserve(0, 0, 1, 0)
 local status = require('velvet.extras.statusbar').create({ where = 'bottom', background = 'mantle' })
 status:add_segment('right'):update({ { text = vv.api.get_servername():upper(), fg = '#000000', bold = true, bg = 'red' } })
 
@@ -405,7 +408,6 @@ local function dwm_tags()
           fg = '#000000',
           text = i,
           bold = v,
-          italic = not v,
           underline = false,
         }
       end
