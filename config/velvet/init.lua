@@ -140,6 +140,13 @@ end, "Temporarily disable keymap")
 
 map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
 
+-- signaled after the log cli action starts waiting for events.
+-- this is convenient for debug prints to start printing only
+-- after a listener is actually attached.
+-- The prime use case here is a shell loop such as:
+-- $ while true; do vv log; done
+-- which will miss messages logged before the socket reconnects
+local log_connected = vv.async.event_source()
 vv.cli.add_command({
   name = "log",
   description = "print all system messages",
@@ -177,6 +184,8 @@ vv.cli.add_command({
       end
     end
     local min_severity = severity[level] or error('invalid log level')
+    -- indicate that we are listening after the briefest possible delay
+    vv.api.schedule_after(0, function() log_connected:emit() end)
     while true do
       local data = vv.async.wait_for_system_message()
       local msg = data.message
@@ -429,3 +438,5 @@ local function status_clock()
   end
 end
 vv.async.run(status_clock)
+log_connected:wait()
+print('logger detected!')
