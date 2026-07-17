@@ -1,10 +1,9 @@
--- call dwm.reserve() before sourcing the preset to avoid
--- tiling windows to (0,0,0,0) after reload
-local dwm = require('velvet.layout.dwm')
-dwm.reserve(0, 0, 1, 0)
-
 local map_prefix = "<C-x>"
-require('velvet.presets.dwm').setup({ prefix = map_prefix, startup = { spawn_shell = true }, shutdown = { on_last_window_exit = true }})
+local preset = require('velvet.presets.dwm').setup({
+  prefix = map_prefix,
+  startup = { spawn_shell = true },
+  shutdown = { on_last_window_exit = true },
+})
 
 -- values stored in |storage| will survive reloads.
 local storage = require('velvet.runtime_storage').create("config")
@@ -18,7 +17,9 @@ local map = function(lhs, func, opt) keymap:set(lhs, func, type(opt) == 'table' 
 
 map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window()) end, "Close focused window")
 
-map("<M-->", function() dwm.inc_inactive_dim(0.05) end, "Increase inactive dim")
+local dwm = require('velvet.layout.dwm')
+
+map("<M-->", function() dwm.inc_inactive_dim(-1.05) end, "Increase inactive dim")
 map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end, "Decrease inactive dim")
 
 local paint = require('paint')
@@ -368,75 +369,7 @@ for k, v in pairs(mocha) do
   vv.options.theme[k] = v
 end
 
-local status = require('velvet.extras.statusbar').create({ where = 'bottom', background = 'mantle' })
-status:add_segment('right'):update({ { text = vv.api.get_servername():upper(), fg = '#000000', bold = true, bg = 'red' } })
 
-local function battery_status()
-  local process = require('process')
-  local loop = 'while acpi; do sleep 10; done'
-  local poll_id = storage.poll_id
-  if poll_id then
-    pcall(vv.api.process_kill, poll_id)
-    poll_id = nil
-  end
-  local acpi_poller
-  if poll_id then
-    acpi_poller = process.wrap(poll_id)
-  else
-    acpi_poller = process.spawn({ 'bash', '-c', loop })
-  end
-
-  local seg = status:add_segment('center')
-  vv.async.defer(function() seg:remove() end)
-  for _, line in acpi_poller:lines() do
-    local charging = line:match('Charging')
-    local bat = { charging = "󰂄", discharging = "󰁿" }
-    local pct, time = line:match('(%d+%%), (%d+:%d+:%d+)')
-    local pow = string.format("%s %s (%s)", charging and bat.charging or bat.discharging, time, pct)
-    seg:update({ { text = pow, bold = true, bg = '#ffee60', fg = 'black' } })
-  end
-end
-vv.async.run(battery_status)
-
-local function dwm_tags()
-  local function tag_occupied(tags, tag)
-    for _, set in pairs(tags) do
-      if set[tag] then return true end
-    end
-    return false
-  end
-  local seg = status:add_segment('left')
-  vv.async.defer(seg.remove)
-  while true do
-    local segments = {}
-    local state = dwm.get_state()
-    for i, v in ipairs(state.view) do
-      if v or tag_occupied(state.tags, i) then
-        segments[#segments + 1] = {
-          bg = v and 'red' or 'blue',
-          fg = '#000000',
-          text = i,
-          bold = v,
-          underline = false,
-        }
-      end
-    end
-    seg:update(segments)
-    dwm.wait_for_state_change()
-  end
-end
-vv.async.run(dwm_tags)
-
-local function status_clock()
-  local clock = status:add_segment('right')
-  while true do
-    local text = tostring(os.date('%H:%M'))
-    clock:update({ { text = text, bg = 'blue', fg = '#000000', bold = true } })
-    local current_seconds = tonumber(os.date('%S'))
-    local next_minute = (60 - current_seconds) * 1000
-    vv.async.wait(next_minute)
-  end
-end
-vv.async.run(status_clock)
 log_connected:wait()
 print('logger detected!')
+
