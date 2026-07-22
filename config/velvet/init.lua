@@ -283,57 +283,9 @@ vv.async.run(function()
   vv.async.run(add_modifier, 'RIGHT_SUPER', 'D')
 end)
 
-local function pick_session()
-  local this = vv.api.get_servername()
-  local function get_servers()
-    local lst = vv.api.get_servernames()
-    table.sort(lst, function(a, b) return a < b end)
-
-    local options = {}
-    for i, text in ipairs(lst) do
-      if text ~= this then
-        options[#options + 1] = { text = text }
-      end
-    end
-    return options
-  end
-  local pick = require('velvet.pick')
-
-  pick.select(get_servers(), {
-    freetext = { enabled = true, prefix = 'New Session: ' },
-    mappings = {
-      {
-        keys = "<C-w>",
-        action = function(sel) 
-          local p = pick:get_active_picker()
-          if p and p:valid() then
-            local proc = vv.api.process_spawn({ "vv", "-S", sel.text, "quit" })
-            vv.async.run(function()
-              vv.async.wait({ event = 'process.exited', when = function(_, e) return e.data.id == proc end })
-              local servers = get_servers()
-              if #servers == 0 then
-                pick.dispose()
-              else
-                pick.update_items(servers)
-              end
-            end)
-          end
-        end,
-        description = "Close selected session"
-      },
-    },
-    on_choice = function(choice)
-      if choice ~= this then
-        vv.api.client_reattach(vv.api.get_active_client(), choice.text)
-      end
-    end,
-    prompt = "Select server: "
-  })
-end
-
-
-map(map_prefix .. 's', pick_session, "Switch session")
 require('clock')
+
+map(map_prefix .. 's', require('pick_session').pick_session, "Switch session")
 
 local mocha = {
   -- extra colors not mapped to ansi colors
