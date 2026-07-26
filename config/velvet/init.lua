@@ -321,32 +321,26 @@ for k, v in pairs(mocha) do
   vv.options.theme[k] = v
 end
 
-local function get_battery()
-  local line = require('process').spawn('acpi'):read_to_end()
-  if not line or line == '' then return end
-  local charging = line:match('Charging')
-  local pct, time = line:match('(%d+%%), (%d+:%d+:%d+)')
-  local state = charging and "󰂄" or "󰁿"
-  return string.format("%s %s (%s)", state, time, pct)
-end
-
-local function has_executable(exe)
-  local test = require('process').spawn({'bash', '-c', 'command -v ' .. exe})
-  test:wait_for_exit()
-  return test.exitcode == 0
-end
-
-if has_executable('acpi') then
-  local bar = preset.statusbar
-  bar.register('battery', {
-    default_options = { foreground = 'black', background = 'peach' },
-    update_triggers = { 60000 },   -- poll get_battery() every 60 seconds
-    content = get_battery,
-  })
-  local center = bar:get_center()
-  table.insert(center, 1, 'battery')
-  bar:set_center(center)
-end
+vv.async.run(function()
+  local proc = require('velvet.process')
+  local function get_battery()
+    local p = proc.spawn('acpi', { stdin = false, stderr = false })
+    local line = assert(p.stdout:line())
+    local charging = line:match('Charging')
+    local pct, hours, minutes = line:match('(%d+%%), 0?(%d+):0?(%d+):0?(%d+)')
+    local charge_state = charging and "󰂄" or "󰁿"
+    local pretty = string.format("%s %sh %sm (%s)", charge_state, hours, minutes, pct)
+    return pretty
+  end
+  if get_battery() then
+    preset.statusbar.register('battery', {
+      default_options = { foreground = 'black', background = 'peach' },
+      content = get_battery,
+      update_triggers = { 60000 }
+    })
+    preset.statusbar:set_center({ 'battery' })
+  end
+end)
 
 log_connected:wait()
 print('logger connected!')
