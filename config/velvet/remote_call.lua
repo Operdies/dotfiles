@@ -1,16 +1,18 @@
 local M = {}
-local process = require('process')
 local function remote_call(servername, fn, ...)
   local args = {}
   for i, v in ipairs({ ... }) do
     args[i] = vv.inspect(v)
   end
-  local payload = string.format("print(vv.inspect(%s(%s)))", fn, table.concat(args, ", "))
-  local proc = process.spawn({ "vv", "--socket", servername, "lua", "-" },
-    { stdin = payload }
-  )
 
-  local stdout, stderr = proc:read_to_end()
+  local payload = string.format("print(vv.inspect(%s(%s)))", fn, table.concat(args, ", "))
+  local proc = require('velvet.process').spawn({ "vv", "--socket", servername, "lua", "-" })
+  proc.stdin:write(payload)
+  proc.stdin:close()
+
+  local stdout = proc.stdout:read_all()
+  local stderr = proc.stderr:read_all()
+
   if stderr then printerr(stderr) end
 
   local ok, err = load('return ' .. stdout)
