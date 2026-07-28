@@ -20,14 +20,6 @@ map(map_prefix .. "K", function() vv.api.window_close(vv.api.get_focused_window(
 
 local dwm = require('velvet.layout.dwm')
 
-map("<M-->", function() dwm.inc_inactive_dim(-1.05) end, "Increase inactive dim")
-map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end, "Decrease inactive dim")
-
-local paint = require('paint')
-map(map_prefix .. "paint", paint.create_paint, "Open paint window")
--- require('coffee').enable()
-
-
 do
   local logpanel = require('velvet.diagnostics.logpanel')
   local function update_logpanel_state()
@@ -123,40 +115,20 @@ local lazygit = quake.create('lazygit', 'lazygit')
 map(map_prefix .. "<C-\\>", quake1.toggle, "Toggle Zsh Quake")
 map(map_prefix .. "<C-]>", lazygit.toggle, "Toggle Lazygit Quake")
 
--- local disable_keymap = require('disable_keymap')
--- map("<C-x><space>", disable_keymap, "Temporarily disable keymap")
 
 map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
 
 
 local log_connected = require('cli-logger').on_logger_connected
-require('log-events')
 
 map(map_prefix .. 's', require('pick_session').pick_session, "Switch session")
 
--- require('nordic_keys')
 require('catppuccin_mocha')
 
-vv.async.run(function()
-  local proc = require('velvet.process')
-  local function get_battery()
-    local p = proc.spawn('acpi', { stdin = false, stderr = false })
-    local line = assert(p.stdout:line())
-    local charging = line:match('Charging')
-    local pct, hours, minutes = line:match('(%d+%%), 0?(%d+):0?(%d+):0?(%d+)')
-    local charge_state = charging and "󰂄" or "󰁿"
-    local pretty = string.format("%s %sh %sm (%s)", charge_state, hours, minutes, pct)
-    return pretty
-  end
-  if get_battery() then
-    preset.statusbar.register('battery', {
-      default_options = { foreground = 'black', background = 'peach' },
-      content = get_battery,
-      update_triggers = { 60000 }
-    })
-    preset.statusbar:set_center({ 'battery' })
-  end
-end)
+local ok, acpi = pcall(require, 'status.acpi')
+if ok then
+  acpi.setup(preset.statusbar)
+end
 
 -- machine-specific config, not checked in
 local ok, private = pcall(require, 'private')
@@ -165,7 +137,23 @@ if ok then
 end
 
 log_connected:wait()
-
 local toast = require('toast')
 toast('info', 'logger connected!')
 
+--- disabled theme {{{1
+-- most of this I don't really need but they all serve as great examples of how to
+-- do cool things with velvet so I will keep them around, but disabled
+
+-- map("<M-->", function() dwm.inc_inactive_dim(-1.05) end, "Increase inactive dim")
+-- map("<M-=>", function() dwm.inc_inactive_dim(-0.05) end, "Decrease inactive dim")
+-- local paint = require('paint')
+-- map(map_prefix .. "paint", paint.create_paint, "Open paint window")
+-- require('coffee').enable()
+-- require('log-events')
+-- local disable_keymap = require('disable_keymap')
+-- map("<C-x><space>", disable_keymap, "Temporarily disable keymap")
+-- require('nordic_keys')
+
+
+-- Modeline {{{1
+-- vim: fdm=marker shiftwidth=2 foldlevel=0
