@@ -1,9 +1,10 @@
 local map_prefix = "<C-x>"
-local preset = require('velvet.presets.dwm').setup({
-  prefix = map_prefix,
-  startup = { spawn_shell = true },
-  shutdown = { on_last_window_exit = true },
-})
+local options = {
+    prefix = map_prefix,
+    startup = { spawn_shell = true },
+    shutdown = { on_last_window_exit = true },
+}
+local preset = require('velvet.presets.dwm').setup(options)
 
 -- values stored in |storage| will survive reloads.
 local storage = require('velvet.runtime_storage').create("config")
@@ -342,9 +343,14 @@ vv.async.run(function()
   end
 end)
 
-local toast = require('toast')
-
+-- non-public work related config
+local ok, private = pcall(require, 'private')
+if ok then
+  private.setup(options, preset)
+end
 
 log_connected:wait()
+
+local toast = require('toast')
 toast('info', 'logger connected!')
 
