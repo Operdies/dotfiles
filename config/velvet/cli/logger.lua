@@ -1,3 +1,8 @@
+--- registers a new cli action, `vv log`, which prints to stdout every time a log message is raised in velvet via print(), printerr(), or vv.log().
+--- Note that the cli action itself uses print() to output; 
+--- This works because print() output is routed through vv.log() if the calling context is not associated with a cli action,
+--- and back to the calling application if it is.
+
 -- signaled after the log cli action starts waiting for events.
 -- this is convenient for debug prints to start printing only
 -- after a listener is actually attached.

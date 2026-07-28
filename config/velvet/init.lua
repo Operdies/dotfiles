@@ -14,7 +14,7 @@ local quake_shell = quake.create('zsh', 'default')
 local quake_lazygit = quake.create('lazygit', 'lazygit')
 
 -- load extra theme colors
-require('catppuccin_mocha')
+require('theme.catppuccin_mocha')
 
 --- @param lhs string
 --- @param func fun()
@@ -51,8 +51,8 @@ if ok then
   mod.setup(options, preset)
 end
 
-local log_connected = require('cli-logger').on_logger_connected
+local log_connected = require('cli.logger').on_logger_connected
 log_connected:wait()
-local toast = require('toast')
+local toast = require('experimental.toast')
 toast('info', 'logger connected!')
 

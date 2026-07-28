@@ -7,7 +7,7 @@ for _, server in ipairs(vv.api.get_servernames()) do
   if server ~= this then
     print(string.format("Running %s[%s] on %s", proc, cmd, server))
     local a = vv.async.run(function()
-      local remote = require('remote_call').create_remote_api(server)
+      local remote = require('examples.remote_call').create_remote_api(server)
       local remote_window = remote.window_create_process(proc)
       remote.window_send_keys(remote_window, cmd .. "\n")
       vv.async.wait(1000)

@@ -1,3 +1,5 @@
+--- Registers a new cli action, `vv log-events`, accepting one or more events, and printing their associated data to stdout when they are raised.
+
 vv.cli.add_command({
   name = "log-events",
   description = "print the indicated events as json",
