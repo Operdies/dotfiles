@@ -123,21 +123,8 @@ local lazygit = quake.create('lazygit', 'lazygit')
 map(map_prefix .. "<C-\\>", quake1.toggle, "Toggle Zsh Quake")
 map(map_prefix .. "<C-]>", lazygit.toggle, "Toggle Lazygit Quake")
 
-map("<C-x><space>", function()
-  keymap:set_passthrough(true)
-  local registration = { event = 'on_key', when = function(_, result) return result.data.key.name == 'ESCAPE' and result.data.key.event_type == 'press' end }
-  -- triple tap escape to disable
-  vv.async.run(function()
-    local timeout = 200
-    while keymap:get_passthrough() do
-      vv.async.wait(registration)
-      if vv.async.wait(registration, timeout) and vv.async.wait(registration, timeout) then
-        keymap:set_passthrough(false)
-        break
-      end
-    end
-  end)
-end, "Temporarily disable keymap")
+-- local disable_keymap = require('disable_keymap')
+-- map("<C-x><space>", disable_keymap, "Temporarily disable keymap")
 
 map("<M-`>", dwm.select_previous_view, { description = "Select the previous view" })
 
