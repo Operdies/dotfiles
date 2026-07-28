@@ -342,33 +342,9 @@ vv.async.run(function()
   end
 end)
 
-local function toast(title, message, duration)
-  local wrap = require('wrap')
+local toast = require('toast')
 
-  local win = velvet_window.create()
-  vv.api.schedule_after(duration, function() win:close() end)
-  win:set_title(title)
-  win:set_frame_enabled(true)
-  win:set_frame_color('blue')
-  win:set_z_index(vv.z_hint.overlay)
-  local vert_offset = 2
-  local horz_offset = 3
-  local height = 5
-  local width = 50
-  local lines = wrap(message, width, true)
-  local pad_bottom = (height - #lines) // 2
-  local pad_top = height - #lines - pad_bottom
-  for _ = 1, pad_top do table.insert(lines, 1, '') end
-  for _ = 1, pad_bottom do table.insert(lines, '') end
-  win:set_anchors( { 
-    left = { to = 'right', offset = -horz_offset - width }, 
-    right = { to = 'right', offset = -horz_offset }, 
-    bottom = { to = 'top', offset = vert_offset + height }, 
-    top = { to = 'top', offset = vert_offset } })
-  win:set_foreground_color('blue')
-  win:draw('\x1b[1m' .. table.concat(lines, '\n') .. '\x1b[m')
-  duration = duration or 2000
-end
 
 log_connected:wait()
-print('logger connected!')
+toast('info', 'logger connected!')
+
