@@ -1632,16 +1632,25 @@ vim.fn.sign_define("DapLogPoint", { text = "", texthl = "ErrorMsg", linehl = 
 do
   -- Download netcoredbg from: https://github.com/Samsung/netcoredbg/releases
   local netcoredbg = vim.fs.joinpath(tools_dir, 'netcoredbg', 'build', 'src', 'netcoredbg')
-  local ui = vim.fn.glob("~/.vscode/extensions/**/.debugger/arm64/vsdbg-ui")
-  local vsdbgPath = vim.split(ui, "\n")[1]
-  if vsdbgPath and vim.fn.executable(vsdbgPath) == 1 then
+  local function find_vsdbg()
+    local function find(x)
+      local glob = "~/.vscode/extensions/**/.debugger/arm64/"
+      local path = vim.split(vim.fn.glob(glob .. x), "\n")[1]
+      if path and vim.fn.executable(path) == 1 then return path end
+      return nil
+    end
+    local ui = find("vsdbg-ui")
+    local dbg = find("vsdbg")
+    local found = ui and dbg and true or false
+    return found, ui, dbg
+  end
+  local found, _, vsdbg = find_vsdbg()
+  if found then
     -- vsdbg is much more complete than netcoredbg, so use that if its available.
     vim.pack.add({ 'https://github.com/kmiterror/dotnet-debug.nvim' })
     require("dotnet-debug").setup({
-      signer_path =
-      "/Applications/Visual Studio Code.app/Contents/Resources/app/node_modules/vsda/build/Release/vsda.node",
-      debugger_path =
-      "/Users/alexander.larsen/.vscode/extensions/ms-dotnettools.csharp-2.130.5-darwin-arm64/.debugger/arm64/vsdbg",
+      signer_path = "/Applications/Visual Studio Code.app/Contents/Resources/app/node_modules/vsda/build/Release/vsda.node",
+      debugger_path = vsdbg,
     })
   elseif vim.fn.executable(netcoredbg) == 1 then
     -- fall back to netcoredbg if installed
