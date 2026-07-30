@@ -7,6 +7,13 @@ local options = {
 -- enable all velvet default options
 local preset = require('velvet.presets.dwm').setup(options)
 local keymap = require('velvet.keymap')
+local log_cli = require('cli.logger')
+
+-- track how many times config was reloaded.
+-- this is mostly useful for detecting if this is the first load or not.
+local store = require('velvet.runtime_storage').create('config')
+local reload_counter = store.reload_counter or 0
+store.reload_counter = reload_counter + 1
 
 -- set up two quake-style terminals
 local quake = require('velvet.extras.quake')
@@ -38,21 +45,30 @@ map_prefix('w', function() require('pickers.window').pick() end, "Start window p
 keymap:remap_key('§', '`')
 keymap:remap_key('±', '~')
 
+local toast = require('experimental.toast')
+if reload_counter > 0 then
+  toast("reload", "config reloaded! (" .. reload_counter .. ")", 2000)
+end
 
 -- laptop battery indicator, dependent on the 'acpi' binary being available
+local err
 local ok, mod = pcall(require, 'status.acpi')
 if ok then
-  mod.setup(preset.statusbar)
+  ok, err = pcall(mod.setup, preset.statusbar)
+  if not ok then printerr(err) end
 end
 
--- machine-specific config, not checked in
-ok, mod = pcall(require, 'private')
-if ok then
-  mod.setup(options, preset)
+do
+  -- machine-specific config, not checked in
+  local velvet_private = (os.getenv('HOME'):gsub('/$', '') .. '/') .. '.config/velvet-private/'
+  package.path = package.path .. ';' .. (velvet_private .. '?.lua;') .. (velvet_private .. '?/init.lua;')
+  ok, mod = pcall(require, 'private')
+  if ok then
+    ok, err = pcall(mod.setup, options, preset)
+    if not ok then printerr(err) end
+  end
 end
 
-local log_connected = require('cli.logger').on_logger_connected
-log_connected:wait()
-local toast = require('experimental.toast')
-toast('info', 'logger connected!')
+log_cli.on_logger_connected:wait()
+toast('log', 'logger connected!')
 

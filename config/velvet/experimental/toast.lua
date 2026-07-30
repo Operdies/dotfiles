@@ -186,6 +186,8 @@ end
 
 local velvet_window = require('velvet.window')
 local function toast(title, message, duration)
+  if title == nil then title = "Notification" end
+  if message == nil then message = title end
   duration = duration or 5000
   assert(math.type(duration) == 'integer', "duration must be integer")
   local win = velvet_window.create()
