@@ -2,5 +2,11 @@
   "workspace.library": ["/usr/local/share/velvet/lua"],
   "runtime": {
     "version": "Lua 5.5"
+  },
+  "diagnostics": {
+    "await-in-sync": "Warning",
+    "neededFileStatus": {
+      "await-in-sync": "Any"
+    }
   }
 }

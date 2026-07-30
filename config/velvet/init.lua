@@ -62,13 +62,14 @@ do
   -- machine-specific config, not checked in
   local velvet_private = (os.getenv('HOME'):gsub('/$', '') .. '/') .. '.config/velvet-private/'
   package.path = package.path .. ';' .. (velvet_private .. '?.lua;') .. (velvet_private .. '?/init.lua;')
-  ok, mod = pcall(require, 'private')
+  ok, mod = xpcall(require, debug.traceback, 'private')
   if ok then
     ok, err = pcall(mod.setup, options, preset)
     if not ok then printerr(err) end
+  else
+    printerr(mod)
   end
 end
 
 log_cli.on_logger_connected:wait()
 toast('log', 'logger connected!')
-
