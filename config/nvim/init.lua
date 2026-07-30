@@ -178,7 +178,7 @@ local function my_colorscheme()
   end
 
 
-  -- styles: bold, underline, undercurl, strikethrough, reverse, inverse, italic, standout, nocombine, none, 
+  -- styles: bold, underline, undercurl, strikethrough, reverse, inverse, italic, standout, nocombine, none,
   --                                                             ~~~~~~~ <- not working
 
   -- get all highlight groups and colors:
@@ -487,7 +487,7 @@ overseer.register_template({
             name = task_name,
             cmd = { fullpath },
             cwd = base_dir,
-            components = { 
+            components = {
               { "restart_on_save", delay = 50, interrupt = true, mode = "autocmd", paths = { base_dir } },
               "default"
             }
@@ -509,8 +509,8 @@ end)
 -- quicker {{{1
 vim.pack.add({ "https://github.com/stevearc/quicker.nvim" })
 require('quicker').setup(
-  { 
-    follow = { enabled = false }, 
+  {
+    follow = { enabled = false },
     edit = { enabled = true, autosave = "unmodified" },
     trim_leading_whitespace = 'all',
     highlight = { treesitter = true, lsp = true, load_buffers = false },
@@ -603,14 +603,14 @@ pick.registry.pick_changelist = function()
 
   local duplicates = {}
   local items = {}
-  for i, change in ipairs(changes) do 
-    if not duplicates[change.lnum] then 
+  for i, change in ipairs(changes) do
+    if not duplicates[change.lnum] then
       duplicates[change.lnum] = true
       local bufnr = vim.fn.bufnr()
       local bufname = vim.fn.bufname(bufnr)
       local ok, lines = pcall(vim.api.nvim_buf_get_lines, bufnr, change.lnum - 1, change.lnum, true)
       local text = bufname
-      if ok and lines[1] then 
+      if ok and lines[1] then
         text = lines[1]
       end
       local offset = position - i + 1
@@ -643,9 +643,9 @@ pick.registry.pick_changelist = function()
   end
 
   local jump_relative = function(item)
-    if item.offset == 0 then 
-      jump_direct(item) 
-      return 
+    if item.offset == 0 then
+      jump_direct(item)
+      return
     end
     local old = 'g;'
     local new = 'g,'
@@ -662,12 +662,12 @@ pick.registry.pick_changelist = function()
   end
 
   -- I was not able to find a good way to set the default picker index,
-  -- so instead we define a custom 'show' function which sets the index 
+  -- so instead we define a custom 'show' function which sets the index
   -- the first time it is called.
   local did_set = false
   local pick_set_index_hack = function(buf, items, query)
     if position_index > 0 and not did_set then
-      did_set = true 
+      did_set = true
       local m = pick.get_picker_matches()
       local indices = m.all_inds
       pick.set_picker_match_inds({indices[position_index]}, "current")
@@ -678,7 +678,7 @@ pick.registry.pick_changelist = function()
 
   local opts = {
     options = { content_from_bottom = false },
-    source = { name = "Change", items = items, choose = choice, show = pick_set_index_hack } 
+    source = { name = "Change", items = items, choose = choice, show = pick_set_index_hack }
   }
   pick.start(opts)
 end
@@ -693,13 +693,13 @@ pick.registry.pick_jumplist = function()
   local position_index = 0
 
   local items = {}
-  for i, jump in ipairs(jumps) do 
+  for i, jump in ipairs(jumps) do
     if vim.fn.bufexists(jump.bufnr) then
       local bufname = vim.fn.bufname(jump.bufnr)
       if bufname and bufname ~= "" then
         local ok, lines = pcall(vim.api.nvim_buf_get_lines, jump.bufnr, jump.lnum - 1, jump.lnum, true)
         local text = "<not loaded>"
-        if ok and lines[1] then 
+        if ok and lines[1] then
           text = lines[1]
         end
         local offset = position - i + 1
@@ -717,7 +717,7 @@ pick.registry.pick_jumplist = function()
               break
             end
           end
-          where = "…" .. where:sub(cutoff) 
+          where = "…" .. where:sub(cutoff)
         end
         items[#items + 1] = { path = bufname, lnum = jump.lnum, col = jump.col, text = text, offset = offset, where = where, bufnr = jump.bufnr }
       end
@@ -743,7 +743,7 @@ pick.registry.pick_jumplist = function()
   end
 
   for _, item in ipairs(items) do
-    item.text = rpad("" .. item.offset, columns[1], " ") .. " │ " 
+    item.text = rpad("" .. item.offset, columns[1], " ") .. " │ "
     .. lpad(item.where, columns[2], " ") .. rpad("" .. item.lnum, columns[3], " ") .. " │ "
     .. item.text
   end
@@ -757,7 +757,7 @@ pick.registry.pick_jumplist = function()
   -- Navigate to the specified location by un- or re-winding the jump stack,
   -- making the offset the current location
   local jump_relative = function(item)
-    if item.offset == 0 then 
+    if item.offset == 0 then
       jump_direct(item)
       return
     end
@@ -774,12 +774,12 @@ pick.registry.pick_jumplist = function()
   end
 
   -- I was not able to find a good way to set the default picker index,
-  -- so instead we define a custom 'show' function which sets the index 
+  -- so instead we define a custom 'show' function which sets the index
   -- the first time it is called.
   local did_set = false
   local pick_set_index_hack = function(buf, items, query)
     if position_index > 0 and not did_set then
-      did_set = true 
+      did_set = true
       local m = pick.get_picker_matches()
       local indices = m.all_inds
       pick.set_picker_match_inds({indices[position_index]}, "current")
@@ -790,7 +790,7 @@ pick.registry.pick_jumplist = function()
 
   local opts = {
     options = { content_from_bottom = false },
-    source = { name = "Jump", items = items, choose = choice, show = pick_set_index_hack } 
+    source = { name = "Jump", items = items, choose = choice, show = pick_set_index_hack }
   }
   pick.start(opts)
 end
@@ -877,7 +877,7 @@ require('treesitter-modules').setup({
 
 -- LSP {{{1
 vim.lsp.log.set_level(vim.log.levels.OFF)
-vim.diagnostic.config({ 
+vim.diagnostic.config({
   signs = false, -- I prefer dedicating the gutter to gitsigns. Diagnostics are distracting here.
   virtual_text = { severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN } },
 })
@@ -1122,33 +1122,33 @@ vim.keymap.set('n', ']t', '<cmd>tabn<cr>')
 -- TODO: The 'all' option seems to only include open buffers. Custom implementation should include everything returned by `vim.diagnostic.get()`
 -- TODO: Add hotkey for cycling between current buffer / all buffers (tab?)
 local pick_diagnostics = require('mini.extra').pickers.diagnostic
-vim.keymap.set('n', 'gfd', function() 
+vim.keymap.set('n', 'gfd', function()
   pick_diagnostics({
-    scope = "current", 
+    scope = "current",
     sort_by = "severity",
     get_opts = { severity = vim.diagnostic.severity.ERROR },
   }) end)
-vim.keymap.set('n', 'gfD', function() 
-  pick_diagnostics({ 
-    scope = "all", 
+vim.keymap.set('n', 'gfD', function()
+  pick_diagnostics({
+    scope = "all",
     sort_by = "path",
     get_opts = { severity = vim.diagnostic.severity.ERROR },
   }) end)
-vim.keymap.set('n', 'gfw', function() 
+vim.keymap.set('n', 'gfw', function()
   pick_diagnostics({
-    scope = "current", 
+    scope = "current",
     sort_by = "severity",
     get_opts = { severity = { vim.diagnostic.severity.WARN, vim.diagnostic.severity.ERROR } },
   }) end)
-vim.keymap.set('n', 'gfW', function() 
+vim.keymap.set('n', 'gfW', function()
   pick_diagnostics({
-    scope = "all", 
+    scope = "all",
     sort_by = "severity",
     get_opts = { severity = { vim.diagnostic.severity.WARN, vim.diagnostic.severity.ERROR } },
   }) end)
 
 -- TODO: according to the documentation, calling vim.lsp.buf.workspace_symbol()
--- without an argument should return all symbols in the workspace, but this is 
+-- without an argument should return all symbols in the workspace, but this is
 -- not the case for roslyn at least (did not check others).
 -- Figure out if there is a workaround for this.
 vim.keymap.set('n', '<leader>cS', "<cmd>Pick lsp scope='workspace_symbol'<cr>")
@@ -1187,7 +1187,7 @@ vim.keymap.set('n', '<leader>fb', function()
 end)
 
 vim.keymap.set('n', 'gfb', function()
-  local switch_branch = function() 
+  local switch_branch = function()
     local m = pick.get_picker_matches()
     local parts = vim.split(m.current, " ", { plain = true, trimempty = true })
     local branch = parts[1]
@@ -1201,8 +1201,8 @@ vim.keymap.set('n', 'gfb', function()
     return true
   end
 
-  require('mini.extra').pickers.git_branches(pick_options, 
-  { 
+  require('mini.extra').pickers.git_branches(pick_options,
+  {
     mappings = { switch = { char = '<CR>', func = switch_branch }}
   })
 end)
@@ -1307,6 +1307,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
+-- Trim trailing whitespace on save in .lua files
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = augroup,
+  pattern = { "*.lua" },
+  callback = function()
+    vim.cmd[[ks|%s/\s\+$//e|'s]]
+  end,
+})
+
 -- chdir to git root or file if not present (autochdir behavior)
 vim.api.nvim_create_autocmd('BufEnter', {
   group = augroup,
@@ -1356,7 +1365,7 @@ vim.api.nvim_create_autocmd('ModeChanged', {
   group = augroup,
   callback = function()
     local mode = vim.fn.mode()
-    local showcmd = 
+    local showcmd =
     {
       -- all visual mode strings. See :help mode()
       ['v']       = true, -- Visual by character
@@ -1372,7 +1381,7 @@ vim.api.nvim_create_autocmd('ModeChanged', {
 
 -- User Commands {{{1
 
-vim.api.nvim_create_user_command('Print', function(ctx) 
+vim.api.nvim_create_user_command('Print', function(ctx)
   local result = vim.fn.luaeval(ctx.args)
   print(vim.inspect(result))
 end, { nargs = '+', complete = "lua" })
@@ -1385,8 +1394,8 @@ vim.api.nvim_create_user_command('Scratch', function(ctx)
     vim.api.nvim_buf_set_name(buf, bufname)
     vim.api.nvim_set_option_value("buflisted", true, { buf = buf })
   end
-  if ft then 
-    vim.api.nvim_set_option_value("ft", ft, { buf = buf }) 
+  if ft then
+    vim.api.nvim_set_option_value("ft", ft, { buf = buf })
   end
   local winid = vim.fn.bufwinid(vim.fn.bufnr())
   vim.api.nvim_win_set_buf(winid, buf)
@@ -1558,18 +1567,18 @@ local dap = require('dap')
 -- DAP External Terminal {{{2
 local external_terminals = {
   {
-    command = 'tmux', 
-    cond = function() return vim.fn.getenv("TMUX") ~= vim.NIL end, 
+    command = 'tmux',
+    cond = function() return vim.fn.getenv("TMUX") ~= vim.NIL end,
     args = { 'split-window', '-d', '-h', '-l', '80' }
-  }, 
+  },
   {
-    command = 'vv', 
-    cond = function() return vim.fn.getenv("VELVET") ~= vim.NIL end, 
+    command = 'vv',
+    cond = function() return vim.fn.getenv("VELVET") ~= vim.NIL end,
     args = { '--socket', vim.fn.getenv("VELVET"), 'spawn', '--title', 'DAP External Terminal' }
   },
-  { command = 'kitty', args = { '-e' } }, 
-  { command = 'alacritty', args = { '-e' } }, 
-  { command = 'ghostty', args = { '-e' } }, 
+  { command = 'kitty', args = { '-e' } },
+  { command = 'alacritty', args = { '-e' } },
+  { command = 'ghostty', args = { '-e' } },
 }
 
 for _, term in ipairs(external_terminals) do
@@ -1600,7 +1609,7 @@ local function DapSetExternalTerminalComplete(arglead, cmdline, cursorpos)
   return words
 end
 
-vim.api.nvim_create_user_command('DapSetExternalTerminal', function(ctx) 
+vim.api.nvim_create_user_command('DapSetExternalTerminal', function(ctx)
   local term = terminal_by_command[ctx.args]
   dap.defaults.fallback.external_terminal = { command = term.command, args = term.args }
 end, { nargs = 1, complete = DapSetExternalTerminalComplete })
@@ -1614,10 +1623,10 @@ end, { nargs = 1, complete = DapSetExternalTerminalComplete })
 -- 2. Keybinds
 -- 3. dap-ui layouts -- different layouts depending on debugging granularity? (basic layout with only console / locals -> layout with stacks / watches -> layout with everything + repl)
 -- 4. Configurations for other languages (C)
--- 5. Configuration provider which is not .vscode - Consider writing a handler for: 
---   a. trivial C projects, 
---   b. trivial C# projects, 
---   c. trivial OpenTAP plugins 
+-- 5. Configuration provider which is not .vscode - Consider writing a handler for:
+--   a. trivial C projects,
+--   b. trivial C# projects,
+--   c. trivial OpenTAP plugins
 --   :help dap-providers-configs
 -- 6. Reliable way of selecting the appropriate debugging window (<leader>bw -> watches -> activating an appropriate layout if watches are not visible)
 --endsection
@@ -1691,7 +1700,7 @@ do
     pid = "${command:pickProcess}"
   }}
 
-  dap.listeners.on_config[attach_pid] = function(config) 
+  dap.listeners.on_config[attach_pid] = function(config)
     if type(config.pid) == "string" then
       local pid = tonumber(config.pid)
       if pid then config.pid = pid end
@@ -1709,7 +1718,7 @@ dap_ui.setup({
         -- { id = "watches", size = 0.10, },
         { id = "breakpoints", size = 0.20, },
         { id = "stacks", size = 0.40, },
-        { id = "scopes", size = 0.40, }, 
+        { id = "scopes", size = 0.40, },
       },
       position = "left",
       size = 40,
@@ -1734,9 +1743,9 @@ local function dap_toggle_layout(layout)
   dap_ui.open(layout)
 end
 
-local function dap_open() 
-  for _, l in ipairs(dap_layouts) 
-    do dap_ui.open(l) 
+local function dap_open()
+  for _, l in ipairs(dap_layouts)
+    do dap_ui.open(l)
   end
 end
 
@@ -1773,7 +1782,7 @@ do
     -- check the new window
     local win = vim.fn.winnr()
     -- if the window did not change, we shouldn't do anything
-    if win == initial_win then 
+    if win == initial_win then
       return nil
     end
     local winid = vim.fn.win_getid(win)
@@ -1806,7 +1815,7 @@ do
         local augroup = vim.api.nvim_create_augroup('dap-peek-hover-group', { clear = true })
         vim.api.nvim_create_autocmd('CursorMoved', {
           group = augroup,
-          callback = function() 
+          callback = function()
             -- allow cursor movement inside the hover window
             local thiswin = vim.fn.win_getid(vim.fn.winnr())
             if thiswin == hover_winid then return end
