@@ -547,7 +547,7 @@ pick.setup(pick_options)
 
 -- Pick Project {{{2
 pick.registry.project = function()
-  local projects = vim.fs.dir(git_dir, { depth = 2 })
+  local projects = vim.fs.dir(git_dir, { depth = 3 })
   local lst = {}
   for project in projects do
     local project_dir = vim.fs.joinpath(git_dir, project)
