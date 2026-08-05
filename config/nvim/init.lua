@@ -556,6 +556,18 @@ pick.registry.project = function()
       lst[#lst + 1] = { name = project, dir = project_dir }
     end
   end
+  local mappings = {
+    velvet_window = {
+      char = '<C-t>',
+      func = function()
+        -- start a new neovim instance in the selected project directory
+        local m = pick.get_picker_matches()
+        vim.system({ 'vv', 'spawn', 'nvim' }, { cwd = m.current.item.dir })
+        -- returning true dismisses the picker
+        return true
+      end
+    }
+  }
   pick.ui_select(lst, {
     prompt = 'Pick a Project',
     format_item = function(item)
@@ -568,7 +580,7 @@ pick.registry.project = function()
       -- change work directories to allow grep/find actions from this directory
       vim.cmd("cd " .. choice.dir)
     end
-  end)
+  end, { mappings = mappings })
 end
 
 -- Pick OldFiles {{{2
@@ -881,6 +893,7 @@ vim.diagnostic.config({
   signs = false, -- I prefer dedicating the gutter to gitsigns. Diagnostics are distracting here.
   virtual_text = { severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN } },
 })
+-- vim.lsp.inlay_hints.enable()
 -- roslyn config {{{2
 -- prereqs: download roslyn lsp from:
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
