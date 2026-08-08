@@ -206,8 +206,7 @@ local function toast(title, message, duration)
     end)
 
   win:set_title(title)
-  win:set_frame_enabled(true)
-  win:set_frame_color('blue')
+  win:configure_frame({ enabled = true, color = 'blue', title = true })
   win:set_z_index(vv.z_hint.overlay)
   local lines = wrap(message, width, true)
 

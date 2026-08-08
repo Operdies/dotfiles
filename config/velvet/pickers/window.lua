@@ -38,7 +38,7 @@ function M.pick()
   end
   pick.select(items, {
     on_preview = function(sel)
-      local picker = pick.get_active_picker()
+      local picker = assert(pick.get_active_picker())
       if not underlay then
         underlay = picker:create_child_window()
         underlay:set_z_index(picker:get_z_index() - 2)
@@ -53,7 +53,7 @@ function M.pick()
       sel.win:set_z_index(picker:get_z_index() - 1)
       sel.win:set_visibility(true)
       sel.win:set_alpha(1.0)
-      if sel.win.borders then sel.win:set_frame_color('magenta') end
+      sel.win:configure_frame({ enabled = true, color = 'magenta' })
     end,
     on_cancel = function()
       dispose()
