@@ -15,9 +15,9 @@ local function setup(bar)
       content = get_battery,
       update_triggers = { 60000 }
     })
-    local center = bar:get_center()
-    table.insert(center, 'battery')
-    bar:set_center(center)
+    local seg = bar:get_right()
+    table.insert(seg, 1, 'battery')
+    bar:set_right(seg)
   end
 end
 
