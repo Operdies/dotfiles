@@ -21,14 +21,12 @@ function M.pick_session()
       {
         keys = "<C-w>",
         action = function(sel)
+          local proc = require('velvet.process')
           local p = pick:get_active_picker()
           if p == nil or not p:valid() then return end
-          local co = coroutine.running()
-          vv.api.process_spawn({ "vv", "-S", sel.text, "quit" }, {
-            on_exit = function() coroutine.resume(co) end,
-            input = "",
-          })
-          coroutine.yield()
+          local cmd = proc.spawn({ "vv", "-S", sel.text, "quit" },
+            { stdin = false, stdout = false, stderr = false })
+          cmd:wait_for_exit()
           local servers = get_servers()
           if #servers == 0 then
             pick.dispose()

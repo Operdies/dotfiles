@@ -54,6 +54,7 @@ local function update()
   end
 end
 
+--- @async
 local function ticker()
   -- remove clock if coroutine is disposed
   vv.async.defer(function() timer:close() end)

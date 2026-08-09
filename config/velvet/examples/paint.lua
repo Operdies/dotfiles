@@ -27,7 +27,7 @@ function paint.create_paint()
     canvas:set_background_color(brush)
   end
 
-  --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
+  --- @param x velvet.api.mouse_move.event_args | velvet.api.mouse_click.event_args
   local draw = function(win, x)
     if x.mouse_button == 'left' then
       win:set_cursor(x.pos.col, x.pos.row)
@@ -40,10 +40,10 @@ function paint.create_paint()
 
   local close = function()
     canvas:close()
-    keymap.del(close_sequence)
+    keymap:del(close_sequence)
   end
 
-  keymap.set(close_sequence, close, { description = "Close paint" })
+  keymap:set(close_sequence, close, { description = "Close paint" })
 
   local function close_on_esc(_, args)
     local kn = require('velvet.keymap.named_keys')
@@ -199,7 +199,7 @@ function paint.create_paint()
 
     --- @type velvet.window|nil
     local drag_win = nil
-    --- @param x velvet.api.mouse.move.event_args | velvet.api.mouse.click.event_args
+    --- @param x velvet.api.mouse_move.event_args | velvet.api.mouse_click.event_args
     local function mouse_pick_hue(w, x)
       if x.mouse_button == 'left' then
         local ok = point_to_color(x.pos.col, x.pos.row)

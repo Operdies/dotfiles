@@ -172,50 +172,68 @@ local width = 50
 
 local function arrange()
   local offset = vert_offset
-  for _, w in ipairs(active_toasts) do
-    local h = w[2]
-    w[1]:set_anchors({
+  local i = 1
+  while i <= #active_toasts do
+    local toast = active_toasts[i]
+    local w, h = toast[1], toast[2]
+    if not w:valid() then
+      table.remove(active_toasts, i)
+      -- skip to next iteration without modifying the index
+      goto repeat_iteration
+    end
+    w:set_anchors({
       left = { to = 'right', offset = -horz_offset - width },
       right = { to = 'right', offset = -horz_offset },
       bottom = { to = 'top', offset = offset + h - 1 },
       top = { to = 'top', offset = offset }
     })
     offset = offset + h + 2
+    i = i + 1
+    ::repeat_iteration::
   end
 end
 
+--- @class toast.options
+--- @field duration? integer toast duration in seconds, defaults to 5
+--- @field border_color? velvet.color
+--- @field text_color? velvet.color
+--- @field background_color? velvet.color
+local toast_default = {
+  duration = 5,
+  border_color = 'blue',
+  text_color = 'blue',
+  background_color = nil,
+  bold = false,
+}
+
 local velvet_window = require('velvet.window')
-local function toast(title, message, duration)
+--- @param title string
+--- @param message string
+--- @param opt? toast.options
+local function toast(title, message, opt)
   if title == nil then title = "Notification" end
   if message == nil then message = title end
-  duration = duration or 5000
-  assert(math.type(duration) == 'integer', "duration must be integer")
+  opt = vv.tbl_deep_extend('force', toast_default, opt or {})
+  assert(math.type(opt.duration) == 'integer', "duration must be integer")
   local win = velvet_window.create()
 
-  vv.api.schedule_after(duration,
-    function()
-      win:close()
-      local id = win.id
-      for i, w in ipairs(active_toasts) do
-        if w[1].id == id then
-          table.remove(active_toasts, i)
-          break
-        end
-      end
-      arrange()
-    end)
+  vv.api.schedule_after(1000 * opt.duration, function() win:close(); arrange(); end)
 
   win:set_title(title)
   win:configure_frame({ enabled = true, color = 'blue', title = true })
   win:set_z_index(vv.z_hint.overlay)
   local lines = wrap(message, width, true)
-
-  win:set_foreground_color('blue')
-  win:draw('\x1b[1m' .. table.concat(lines, '\n') .. '\x1b[m')
-
   table.insert(active_toasts, 1, { win, #lines })
-
   arrange()
+
+  if opt.background_color then
+    win:set_background_color(opt.background_color)
+    win:clear()
+  end
+  win:set_foreground_color(opt.text_color)
+  local wrapped_text = table.concat(lines, '\n')
+  if opt.bold then wrapped_text = '\x1b[1m' .. wrapped_text .. '\x1b[m' end
+  win:draw(wrapped_text)
 end
 
 return toast

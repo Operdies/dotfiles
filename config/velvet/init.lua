@@ -7,7 +7,6 @@ local options = {
 -- enable all velvet default options
 local preset = require('velvet.presets.dwm').setup(options)
 local keymap = require('velvet.keymap')
-local log_cli = require('cli.logger')
 
 -- track how many times config was reloaded.
 -- this is mostly useful for detecting if this is the first load or not.
@@ -45,10 +44,10 @@ map_prefix('w', function() require('pickers.window').pick() end, "Start window p
 keymap:remap_key('§', '`')
 keymap:remap_key('±', '~')
 
-local toast = require('experimental.toast')
-if reload_counter > 0 then
-  toast("reload", "config reloaded! (" .. reload_counter .. ")", 2000)
-end
+-- local toast = require('experimental.toast')
+-- if reload_counter > 0 then
+--   toast("reload", "config reloaded! (" .. reload_counter .. ")", { duration = 2 })
+-- end
 
 -- laptop battery indicator, dependent on the 'acpi' binary being available
 local err
@@ -71,5 +70,6 @@ do
   end
 end
 
-log_cli.on_logger_connected:wait()
+local toast = require('experimental.toast')
+require('velvet.cli.log').on_logger_connected:wait()
 toast('log', 'logger connected!')
