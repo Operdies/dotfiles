@@ -3,6 +3,7 @@ local function setup(bar)
   local function get_battery()
     local p = proc.spawn('acpi', { stdin = false, stderr = false })
     local line = assert(p.stdout:line())
+    assert(type(line) == 'string')
     local charging = line:match('Charging')
     local pct, hours, minutes = line:match('(%d+%%), 0?(%d+):0?(%d+):0?(%d+)')
     local charge_state = charging and "󰂄" or "󰁿"

@@ -5,7 +5,6 @@ return function()
     return args.key.name == 'ESCAPE' and args.key.event_type == 'press'
   end
   -- triple tap escape to disable
-  --- @async
   vv.async.run(function()
     local timeout = 300
     while keymap:get_passthrough() do

@@ -6,7 +6,6 @@ local this = vv.api.get_servername()
 for _, server in ipairs(vv.api.get_servernames()) do
   if server ~= this then
     print(string.format("Running %s[%s] on %s", proc, cmd, server))
-    ---@async
     local a = vv.async.run(function()
       local remote = require('examples.remote_call').create_remote_api(server)
       local remote_window = remote.window_create_process(proc)
@@ -18,25 +17,4 @@ for _, server in ipairs(vv.api.get_servernames()) do
   end
 end
 
-local function remove_if(t, pred)
-  local j = 1
-  for i = 1, #t do
-    if not pred(t[i]) then
-      t[j] = t[i]
-      j = j + 1
-    end
-  end
-  for i = j, #t do
-    t[i] = nil
-  end
-end
-
----@async
-local function wait_all(args)
-  while #args > 0 do
-    local resolved = vv.async.wait(table.unpack(args))
-    remove_if(args, function(x) return x == resolved end)
-  end
-end
-
-wait_all(threads)
+vv.async.wait_all(threads)

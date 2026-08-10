@@ -3,7 +3,6 @@ local keymap = require('velvet.keymap')
 -- workaround for ghostty not setting associated text when option is held on MacOS
 vv.async.run(function()
 
-  ---@async
   local function add_modifier(mod, shorthand)
     local is_key = function(k) return k.key.name == mod end
     local is_release = function(k) return k.key.event_type == 'release' end

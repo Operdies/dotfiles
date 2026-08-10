@@ -1,3 +1,4 @@
+---@diagnostic disable: invisible
 local single = vv.async.event_source()
 local double = vv.async.event_source()
 local triple = vv.async.event_source()
@@ -7,20 +8,19 @@ local M = {
   left_triple_click = triple:listener(),
 }
 
---- @async
 vv.async.run(function()
   local timeout = 500
   local when = function(_, clk) return clk.data.event_type == 'mouse_down' and clk.data.mouse_button == 'left' end
   local left_click = { event = 'mouse.click', when = when }
   while true do
-    local reg, event = vv.async.wait(left_click)
-    single:emit(event.data)
-    reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
-    if reg == left_click then
-      double:emit(event.data)
-      reg, event = vv.async.wait(left_click, 'mouse.move', timeout)
-      if reg == left_click then
-        triple:emit(event.data)
+    local data, event = vv.async.wait(left_click)
+    single:emit(data)
+    data, event = vv.async.wait(left_click, 'mouse.move', timeout)
+    if event == left_click then
+      double:emit(data)
+      data, event  = vv.async.wait(left_click, 'mouse.move', timeout)
+      if event == left_click then
+        triple:emit(data)
       end
     end
   end
