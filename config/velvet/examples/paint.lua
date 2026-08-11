@@ -248,7 +248,7 @@ function paint.create_paint()
     --   sat = (sat + 0.01) % 2
     --   saturation = (math.abs((sat / 2) - 0.5) + 0.1) * 1.6
     --   set_color(sel_x, sel_y)
-    --   vv.api.schedule_after(1000 // fps_target, cycle_saturation)
+    --   vv.api.schedule_after(1 / fps_target, cycle_saturation)
     --   local now = vv.api.get_current_tick()
     --   dbg({set_color = now - start})
     -- end

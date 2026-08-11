@@ -10,7 +10,7 @@ for _, server in ipairs(vv.api.get_servernames()) do
       local remote = require('examples.remote_call').create_remote_api(server)
       local remote_window = remote.window_create_process(proc)
       remote.window_send_keys(remote_window, cmd .. "\n")
-      vv.async.wait(1000)
+      vv.async.wait(1)
       remote.window_send_keys(remote_window, "<C-d>")
     end)
     threads[#threads+1] = a

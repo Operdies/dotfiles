@@ -112,7 +112,7 @@ return {
       if bg:valid() then
         frame = 1 + (frame % #frame_order)
         draw_coffee()
-        vv.api.schedule_after(1500, coffee_animation_schedule)
+        vv.api.schedule_after(1.5, coffee_animation_schedule)
       end
     end
     coffee_animation_schedule()

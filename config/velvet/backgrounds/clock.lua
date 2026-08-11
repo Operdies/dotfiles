@@ -60,7 +60,7 @@ local function ticker()
   while timer:valid() do
     update()
     local current_seconds = tonumber(os.date('%S'))
-    local next_minute = (60 - current_seconds) * 1000
+    local next_minute = 60 - current_seconds
     vv.async.wait('screen.resized', next_minute)
   end
 end

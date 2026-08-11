@@ -194,7 +194,7 @@ local function arrange()
 end
 
 --- @class toast.options
---- @field duration? integer toast duration in seconds, defaults to 5
+--- @field duration? number toast duration in seconds, defaults to 5
 --- @field border_color? velvet.color
 --- @field text_color? velvet.color
 --- @field background_color? velvet.color
@@ -214,10 +214,10 @@ local function toast(title, message, opt)
   if title == nil then title = "Notification" end
   if message == nil then message = title end
   opt = vv.tbl_deep_extend('force', toast_default, opt or {})
-  assert(math.type(opt.duration) == 'integer', "duration must be integer")
+  assert(type(opt.duration) == 'number', "duration must be a number")
   local win = velvet_window.create()
 
-  vv.api.schedule_after(1000 * opt.duration, function() win:close(); arrange(); end)
+  vv.api.schedule_after(opt.duration, function() win:close(); arrange(); end)
 
   win:set_title(title)
   win:configure_frame({ enabled = true, color = 'blue', title = true })

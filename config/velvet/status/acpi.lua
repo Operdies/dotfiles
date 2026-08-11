@@ -14,7 +14,7 @@ local function setup(bar)
     bar.register('battery', {
       default_options = { foreground = 'black', background = 'peach' },
       content = get_battery,
-      update_triggers = { 60000 }
+      update_triggers = { 60 }
     })
     local seg = bar:get_right()
     table.insert(seg, 1, 'battery')
