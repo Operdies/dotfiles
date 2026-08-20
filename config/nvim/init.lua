@@ -84,6 +84,14 @@ local function friendly_path(file)
 end
 
 
+-- "deprecated" bindings. Used for keybinds I would like to stop using
+local prefer = function(preferred)
+  return function()
+    print("Prefer " .. preferred .. " instead.")
+  end
+end
+
+
 
 -- Plugins {{{1
 vim.pack.add({
@@ -825,7 +833,13 @@ require('nvim-treesitter').install(filetypes)
 
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup,
-  pattern = { "bash", "sh", "c", "cs", "html", "js", "json", "make", "xml", "yaml", "lua", "ts", "typescript", "odin" },
+  pattern = { "bash", "sh",
+    'cs',
+    'xml', 'yaml', 'json',
+    'html', 'js', 'javascript', 'ts', 'typescript',
+    'lua',
+    'c', 'odin' , 'make',
+  },
   callback = function()
     -- enable syntax highlighting (assigns hl-groups used by colorbuddy theme)
     vim.treesitter.start()
@@ -976,12 +990,8 @@ vim.lsp.config('clangd', {
 })
 vim.lsp.enable({ "clangd" })
 
--- "deprecated" bindings. Used for keybinds I would like to stop using
-local prefer = function(preferred)
-  return function()
-    print("Prefer " .. preferred .. " instead.")
-  end
-end
+
+-- lua lsp {{{2
 
 vim.lsp.config('lua_ls', {
   cmd = { 'lua-language-server' },
@@ -1000,6 +1010,8 @@ vim.lsp.config('lua_ls', {
 })
 
 vim.lsp.enable({ "lua_ls" })
+
+-- typescript lsp {{{2
 
 if vim.fn.executable('typescript-language-server') == 1 then
   vim.lsp.config('typescript_ls', {

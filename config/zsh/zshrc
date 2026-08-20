@@ -21,7 +21,7 @@ EOF
 bindkey '\e\C-u' up-directory
 generate_command_shortcuts \
   's:git -c color.ui=always status' \
-  'l:ls -lh' \
+  'l:ls --color=always' \
   'e:eval $BUFFER'
 
 export EDITOR='nvim'
