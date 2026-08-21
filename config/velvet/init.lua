@@ -71,21 +71,12 @@ do
 end
 
 local bar = preset.statusbar
-bar.register('render_counter', {
-  update_triggers = { 'pre_render' },
-  default_options = { background = 'inherit', foreground = 'bright_green' },
-  content = function(data, _, y)
-    local count = data.count or 1
-    data.count = count + 1
-    return {{ text = "renders: " .. count }, { text = y and (' (' .. y.cause .. ')'), italic = true }}
-  end,
-})
-local c = bar:get_right()
-table.insert(c, 'render_counter')
-bar:set_right(c)
+local c = bar:get_left()
+table.insert(c, 2, (require('status.render_counter')))
+table.insert(c, 3, (require('status.vm_memory')))
+bar:set_left(c)
 
-
-local toast = require('experimental.toast')
-require('velvet.cli.log').on_logger_connected:wait()
-toast('log', 'logger connected!')
+-- local toast = require('experimental.toast')
+-- require('velvet.cli.log').on_logger_connected:wait()
+-- toast('log', 'logger connected!')
 
