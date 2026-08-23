@@ -20,7 +20,7 @@ require('velvet.extras.statusbar').register(name, {
     x.peak = peak
     local current_usage = mem_str(used)
     local peak_usage = mem_str(peak)
-    return ("mem: %s (peak: %s)"):format(current_usage, peak_usage)
+    return ("mem: %s / %s"):format(current_usage, peak_usage)
   end,
 })
 

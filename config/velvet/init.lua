@@ -74,6 +74,7 @@ local bar = preset.statusbar
 local c = bar:get_left()
 table.insert(c, 2, (require('status.render_counter')))
 table.insert(c, 3, (require('status.vm_memory')))
+table.insert(c, 4, (require('status.cpu_time')))
 bar:set_left(c)
 
 -- local toast = require('experimental.toast')
