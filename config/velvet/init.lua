@@ -61,20 +61,19 @@ do
   -- machine-specific config, not checked in
   local velvet_private = (os.getenv('HOME'):gsub('/$', '') .. '/') .. '.config/velvet-private/'
   package.path = package.path .. ';' .. (velvet_private .. '?.lua;') .. (velvet_private .. '?/init.lua;')
-  ok, mod = xpcall(require, debug.traceback, 'private')
+  ok, mod = pcall(require, 'private')
   if ok then
     ok, err = pcall(mod.setup, options, preset)
     if not ok then printerr(err) end
-  else
-    printerr(mod)
   end
 end
 
 local bar = preset.statusbar
 local c = bar:get_left()
-table.insert(c, 2, (require('status.render_counter')))
-table.insert(c, 3, (require('status.vm_memory')))
-table.insert(c, 4, (require('status.cpu_time')))
+table.insert(c, (require('status.render_counter')))
+table.insert(c, (require('status.vm_memory')))
+table.insert(c, (require('status.cpu_time')))
+table.insert(c, (require('status.uptime')))
 bar:set_left(c)
 
 -- local toast = require('experimental.toast')
