@@ -909,18 +909,16 @@ vim.diagnostic.config({
 })
 -- vim.lsp.inlay_hints.enable()
 -- roslyn config {{{2
--- prereqs: download roslyn lsp from:
+-- prereqs: install roslyn lsp with:
+-- dotnet tool install -g roslyn-language-server --source https://pkgs.dev.azure.com/azure-public/vside/_packaging/vs-impl/nuget/v3/index.json --prerelease
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
--- https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/Microsoft.CodeAnalysis.LanguageServer.<platform>/overview/5.0.0-2.25451.1
-local platform = is_windows and 'win-x64' or 'linux-x64'
-local roslyn_lsp_path = vim.fs.joinpath(tools_dir, 'roslyn-lsp', 'Microsoft.CodeAnalysis.LanguageServer.dll')
+local roslyn_lsp_path = vim.fs.joinpath(home_dir, '.dotnet', 'tools', 'roslyn-language-server')
 if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
   local roslyn = {
     on_attach = function()
       print("Roslyn attached!")
     end,
     cmd = {
-      "dotnet",
       roslyn_lsp_path,
       "--logLevel", -- this property is required by the server
       "Information",
