@@ -914,9 +914,34 @@ vim.diagnostic.config({
 -- setup instructions at https://github.com/seblyng/roslyn.nvim
 local roslyn_lsp_path = vim.fs.joinpath(home_dir, '.dotnet', 'tools', 'roslyn-language-server')
 if vim.fn.filereadable(roslyn_lsp_path) ~= 0 then
+  require('roslyn').setup({
+    lock_target = true,
+  })
   local roslyn = {
     on_attach = function()
       print("Roslyn attached!")
+    end,
+    root_dir = function(bufnr, on_dir)
+      local utils = require('roslyn.sln.utils')
+      if vim.g.roslyn_nvim_selected_solution then
+        return on_dir(vim.fs.dirname(vim.g.roslyn_nvim_selected_solution))
+      end
+      local solutions = utils.find_solutions(bufnr)
+      if #solutions == 0 then
+        return on_dir(utils.root_dir(bufnr))
+      elseif #solutions == 1 then
+        vim.g.roslyn_nvim_selected_solution = solutions[1]
+        return on_dir(vim.fs.dirname(solutions[1]))
+      end
+      vim.ui.select(solutions, {
+        prompt = 'Select solution for Roslyn: ',
+        format_item = function(item) return vim.fn.fnamemodify(item, ':.') end,
+      }, function(choice)
+        if choice then
+          vim.g.roslyn_nvim_selected_solution = choice
+          on_dir(vim.fs.dirname(choice))
+        end
+      end)
     end,
     cmd = {
       roslyn_lsp_path,
