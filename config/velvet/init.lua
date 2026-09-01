@@ -1,7 +1,8 @@
 local options = {
-    prefix = '<C-x>',
-    startup = { spawn_shell = true },
-    shutdown = { on_last_window_exit = true },
+  prefix = '<C-x>',
+  startup = { spawn_shell = true },
+  shutdown = { on_last_window_exit = true },
+  mouse = { automatic_selection = true },
 }
 
 -- enable all velvet default options
@@ -10,7 +11,7 @@ local keymap = require('velvet.keymap')
 
 -- track how many times config was reloaded.
 -- this is mostly useful for detecting if this is the first load or not.
-local store = require('velvet.runtime_storage').create('config')
+local store = require('velvet.storage').create('config')
 local reload_counter = store.reload_counter or 0
 store.reload_counter = reload_counter + 1
 
