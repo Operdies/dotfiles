@@ -12,6 +12,13 @@ customCommands:
     context: 'localBranches'
     output: log
 gui:
+  spinner:
+    frames:
+      - "/"
+      - "-"
+      - "\\"
+      - "|"
+
   skipDiscardChangeWarning: true
   theme:
     activeBorderColor:

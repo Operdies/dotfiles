@@ -1537,6 +1537,13 @@ customCommands:
     context: 'localBranches'
     stream: true
 gui:
+  spinner:
+    frames:
+      - "/"
+      - "-"
+      - "\\"
+      - "|"
+
   skipDiscardChangeWarning: true
   theme:
     activeBorderColor:
