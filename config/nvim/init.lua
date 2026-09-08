@@ -1486,7 +1486,7 @@ require('toggleterm').setup({
 })
 
 local function lazygit_setup_cfg()
-  local bat_path = is_windows and (vim.fn.tempname() .. ".bat") or nil
+  local bat_path = is_windows and (vim.fn.tempname() .. ".bat") or ""
 
   -- lazygit makes it impossible to properly format a <CMD> commands because it naively escapes < to ^<
   -- as a workaround, create a bat file and invoke that instead
@@ -1513,9 +1513,18 @@ if "%linenumber%"=="" (
   end
 
   local edit = {
-    file = is_windows and (bat_path .. " {{filename}}") or ([=[nvim --server "$NVIM" --remote-send "<CMD>lua lazygit_edit_file([[{{filename}}]])<CR>"]=]),
-    line = is_windows and (bat_path .. " {{filename}} {{line}}") or ([=[nvim --server "$NVIM" --remote-send "<CMD>lua lazygit_edit_file([[{{filename}}]], {{line}})<CR>"]=])
+    line = {
+      windows = bat_path .. " {{filename}} {{line}}",
+      unix = [=[nvim --server "$NVIM" --remote-send '<CMD>lua lazygit_edit_file([[{{filename}}]], {{line}})<CR>']=],
+    },
+    file = {
+      windows = bat_path .. " {{filename}}",
+      unix = [=[nvim --server "$NVIM" --remote-send '<CMD>lua lazygit_edit_file([[{{filename}}]])<CR>']=],
+    },
   }
+
+  local edit_line = is_windows and edit.line.windows or edit.line.unix
+  local edit_file = is_windows and edit.file.windows or edit.file.unix
 
   local yml = ([[
 os:
@@ -1558,8 +1567,8 @@ keybinding:
   universal:
     quit: <disabled>
     open: <disabled>
-]]):gsub("<FILE_EDIT>", edit.file)
-  :gsub("<LINE_EDIT>", edit.line)
+]]):gsub("<FILE_EDIT>", edit_file)
+  :gsub("<LINE_EDIT>", edit_line)
 
   local tempcfg = vim.fn.tempname() .. ".yml"
   local file = io.open(tempcfg, "w")
@@ -1582,9 +1591,16 @@ vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "laz
 -- called from the lazygit Edit command via nvim --remote-send
 function lazygit_edit_file(file, line)
   if lazygit:is_open() then lazygit:close() end
+
+  -- strip quotes if present
+  file = file:match('"?([^"]*)"?')
+
   -- drop: If the file is open in a window, change to that window. Otherwise
   -- open it in the current buffer. See :help drop
-  vim.cmd("drop " .. file)
+  -- NOTE: drop does not work if the file contains a space.
+  -- In that case, edit the file instead.
+  local command = file:match(' ') and 'edit ' or 'drop '
+  vim.cmd(command .. file)
   local cmd = "normal! "
   if line then
     cmd = cmd .. line .. "gg"
