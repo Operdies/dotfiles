@@ -1537,12 +1537,26 @@ customCommands:
     context: 'localBranches'
     stream: true
 gui:
+  showRandomTip: false
+  showCommandLog: false
+  showBottomLine: true
+  showPanelJumps: false
+
+  sidePanels:
+    - [status]
+    - [files]
+    - [branches, remotes, tags]
+    - [commits, reflog]
+
   spinner:
     frames:
-      - "/"
-      - "-"
-      - "\\"
-      - "|"
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    rate: 60
 
   skipDiscardChangeWarning: true
   theme:
