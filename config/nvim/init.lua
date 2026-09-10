@@ -66,7 +66,6 @@ local home_dir = vim.fn.resolve(vim.env.HOME) .. path_separator
 local git_dir = is_windows and [[C:\git\]] or home_dir .. "repos/"
 local tools_dir = is_windows and [[C:\tools\]] or home_dir .. "tools/"
 local config_dir = (is_windows and home_dir .. [[AppData\Local\]]) or (home_dir .. ".config/")
-local os = (is_windows and "windows") or (is_osx and "osx") or "linux"
 
 -- Helper functions {{{1
 local function rpad(str, len, char)
@@ -482,7 +481,7 @@ overseer.register_template({
     local files = require("overseer.files")
     local base_dir = vim.fn.getcwd()
     local scripts = vim.tbl_filter(function(filename)
-      return filename:match("%.sh$")
+      return filename:match("%.sh$") or filename:match("%.lua$")
     end, files.list_files(base_dir))
     local ret = {}
     for _, filename in ipairs(scripts) do
@@ -1014,25 +1013,6 @@ vim.lsp.config('clangd', {
 vim.lsp.enable({ "clangd" })
 
 
--- lua lsp {{{2
-
-vim.lsp.config('lua_ls', {
-  cmd = { 'lua-language-server' },
-  filetypes = { 'lua' },
-  -- Sets the "workspace" to the directory where any of these files is found.
-  root_markers = {
-    ".luarc.json",
-  },
-  settings = {
-    Lua = {
-      runtime = {
-        version = 'Lua 5.5',
-      }
-    }
-  }
-})
-
-vim.lsp.enable({ "lua_ls" })
 
 -- typescript lsp {{{2
 
@@ -1945,5 +1925,42 @@ if vim.fn.getenv("VELVET") ~= vim.NIL then
   end
 end
 
+-- lua lsp {{{1
+
+-- configure lua lsp last so we can add all pack.add() paths as libraries
+local libs = {
+  -- default vim definitions
+  vim.fs.joinpath(os.getenv('VIMRUNTIME'), 'lua')
+}
+
+for _, pkg in ipairs(vim.pack.get()) do
+  if pkg.active then
+    local lua_base = vim.fs.joinpath(pkg.path, "lua")
+    if vim.fn.isdirectory(lua_base) == 1 then
+      libs[#libs+1] = lua_base
+    end
+  end
+end
+
+vim.lsp.config('lua_ls', {
+  cmd = { 'lua-language-server' },
+  filetypes = { 'lua' },
+  -- Sets the "workspace" to the directory where any of these files is found.
+  root_markers = {
+    ".luarc.json",
+  },
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      workspace = {
+        library = libs,
+      },
+    }
+  }
+})
+
+vim.lsp.enable({ "lua_ls" })
 -- Modeline {{{1
 -- vim: fdm=marker shiftwidth=2 foldlevel=0
