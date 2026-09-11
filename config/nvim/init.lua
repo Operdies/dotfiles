@@ -131,7 +131,6 @@ vim.pack.add({
   -- nio -- asynchronous io. Dependency of nvim-dap-ui
   { src = "https://github.com/nvim-neotest/nvim-nio" },
   -- blink.cmp
-  { src = "https://github.com/rafamadriz/friendly-snippets" },
   { src = "https://github.com/saghen/blink.cmp", version = "v1.10.2" },
 })
 
@@ -1057,6 +1056,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 -- Blink Completion {{{1
 
+local blink = require('blink.cmp')
 local function drill_or_accept(cmp)
   local function lsp_timeout()
     -- all LSPs are not created equal.
@@ -1102,17 +1102,17 @@ local function drill_or_accept(cmp)
       -- After a short delay, check if the menu opened.
       -- If not, remove the trailing "."
       vim.defer_fn(function()
-        if not require('blink.cmp').is_menu_visible() then
+        if not blink.is_menu_visible() then
           -- Delete the "." we just inserted
-          local key = vim.api.nvim_replace_termcodes('<BS>', true, false, true)
-          vim.api.nvim_feedkeys(key, 'n', false)
+          local bs = vim.api.nvim_replace_termcodes('<BS>', true, false, true)
+          vim.api.nvim_feedkeys(bs, 'n', false)
         end
       end, lsp_timeout())
     end,
   })
 end
 
-require('blink.cmp').setup({
+blink.setup({
   completion = {
     list = {
       selection = { preselect = true, auto_insert = true },
