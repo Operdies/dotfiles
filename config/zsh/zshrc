@@ -20,9 +20,9 @@ EOF
 
 bindkey '\e\C-u' up-directory
 generate_command_shortcuts \
-  's:git -c color.ui=always status' \
-  'l:ls --color=always' \
-  'e:eval $BUFFER'
+  's:printf "\x1b[3G\x1b[Kgit status\n"; git -c color.ui=always status' \
+  'l:printf "\x1b[3G\x1b[Kls\n"; ls --color=always' \
+  'e:printf "\n"; eval $BUFFER'
 
 export EDITOR='nvim'
 export MANPAGER='nvim +Man! -'
